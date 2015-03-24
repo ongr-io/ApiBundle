@@ -1,0 +1,29 @@
+{
+    "name": "ongr/api-bundle",
+    "description": "Api bundle for ONGR platform.",
+    "type": "symfony-bundle",
+    "homepage": "http://ongr.io",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ONGR team",
+            "homepage": "http://www.ongr.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "symfony/symfony": "~2.6",
+        "doctrine/orm": "~2.4",
+        "doctrine/doctrine-bundle": "~1.2",
+        "symfony/monolog-bundle": "~2.0",
+        "ongr/elasticsearch-bundle": ">=0.1,<2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.2",
+        "squizlabs/php_codesniffer": "~1.5",
+        "ongr/ongr-strict-standard": "~1.0.0-beta"
+    },
+    "autoload": {
+        "psr-4": { "ONGR\\ApiBundle\\": "" }
+    }
+}
