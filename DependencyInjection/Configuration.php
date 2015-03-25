@@ -36,7 +36,10 @@ class Configuration implements ConfigurationInterface
                         [
                             'v1' => [
                                 'endpoints' => [
-                                    'endpoint' => ['manager' => 'default', 'documents' => ['ONGRDemoBundle:ProductDocument']]
+                                    'endpoint' => [
+                                        'manager' => 'default',
+                                        'documents' => ['ONGRDemoBundle:ProductDocument'],
+                                    ],
                                 ],
                             ],
                         ]
@@ -62,7 +65,7 @@ class Configuration implements ConfigurationInterface
                                             ->prototype('scalar')->end()
                                         ->end()
                                         ->scalarNode('controller')
-                                            ->defaultValue('default') //DEFAULT CONTROLLER
+                                            ->defaultValue('default')
                                         ->end()
                                     ->end()
                                 ->end()

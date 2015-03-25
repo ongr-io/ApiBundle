@@ -30,6 +30,13 @@ class ONGRApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        foreach ($config['versions'] as $versionName => $version) {
+            foreach ($version['endpoints'] as $endpointName => $endpoint) {
+                $container->setParameter("ongr_api.$versionName.$endpointName.manager", $endpoint['manager']);
+                $container->setParameter("ongr_api.$versionName.$endpointName.documents", $endpoint['documents']);
+                $container->setParameter("ongr_api.$versionName.$endpointName.controller", $endpoint['controller']);
+            }
+        }
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
