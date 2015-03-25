@@ -26,5 +26,14 @@ class DataRequestPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $versions = $container->getParameter('ongr_api.versions');
+
+        foreach ($versions as $version) {
+            $endpoints = $container->getParameter('ongr_api.' . $version . '.endpoints');
+
+            foreach ($endpoints as $endpoint) {
+                $service_name = 'ongr_api.' . $version . '.' . $endpoint . '.data_request';
+            }
+        }
     }
 }
