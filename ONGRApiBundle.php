@@ -12,10 +12,20 @@
 namespace ONGR\ApiBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use ONGR\ApiBundle\DependencyInjection\Compiler\DataRequestPass;
 
 /**
  * Class ONGRApiBundle.
  */
 class ONGRApiBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+        $container->addCompilerPass(new DataRequestPass());
+    }
 }

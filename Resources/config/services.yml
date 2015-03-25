@@ -1,0 +1,6 @@
+parameters:
+  ongr_api.data_request: ONGR\ApiBundle\Service\DataRequestService
+
+#  ongr_api.api.[version].[endpoint].controller
+#  ongr_api.api.[version].[endpoint].data_request
+#  ongr_api.api.[version].[endpoint].router
