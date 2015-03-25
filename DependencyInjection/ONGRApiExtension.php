@@ -28,7 +28,9 @@ class ONGRApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        $container->setParameter('ongr_api.versions', array_keys($config['versions']));
         foreach ($config['versions'] as $versionName => $version) {
+            $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 $container->setParameter("ongr_api.$versionName.$endpointName.manager", $endpoint['manager']);
                 $container->setParameter("ongr_api.$versionName.$endpointName.documents", $endpoint['documents']);
