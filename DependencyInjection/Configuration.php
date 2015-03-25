@@ -27,9 +27,50 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('ongr_api');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+                ->arrayNode('versions')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->example(
+                        [
+                            'v1' => [
+                                'endpoints' => [
+                                    'endpoint' => ['manager' => 'default', 'documents' => ['ONGRDemoBundle:ProductDocument']]
+                                ],
+                            ],
+                        ]
+                    )
+                    ->useAttributeAsKey('version')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('version')->end()
+                            ->arrayNode('endpoints')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->useAttributeAsKey('endpoint')
+
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('endpoint')->end()
+                                        ->scalarNode('manager')
+                                            ->isRequired()
+                                        ->end()
+                                        ->arrayNode('documents')
+                                            ->isRequired()
+                                            ->requiresAtLeastOneElement()
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->scalarNode('controller')
+                                            ->defaultValue('default') //DEFAULT CONTROLLER
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }
