@@ -29,7 +29,7 @@ monolog:
 
 ongr_elasticsearch:
     connections:
-        default:
+        not_default:
             hosts:
                 - { host: 127.0.0.1:9200 }
             index_name: "%test.default.index%"
@@ -39,6 +39,15 @@ ongr_elasticsearch:
                 index:
                     refresh_interval: -1
     managers:
-        default:
-            connection: default
+        not_default:
+            connection: not_default
             debug: "%kernel.debug%"
+
+ongr_api:
+    versions:
+        test:
+            endpoints:
+                magic:
+                    manager: not_default
+                    documents:
+                        - AcmeTestBundle:PersonDocument

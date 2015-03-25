@@ -1,3 +1,5 @@
 parameters:
     locale: en
     secret: 'superdupersecretkey#pleasedonttellitanyone'
+
+    test.default.index: ongr_api_test
