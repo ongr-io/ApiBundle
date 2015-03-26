@@ -37,7 +37,7 @@ class Configuration implements ConfigurationInterface
                             'v1' => [
                                 'endpoints' => [
                                     'endpoint' => [
-                                        'manager' => 'default',
+                                        'manager' => 'es.manager.default',
                                         'documents' => ['ONGRDemoBundle:ProductDocument'],
                                     ],
                                 ],

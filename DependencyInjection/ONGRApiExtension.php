@@ -17,6 +17,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -53,7 +54,10 @@ class ONGRApiExtension extends Extension
                     );
                 }
 
-                $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
+                // Data request services are generated only for endpoints with default controllers.
+                if ($endpoint['controller'] === 'default') {
+                    $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
+                }
             }
         }
     }
@@ -101,11 +105,20 @@ class ONGRApiExtension extends Extension
      */
     private function generateDataRequestService($container, $versionName, $endpointName, $endpoint)
     {
+        $fields = [];
+        $fields['exclude_fields'] = $endpoint['exclude_fields'];
+        $fields['include_fields'] = $endpoint['include_fields'];
+
         $definition = new Definition(
             $container->getParameter(
                 'ongr_api.data_request.class'
             ),
-            []
+            [
+                new Reference('service_container'),
+                $endpoint['manager'],
+                $endpoint['document'],
+                $fields,
+            ]
         );
 
         $container->setDefinition(

@@ -39,20 +39,25 @@ ongr_elasticsearch:
                 index:
                     refresh_interval: -1
     managers:
+        default:
+            connection: not_default
+            debug: "%kernel.debug%"
+            mappings:
+                - AcmeTestBundle:PersonDocument
         not_default:
             connection: not_default
             debug: "%kernel.debug%"
+            mappings:
+                - AcmeTestBundle:PersonDocument
 
 ongr_api:
     versions:
         test:
             endpoints:
                 magic:
-                    manager: default
-                    documents:
-                        - AcmeTestBundle:PersonDocument
+                    manager: es.manager.default
+                    document: AcmeTestBundle:PersonDocument
                 black_magic:
                     parent: magic
-                    manager: not_default
-                    documents:
-                        - AcmeTestBundle:PersonDocument
+                    manager: es.manager.not_default
+                    document: AcmeTestBundle:PersonDocument

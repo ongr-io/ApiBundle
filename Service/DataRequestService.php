@@ -11,12 +11,43 @@
 
 namespace ONGR\ApiBundle\Service;
 
+use ONGR\ElasticsearchBundle\ORM\Repository;
+use Symfony\Component\DependencyInjection\Container;
+use ONGR\ElasticsearchBundle\ORM\Manager;
+use ONGR\ElasticsearchBundle\DSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchBundle\DSL\Search;
+
 /**
  * Class DataRequestService, for managing request to a Document repository.
  */
 class DataRequestService
 {
+    /**
+     * @var Manager Data Documents manager.
+     */
+    protected $dataManager;
 
+    /**
+     * @var Repository Data document's repository.
+     */
+    protected $dataRepository;
+
+    /**
+     * @param Container $container
+     * @param string    $manager
+     * @param string    $document
+     * @param array     $fields
+     */
+    public function __construct(
+        Container $container,
+        $manager,
+        $document,
+        $fields
+    ) {
+        $this->dataManager = $container->get($manager);
+
+        $this->dataRepository = $this->dataManager->getRepository($document);
+    }
 
     /**
      * Repository getter.
@@ -27,6 +58,13 @@ class DataRequestService
      */
     public function get($params)
     {
-        return [];
+        /** @var Search $search */
+        $search = $this->dataRepository->createSearch();
+
+        $query = new MatchAllQuery();
+
+        $search->addQuery($query);
+
+        return $this->dataRepository->execute($search, Repository::RESULTS_ARRAY);
     }
 }
