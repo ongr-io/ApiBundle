@@ -49,7 +49,6 @@ class ONGRApiExtension extends Extension
                 }
 
                 $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
-
             }
         }
     }
@@ -143,6 +142,4 @@ class ONGRApiExtension extends Extension
     {
         return sprintf($namespace, $name);
     }
-
-
 }
