@@ -60,8 +60,6 @@ class Configuration implements ConfigurationInterface
                                             ->defaultNull()
                                         ->end()
                                         ->arrayNode('documents')
-                                            ->isRequired()
-                                            ->requiresAtLeastOneElement()
                                             ->prototype('scalar')->end()
                                         ->end()
                                         ->scalarNode('controller')
