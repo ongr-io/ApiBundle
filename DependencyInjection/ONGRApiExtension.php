@@ -34,7 +34,7 @@ class ONGRApiExtension extends Extension
             $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
-                    $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
+                    $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints'], []);
                 } elseif ($endpoint['manager'] === null) {
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
@@ -60,7 +60,7 @@ class ONGRApiExtension extends Extension
      * @return array
      * @throws InvalidConfigurationException
      */
-    private function appendParentConfig($endpoint, $parentName, $endpoints)
+    private function appendParentConfig($endpoint, $parentName, $endpoints, $childs)
     {
         if (!array_key_exists($parentName, $endpoints)) {
             throw new InvalidConfigurationException(
@@ -68,8 +68,14 @@ class ONGRApiExtension extends Extension
             );
         }
         $parent = $endpoints[$parentName];
+        if (in_array($parent, $childs)) {
+            throw new InvalidConfigurationException(
+                "Endpoint '$parentName' can not be ancestor of itself."
+            );
+        }
+        $childs[] = $parent;
         if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints);
+            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $childs);
         }
         $endpoint['documents'] = array_unique(array_merge($endpoint['documents'], $parent['documents']));
         if ($endpoint['manager'] === null) {
