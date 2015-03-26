@@ -42,6 +42,10 @@ class ONGRApiExtension extends Extension
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
                     );
+                } elseif (empty($endpoint['documents'])) {
+                    throw new InvalidConfigurationException(
+                        "No documents set for endpoint '$endpointName'."
+                    );
                 }
 
                 $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
