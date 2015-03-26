@@ -38,13 +38,18 @@ class ONGRApiExtension extends Extension
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
-                } elseif ($endpoint['manager'] === null) {
+                } elseif (is_null($endpoint['manager'])) {
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
                     );
-                } elseif (empty($endpoint['documents'])) {
+                } elseif (is_null($endpoint['document'])) {
                     throw new InvalidConfigurationException(
-                        "No documents set for endpoint '$endpointName'."
+                        "No document set for endpoint '$endpointName'."
+                    );
+                }
+                if (!empty($endpoint['include_fields']) && !empty($endpoint['exclude_fields'])) {
+                    throw new InvalidConfigurationException(
+                        "'include_fields' and 'exclude_fields' can not be used together in endpoint '$endpointName'."
                     );
                 }
 
@@ -54,7 +59,7 @@ class ONGRApiExtension extends Extension
     }
 
     /**
-     * Appends documents to endpoint from parent endpoint.
+     * Appends settings to endpoint from parent endpoint.
      *
      * @param array  $endpoint
      * @param string $parentName
@@ -81,10 +86,7 @@ class ONGRApiExtension extends Extension
         if (isset($parent['parent'])) {
             $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
         }
-        $endpoint['documents'] = array_unique(array_merge($endpoint['documents'], $parent['documents']));
-        if ($endpoint['manager'] === null) {
-            $endpoint['manager'] = $parent['manager'];
-        }
+        $endpoint = array_merge($endpoint, $parent);
 
         return $endpoint;
     }
