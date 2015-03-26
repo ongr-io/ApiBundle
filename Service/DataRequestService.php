@@ -16,4 +16,17 @@ namespace ONGR\ApiBundle\Service;
  */
 class DataRequestService
 {
+
+
+    /**
+     * Repository getter.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function get($params)
+    {
+        return [];
+    }
 }

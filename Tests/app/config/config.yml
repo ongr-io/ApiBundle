@@ -48,6 +48,11 @@ ongr_api:
         test:
             endpoints:
                 magic:
+                    manager: default
+                    documents:
+                        - AcmeTestBundle:PersonDocument
+                black_magic:
+                    parent: magic
                     manager: not_default
                     documents:
                         - AcmeTestBundle:PersonDocument

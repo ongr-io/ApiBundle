@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -29,25 +30,24 @@ class ONGRApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $container->setParameter('ongr_api.versions', array_keys($config['versions']));
+
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
+
         foreach ($config['versions'] as $versionName => $version) {
-            $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
-                    $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints'], []);
+                    $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
                 } elseif ($endpoint['manager'] === null) {
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
                     );
                 }
-                $container->setParameter("ongr_api.$versionName.$endpointName.manager", $endpoint['manager']);
-                $container->setParameter("ongr_api.$versionName.$endpointName.documents", $endpoint['documents']);
-                $container->setParameter("ongr_api.$versionName.$endpointName.controller", $endpoint['controller']);
+
+                $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
+
             }
         }
-
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
     }
 
     /**
@@ -56,11 +56,12 @@ class ONGRApiExtension extends Extension
      * @param array  $endpoint
      * @param string $parentName
      * @param array  $endpoints
+     * @param array  $children
      *
      * @return array
      * @throws InvalidConfigurationException
      */
-    private function appendParentConfig($endpoint, $parentName, $endpoints, $childs)
+    private function appendParentConfig($endpoint, $parentName, $endpoints, $children = [])
     {
         if (!array_key_exists($parentName, $endpoints)) {
             throw new InvalidConfigurationException(
@@ -68,14 +69,14 @@ class ONGRApiExtension extends Extension
             );
         }
         $parent = $endpoints[$parentName];
-        if (in_array($parent, $childs)) {
+        if (in_array($parent, $children)) {
             throw new InvalidConfigurationException(
                 "Endpoint '$parentName' can not be ancestor of itself."
             );
         }
-        $childs[] = $parent;
+        $children[] = $parent;
         if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $childs);
+            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
         }
         $endpoint['documents'] = array_unique(array_merge($endpoint['documents'], $parent['documents']));
         if ($endpoint['manager'] === null) {
@@ -84,4 +85,60 @@ class ONGRApiExtension extends Extension
 
         return $endpoint;
     }
+
+    /**
+     * Generate data request services.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $versionName
+     * @param string           $endpointName
+     * @param array            $endpoint
+     */
+    private function generateDataRequestService($container, $versionName, $endpointName, $endpoint)
+    {
+        $definition = new Definition(
+            $container->getParameter(
+                'ongr_api.data_request.class'
+            ),
+            []
+        );
+
+        $container->setDefinition(
+            self::getServiceNameWithNamespace(
+                'data_request',
+                self::getNamespaceName($versionName, $endpointName)
+            ),
+            $definition
+        );
+    }
+
+    /**
+     * Gets namespace string according to configuration version and endpoint given.
+     *
+     * @param string $version
+     * @param string $endpoint
+     *
+     * @return string
+     */
+    public static function getNamespaceName($version, $endpoint)
+    {
+        $namespace = 'ongr_api.service.' . $version . '.' . $endpoint . '.%s';
+
+        return $namespace;
+    }
+
+    /**
+     * Gets service full name, by it's namespace and short name.
+     *
+     * @param string $name
+     * @param string $namespace
+     *
+     * @return string
+     */
+    public static function getServiceNameWithNamespace($name, $namespace)
+    {
+        return sprintf($namespace, $name);
+    }
+
+
 }
