@@ -35,15 +35,16 @@ class ONGRApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
+        $container->setParameter('ongr_api.versions', array_keys($config['versions']));
         foreach ($config['versions'] as $versionName => $version) {
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
-                } elseif (is_null($endpoint['manager'])) {
+                } elseif ($endpoint['manager'] === null) {
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
                     );
-                } elseif (is_null($endpoint['document'])) {
+                } elseif ($endpoint['document'] === null) {
                     throw new InvalidConfigurationException(
                         "No document set for endpoint '$endpointName'."
                     );
@@ -59,6 +60,7 @@ class ONGRApiExtension extends Extension
                     $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
                 }
             }
+            $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
         }
     }
 
