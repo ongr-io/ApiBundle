@@ -33,30 +33,26 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
     /**
      * Check services are  created.
      */
-    public function testService()
+    public function testDataRequestService()
     {
         $serviceName = ONGRApiExtension::getServiceNameWithNamespace(
             'data_request',
             ONGRApiExtension::getNamespaceName('test', 'magic')
         );
-
         /** @var DataRequestService $dataRequest */
         $dataRequest = $this->getContainer()->get($serviceName);
+        $this->assertEquals('ONGR\ApiBundle\Service\DataRequestService', get_class($dataRequest));
+
+        $serviceName = ONGRApiExtension::getServiceNameWithNamespace(
+            'data_request',
+            ONGRApiExtension::getNamespaceName('test', 'black_magic')
+        );
+        /** @var DataRequestService $dataRequest */
+        $dataRequest = $this->getContainer()->get($serviceName);
+        $this->assertEquals('ONGR\ApiBundle\Service\DataRequestService', get_class($dataRequest));
 
         $result = $dataRequest->get([]);
-
+        $result = iterator_to_array($result);
         $this->assertEquals([], $result);
-
-//        $serviceName = ONGRApiExtension::getServiceNameWithNamespace(
-//            'data_request',
-//            ONGRApiExtension::getNamespaceName('test', 'black_magic')
-//        );
-//
-//        /** @var DataRequestService $dataRequest */
-//        $dataRequest = $this->getContainer->get($serviceName);
-//
-//        $result = $dataRequest->get([]);
-//
-//        $this->assertEquals([], $result);
     }
 }

@@ -54,7 +54,7 @@ class DataRequestService
      *
      * @param array $params
      *
-     * @return array
+     * @return mixed
      */
     public function get($params)
     {
@@ -65,6 +65,6 @@ class DataRequestService
 
         $search->addQuery($query);
 
-        return $this->dataRepository->execute($search, Repository::RESULTS_ARRAY);
+        return $this->dataRepository->execute($search);
     }
 }
