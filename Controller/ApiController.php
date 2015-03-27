@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+use JMS\Serializer\SerializerBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,38 +28,48 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Create operation.
      *
-     * @param Request $request
      * @param string  $endpoint
+     * @param Request $request
      *
      * @return Response
      */
-    public function putData($request, $endpoint)
+    public function putAction($endpoint, Request $request)
     {
         return new Response('Not implemented');
     }
 
     /**
      * Read operation.
-
-     * @param Request $request
+     *
      * @param string  $endpoint
+     * @param Request $request
      *
      * @return Response
      */
-    public function getData($request, $endpoint)
+    public function getAction($endpoint, Request $request)
     {
-        return new Response('Not implemented.');
+        $service = $this->get($endpoint);
+        $serializer = SerializerBuilder::create()->build();
+
+        $data = $service->get($request);
+        $data = $serializer->serialize($data, 'json');
+
+        $response = new Response();
+        $response->setContent($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
      * Update operation.
      *
-     * @param Request $request
      * @param string  $endpoint
+     * @param Request $request
      *
      * @return Response
      */
-    public function postData($request, $endpoint)
+    public function postAction($endpoint, Request $request)
     {
         return new Response('Not implemented');
     }
@@ -66,12 +77,12 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Delete operation.
      *
-     * @param Request $request
      * @param string  $endpoint
+     * @param Request $request
      *
      * @return Response
      */
-    public function deleteData($request, $endpoint)
+    public function deleteAction($endpoint, Request $request)
     {
         return new Response('Not implemented');
     }
