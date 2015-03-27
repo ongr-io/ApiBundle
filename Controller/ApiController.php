@@ -11,17 +11,18 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
  *
- * Interface ApiControllerInterface
+ * Abstract class ApiControllerInterface
  *
  * @package ONGR\ApiBundle\Controller
  */
-interface ApiControllerInterface
+class ApiController extends Controller implements ApiControllerInterface
 {
     /**
      * Create operation.
@@ -31,17 +32,23 @@ interface ApiControllerInterface
      *
      * @return Response
      */
-    public function putData($request, $endpoint);
+    public function putData($request, $endpoint)
+    {
+        return new Response('Not implemented');
+    }
 
     /**
      * Read operation.
-     *
+
      * @param Request $request
      * @param string  $endpoint
      *
      * @return Response
      */
-    public function getData($request, $endpoint);
+    public function getData($request, $endpoint)
+    {
+        return new Response('Not implemented.');
+    }
 
     /**
      * Update operation.
@@ -51,7 +58,10 @@ interface ApiControllerInterface
      *
      * @return Response
      */
-    public function postData($request, $endpoint);
+    public function postData($request, $endpoint)
+    {
+        return new Response('Not implemented');
+    }
 
     /**
      * Delete operation.
@@ -61,5 +71,8 @@ interface ApiControllerInterface
      *
      * @return Response
      */
-    public function deleteData($request, $endpoint);
+    public function deleteData($request, $endpoint)
+    {
+        return new Response('Not implemented');
+    }
 }
