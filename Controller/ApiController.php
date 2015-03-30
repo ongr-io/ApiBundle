@@ -11,7 +11,6 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +34,7 @@ class ApiController extends Controller implements ApiControllerInterface
      */
     public function putAction($endpoint, Request $request)
     {
-        return new Response('Not implemented');
+        return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
 
     /**
@@ -49,14 +48,7 @@ class ApiController extends Controller implements ApiControllerInterface
     public function getAction($endpoint, Request $request)
     {
         $service = $this->get($endpoint);
-        $serializer = SerializerBuilder::create()->build();
-
-        $data = $service->get($request);
-        $data = $serializer->serialize($data, 'json');
-
-        $response = new Response();
-        $response->setContent($data);
-        $response->headers->set('Content-Type', 'application/json');
+        $response = $service->getResponse($request);
 
         return $response;
     }
@@ -71,7 +63,7 @@ class ApiController extends Controller implements ApiControllerInterface
      */
     public function postAction($endpoint, Request $request)
     {
-        return new Response('Not implemented');
+        return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
 
     /**
@@ -84,6 +76,6 @@ class ApiController extends Controller implements ApiControllerInterface
      */
     public function deleteAction($endpoint, Request $request)
     {
-        return new Response('Not implemented');
+        return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
 }
