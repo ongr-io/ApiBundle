@@ -59,6 +59,8 @@ class ONGRApiExtension extends Extension
                 if ($endpoint['controller'] === 'default') {
                     $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
                 }
+
+                $container->setParameter("ongr_api.$versionName.$endpointName.controller", $endpoint['controller']);
             }
             $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
         }
