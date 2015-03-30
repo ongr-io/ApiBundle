@@ -40,11 +40,11 @@ class ONGRApiExtension extends Extension
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
-                } elseif ($endpoint['manager'] === null) {
+                } elseif (!isset($endpoint['manager'])) {
                     throw new InvalidConfigurationException(
                         "No manager set for endpoint '$endpointName'."
                     );
-                } elseif ($endpoint['document'] === null) {
+                } elseif (!isset($endpoint['document'])) {
                     throw new InvalidConfigurationException(
                         "No document set for endpoint '$endpointName'."
                     );
@@ -94,7 +94,7 @@ class ONGRApiExtension extends Extension
         if (isset($parent['parent'])) {
             $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
         }
-        $endpoint = array_merge($endpoint, $parent);
+        $endpoint = array_merge($parent, $endpoint);
 
         return $endpoint;
     }

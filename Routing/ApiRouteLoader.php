@@ -72,7 +72,7 @@ class ApiRouteLoader implements LoaderInterface
         foreach ($versions as $version) {
             $endpoints = $this->container->getParameter('ongr_api.' . $version . '.endpoints');
             foreach ($endpoints as $endpoint) {
-                $path = '/API/' . $version . '/' . $endpoint;
+                $path = '/' . $version . '/' . $endpoint;
 
                 $controller = $this->container->getParameter("ongr_api.$version.$endpoint.controller");
                 foreach (self::$supportedTypes as $type) {

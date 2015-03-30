@@ -11,7 +11,6 @@
 
 namespace ONGR\ApiBundle\Service;
 
-use JMS\Serializer\SerializerBuilder;
 use ONGR\ElasticsearchBundle\ORM\Repository;
 use Symfony\Component\DependencyInjection\Container;
 use ONGR\ElasticsearchBundle\ORM\Manager;
@@ -55,11 +54,11 @@ class DataRequestService
     /**
      * Repository getter.
      *
-     * @param array $params
+     * @param Request $request
      *
      * @return mixed
      */
-    public function get($params)
+    public function get($request)
     {
         /** @var Search $search */
         $search = $this->dataRepository->createSearch();
@@ -68,7 +67,7 @@ class DataRequestService
 
         $search->addQuery($query);
 
-        return $this->dataRepository->execute($search);
+        return $this->dataRepository->execute($search, 'array');
     }
 
     /**
@@ -80,18 +79,36 @@ class DataRequestService
      */
     public function getResponse(Request $request)
     {
-        $serializer = SerializerBuilder::create()->build();
         $format = $this->getResponseFormat($request);
         $mime = $this->getResponseMime($format);
 
         $data = $this->get($request);
-        $data = $serializer->serialize($data, $format);
+        $data = $this->encodeArray($data, $format);
 
         $response = new Response();
         $response->setContent($data);
         $response->headers->set('Content-Type', $mime);
 
         return $response;
+    }
+
+    /**
+     * Encodes array to given format.
+     *
+     * @param array  $data
+     * @param string $format
+     *
+     * @return mixed
+     * @throws \DomainException
+     */
+    private function encodeArray($data, $format)
+    {
+        switch($format){
+            case 'json':
+                return json_encode($data);
+            default:
+                throw new \DomainException("Unknown format \"{$format}\"");
+        }
     }
 
     /**
