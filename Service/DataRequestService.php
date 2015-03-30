@@ -123,5 +123,4 @@ class DataRequestService
 
         return $types[$format];
     }
-
 }
