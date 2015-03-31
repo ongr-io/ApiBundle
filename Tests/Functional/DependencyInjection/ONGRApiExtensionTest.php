@@ -14,6 +14,8 @@ namespace ONGR\ApiBundle\Tests\Functional\DependencyInjection;
 use ONGR\ApiBundle\DependencyInjection\ONGRApiExtension;
 use ONGR\ApiBundle\Service\DataRequestService;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests for ONGRApiExtension.
@@ -51,8 +53,16 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
         $dataRequest = $this->getContainer()->get($serviceName);
         $this->assertEquals('ONGR\ApiBundle\Service\DataRequestService', get_class($dataRequest));
 
-        $result = $dataRequest->get([]);
-        $result = iterator_to_array($result);
-        $this->assertEquals([], $result);
+        $request = new Request();
+        $request->setMethod('get');
+        $request->headers->set('Content-Type', 'application/json');
+
+        $result = $dataRequest->getResponse($request);
+
+        $response = new Response();
+        $response->setContent(json_encode([]));
+        $response->headers->set('Content-Type', 'application/json');
+
+        $this->assertEquals($response, $result);
     }
 }
