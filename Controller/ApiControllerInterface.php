@@ -31,7 +31,7 @@ interface ApiControllerInterface
      *
      * @return Response
      */
-    public function putAction($endpoint, Request $request);
+    public function postAction($endpoint, Request $request);
 
     /**
      * Read operation.
@@ -51,7 +51,7 @@ interface ApiControllerInterface
      *
      * @return Response
      */
-    public function postAction($endpoint, Request $request);
+    public function putAction($endpoint, Request $request);
 
     /**
      * Delete operation.

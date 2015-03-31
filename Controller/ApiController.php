@@ -32,7 +32,7 @@ class ApiController extends Controller implements ApiControllerInterface
      *
      * @return Response
      */
-    public function putAction($endpoint, Request $request)
+    public function postAction($endpoint, Request $request)
     {
         return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
@@ -61,7 +61,7 @@ class ApiController extends Controller implements ApiControllerInterface
      *
      * @return Response
      */
-    public function postAction($endpoint, Request $request)
+    public function putAction($endpoint, Request $request)
     {
         return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
