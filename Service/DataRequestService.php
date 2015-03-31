@@ -35,6 +35,11 @@ class DataRequestService
     protected $dataRepository;
 
     /**
+     * @var array Document's fields to include/exclude.
+     */
+    protected $fields;
+
+    /**
      * @param Container $container
      * @param string    $manager
      * @param string    $document
@@ -47,8 +52,8 @@ class DataRequestService
         $fields
     ) {
         $this->dataManager = $container->get($manager);
-
         $this->dataRepository = $this->dataManager->getRepository($document);
+        $this->fields = $fields;
     }
 
     /**
@@ -64,8 +69,12 @@ class DataRequestService
         $search = $this->dataRepository->createSearch();
 
         $query = new MatchAllQuery();
-
         $search->addQuery($query);
+        if (!empty($this->fields['include_fields'])) {
+            $search->setFields($this->fields['include_fields']);
+        } elseif (!empty($this->fields['exclude_fields'])) {
+            $search->setSource(['exclude' => $this->fields['exclude_fields']]);
+        }
 
         return $this->dataRepository->execute($search, 'array');
     }
