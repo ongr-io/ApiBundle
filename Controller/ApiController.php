@@ -27,12 +27,12 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Create operation.
      *
-     * @param string  $endpoint
      * @param Request $request
+     * @param string  $endpoint
      *
      * @return Response
      */
-    public function postAction($endpoint, Request $request)
+    public function postAction(Request $request, $endpoint = null)
     {
         return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
@@ -40,12 +40,12 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Read operation.
      *
-     * @param string  $endpoint
      * @param Request $request
+     * @param string  $endpoint
      *
      * @return Response
      */
-    public function getAction($endpoint, Request $request)
+    public function getAction(Request $request, $endpoint = null)
     {
         $service = $this->get($endpoint);
         $response = $service->getResponse($request);
@@ -56,12 +56,12 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Update operation.
      *
-     * @param string  $endpoint
      * @param Request $request
+     * @param string  $endpoint
      *
      * @return Response
      */
-    public function putAction($endpoint, Request $request)
+    public function putAction(Request $request, $endpoint = null)
     {
         return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
@@ -69,12 +69,12 @@ class ApiController extends Controller implements ApiControllerInterface
     /**
      * Delete operation.
      *
-     * @param string  $endpoint
      * @param Request $request
+     * @param string  $endpoint
      *
      * @return Response
      */
-    public function deleteAction($endpoint, Request $request)
+    public function deleteAction(Request $request, $endpoint = null)
     {
         return new Response('Not implemented', Response::HTTP_NOT_IMPLEMENTED);
     }
