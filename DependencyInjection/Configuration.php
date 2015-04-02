@@ -34,11 +34,11 @@ class Configuration implements ConfigurationInterface
                     ->requiresAtLeastOneElement()
                     ->example(
                         [
-                            'v1' => [
+                            'version_1' => [
                                 'endpoints' => [
-                                    'endpoint' => [
+                                    'endpoint_1' => [
                                         'manager' => 'es.manager.default',
-                                        'documents' => ['ONGRDemoBundle:ProductDocument'],
+                                        'document' => 'ONGRDemoBundle:ProductDocument',
                                     ],
                                 ],
                             ],
