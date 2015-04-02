@@ -26,40 +26,36 @@ interface ApiControllerInterface
     /**
      * Create operation.
      *
-     * @param string  $endpoint
      * @param Request $request
      *
      * @return Response
      */
-    public function postAction($endpoint, Request $request);
+    public function postAction(Request $request);
 
     /**
      * Read operation.
      *
-     * @param string  $endpoint
      * @param Request $request
      *
      * @return Response
      */
-    public function getAction($endpoint, Request $request);
+    public function getAction(Request $request);
 
     /**
      * Update operation.
      *
-     * @param string  $endpoint
      * @param Request $request
      *
      * @return Response
      */
-    public function putAction($endpoint, Request $request);
+    public function putAction(Request $request);
 
     /**
      * Delete operation.
      *
-     * @param string  $endpoint
      * @param Request $request
      *
      * @return Response
      */
-    public function deleteAction($endpoint, Request $request);
+    public function deleteAction(Request $request);
 }
