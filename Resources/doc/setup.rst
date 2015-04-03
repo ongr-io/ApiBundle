@@ -60,11 +60,12 @@ Add minimal configuration for Api bundle.
     ONGRApiBundle_ApiRoute:
        resource: .
        type: apiroute
+       prefix: /api
 
 Step 5: That's it
 -----------------
 
-Try your new API. Type ``http://ongr.dev/api/v1/product`` in your browser. You should receive json encoded products list.
+Try your new API. Open ``yourdomain.com/api/v1/product`` page in your browser. You should receive json encoded product list.
 
 What's next ?
 -------------
