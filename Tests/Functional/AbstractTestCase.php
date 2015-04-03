@@ -11,13 +11,12 @@
 
 namespace ONGR\ApiBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use ONGR\ElasticsearchBundle\Command\IndexDropCommand;
 use ONGR\ElasticsearchBundle\Command\IndexImportCommand;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use ONGR\ElasticsearchBundle\Command\IndexCreateCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * Class for importing and removing data from ElasticSearch.
@@ -25,34 +24,31 @@ use Symfony\Component\Console\Tester\CommandTester;
 abstract class AbstractTestCase extends WebTestCase
 {
     /**
-     * @var Application
-     */
-    private static $application;
-
-    /**
      * {@inheritdoc}
      */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
 
-        self::$application = new Application(self::createClient()->getKernel());
+        $output = new NullOutput();
+        $command = new IndexCreateCommand();
+        $command->setContainer(self::getContainer());
+        $input = new ArrayInput([]);
+        if ($command->run($input, $output) !== 0) {
+            throw new \Exception('Failed to create index in ElasticSearch');
+        }
 
-        self::$application->add(new IndexCreateCommand());
-        $command = self::$application->find('es:index:create');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName()]);
-
-        self::$application->add(new IndexImportCommand());
-        $command = self::$application->find('es:index:import');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
+        $command = new IndexImportCommand();
+        $command->setContainer(self::getContainer());
+        $input = new ArrayInput(
             [
-                'command' => $command->getName(),
                 '--raw' => true,
                 'filename' => __DIR__ . '/Fixtures/Bundles/Acme/TestBundle/Resources/data/persons.json',
             ]
         );
+        if ($command->run($input, $output) !== 0) {
+            throw new \Exception('Failed to import data to ElasticSearch');
+        }
     }
 
     /**
@@ -62,18 +58,14 @@ abstract class AbstractTestCase extends WebTestCase
     {
         parent::tearDownAfterClass();
 
-        $indexDropCommand = new IndexDropCommand();
-        $indexDropCommand->setContainer(self::getContainer());
-        self::$application->add($indexDropCommand);
+        $output = new NullOutput();
 
-        $command = self::$application->find('es:index:drop');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            [
-                'command' => $command->getName(),
-                '--force' => true,
-            ]
-        );
+        $command = new IndexDropCommand();
+        $command->setContainer(self::getContainer());
+        $input = new ArrayInput(['--force' => true]);
+        if ($command->run($input, $output) !== 0) {
+            throw new \Exception('Failed to drop index in ElasticSearch');
+        }
     }
 
     /**

@@ -11,11 +11,9 @@
 
 namespace ONGR\ApiBundle\Tests\Functional\DependencyInjection;
 
-use ONGR\ApiBundle\DependencyInjection\Configuration;
 use ONGR\ApiBundle\DependencyInjection\ONGRApiExtension;
 use ONGR\ApiBundle\Service\DataRequestService;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,16 +24,11 @@ use Symfony\Component\HttpFoundation\Response;
 class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
 {
     /**
-     * @var ONGRApiExtension
-     */
-    private $extension;
-
-    /**
      * @var string
      *
      * Root name of the configuration.
      */
-    private $root;
+    private $root = 'ongr_api';
 
     /**
      * {@inheritdoc}
@@ -44,8 +37,6 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
     {
         parent::setUp();
 
-        $this->extension = $this->getExtension();
-        $this->root = 'ongr_api';
         $this->getManager('not_default');
     }
 
@@ -68,7 +59,7 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
     }
 
     /**
-     * TODO.
+     * Test that config is loaded properly.
      */
     public function testGetConfig()
     {
@@ -104,8 +95,9 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
             ],
         ];
 
+        $extension = $this->getExtension();
         $container = $this->getDIContainer();
-        $this->extension->load([$config], $container);
+        $extension->load([$config], $container);
 
         $parameterKey = '.versions';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
@@ -137,7 +129,7 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
     }
 
     /**
-     * Check services are  created.
+     * Check services are created.
      */
     public function testDataRequestService()
     {

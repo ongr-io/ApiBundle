@@ -41,7 +41,7 @@ class ApiControllerTest extends AbstractTestCase
     public function providerForGet()
     {
         return [
-            // General test for get.
+            // Case #0. General test for get.
             [
                 '/v1/persons',
                 [
@@ -59,7 +59,7 @@ class ApiControllerTest extends AbstractTestCase
                     ],
                 ],
             ],
-            // Test included fields.
+            // Case #1. Test included fields.
             [
                 '/v1/people_names',
                 [
@@ -74,7 +74,7 @@ class ApiControllerTest extends AbstractTestCase
                     ],
                 ],
             ],
-            // Test excluded fields.
+            // Case #2. Test excluded fields.
             [
                 '/v1/people_surnames',
                 [
@@ -89,7 +89,7 @@ class ApiControllerTest extends AbstractTestCase
                     ],
                 ],
             ],
-            // Test parent handling for endpoint.
+            // Case #3. Test parent handling for endpoint.
             [
                 '/v2/people',
                 [
@@ -107,7 +107,7 @@ class ApiControllerTest extends AbstractTestCase
                     ],
                 ],
             ],
-            // Test Custom controller.
+            // Case #4. Test Custom controller.
             [
                 '/v3/persons',
                 'Custom controller GET',
@@ -143,17 +143,29 @@ class ApiControllerTest extends AbstractTestCase
     public function providerForStatusCode()
     {
         return [
+            // Case #0.
             ['PUT', '/v1/persons', Response::HTTP_NOT_FOUND, false],
+            // Case #1.
             ['PUT', '/v2/people', Response::HTTP_NOT_FOUND, false],
+            // Case #2.
             ['PUT', '/v3/persons', Response::HTTP_OK],
+            // Case #3.
             ['GET', '/v1/persons', Response::HTTP_OK],
+            // Case #4.
             ['GET', '/v2/people', Response::HTTP_OK],
+            // Case #5.
             ['GET', '/v3/persons', Response::HTTP_OK],
+            // Case #6.
             ['POST', '/v1/persons', Response::HTTP_NOT_FOUND, false],
+            // Case #7.
             ['POST', '/v2/people', Response::HTTP_NOT_FOUND, false],
+            // Case #8.
             ['POST', '/v3/persons', Response::HTTP_OK],
+            // Case #9.
             ['DELETE', '/v1/persons', Response::HTTP_NOT_FOUND, false],
+            // Case #10.
             ['DELETE', '/v2/people', Response::HTTP_NOT_FOUND, false],
+            // Case #11.
             ['DELETE', '/v3/persons', Response::HTTP_OK],
         ];
     }
