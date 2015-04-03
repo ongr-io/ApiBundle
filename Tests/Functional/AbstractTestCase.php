@@ -20,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * Class AbstractTestCase.
+ * Class for importing and removing data from ElasticSearch.
  */
 abstract class AbstractTestCase extends WebTestCase
 {
