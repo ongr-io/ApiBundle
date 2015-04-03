@@ -38,14 +38,6 @@ class ONGRApiExtension extends Extension
         $container->setParameter('ongr_api.versions', array_keys($config['versions']));
         foreach ($config['versions'] as $versionName => $version) {
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
-                if (!isset($endpoint['controller'])) {
-                    $endpoint['controller'] = 'default';
-                } elseif (isset($endpoint['controller']['path'])
-                    && strpos($endpoint['controller']['path'], '/') !== 0
-                ) {
-                    $endpoint['controller']['path'] = '/' . $endpoint['controller']['path'];
-                }
-
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
                 } elseif (!isset($endpoint['manager'])) {
@@ -61,6 +53,14 @@ class ONGRApiExtension extends Extension
                     throw new InvalidConfigurationException(
                         "'include_fields' and 'exclude_fields' can not be used together in endpoint '$endpointName'."
                     );
+                }
+
+                if (!isset($endpoint['controller'])) {
+                    $endpoint['controller'] = 'default';
+                } elseif (isset($endpoint['controller']['path'])
+                    && strpos($endpoint['controller']['path'], '/') !== 0
+                ) {
+                    $endpoint['controller']['path'] = '/' . $endpoint['controller']['path'];
                 }
 
                 // Data request services are generated only for endpoints with default controllers.
