@@ -11,18 +11,43 @@
 
 namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
-use ONGR\ApiBundle\Tests\Functional\AbstractTestCase;
+use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests for CustomApiController.
  */
-class CustomApiControllerTest extends AbstractTestCase
+class CustomApiControllerTest extends AbstractElasticsearchTestCase
 {
     /**
      * @var Client.
      */
     private $client;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDataArray()
+    {
+        return [
+            'default' => [
+                'person' => [
+                    [
+                        'name' => 'TestName1',
+                        'surname' => 'TestSurname1',
+                    ],
+                    [
+                        'name' => 'TestName2',
+                        'surname' => 'TestSurname2',
+                    ],
+                    [
+                        'name' => 'TestName3',
+                        'surname' => 'TestSurname3',
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * {@inheritdoc}
