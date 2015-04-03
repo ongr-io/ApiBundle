@@ -11,13 +11,13 @@
 
 namespace ONGR\ApiBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -55,12 +55,21 @@ class ONGRApiExtension extends Extension
                     );
                 }
 
+                if (!isset($endpoint['controller'])) {
+                    $endpoint['controller'] = 'default';
+                } elseif (isset($endpoint['controller']['path'])
+                    && strpos($endpoint['controller']['path'], '/') !== 0
+                ) {
+                    $endpoint['controller']['path'] = '/' . $endpoint['controller']['path'];
+                }
+
                 // Data request services are generated only for endpoints with default controllers.
                 if ($endpoint['controller'] === 'default') {
                     $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
                 }
 
                 $container->setParameter("ongr_api.$versionName.$endpointName.controller", $endpoint['controller']);
+                $container->setParameter("ongr_api.$versionName.$endpointName", $endpoint);
             }
             $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
         }

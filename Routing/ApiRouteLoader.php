@@ -76,29 +76,32 @@ class ApiRouteLoader implements LoaderInterface
 
                 $controller = $this->container->getParameter("ongr_api.$version.$endpoint.controller");
                 foreach (self::$supportedTypes as $type) {
-                    if ($controller == 'default') {
+                    if ($controller != 'default') {
+                        $route = $this->createCustomRoute(
+                            $path,
+                            $type,
+                            $controller,
+                            $this->container->getParameter("ongr_api.$version.$endpoint")
+                        );
+                    } else {
                         $method = "ONGRApiBundle:Api:$type";
                         $service = "ongr_api.service.$version.$endpoint.data_request";
                         $defaults = [
                             '_controller' => $method,
                             'endpoint' => $service,
                         ];
-                    } else {
-                        $method = "$controller:$type";
-                        $defaults = [
-                            '_controller' => $method,
-                        ];
+
+                        $route = new Route(
+                            $path,
+                            $defaults,
+                            [],
+                            [],
+                            '',
+                            [],
+                            [$type],
+                            ''
+                        );
                     }
-                    $route = new Route(
-                        $path,
-                        $defaults,
-                        [],
-                        [],
-                        '',
-                        [],
-                        [$type],
-                        ''
-                    );
                     $name = 'ongr_api_' . $version . '_' . $endpoint . '_' . $type;
                     $routes->add($name, $route);
                 }
@@ -108,6 +111,57 @@ class ApiRouteLoader implements LoaderInterface
         $this->loaded = true;
 
         return $routes;
+    }
+
+    /**
+     * Creates route for custom controller.
+     *
+     * @param string $path
+     * @param string $type
+     * @param array  $controller
+     * @param array  $endpoint
+     *
+     * @return Route
+     */
+    private function createCustomRoute($path, $type, $controller, $endpoint)
+    {
+        $method = "{$controller['controller']}:{$type}";
+
+        $defaults = [
+            '_controller' => $method,
+            'endpoint' => $endpoint,
+        ];
+
+        if (isset($controller['defaults'])) {
+            $defaults = array_merge($controller['defaults'], $defaults);
+        }
+
+        if (isset($controller['path'])) {
+            $path .= $controller['path'];
+        }
+
+        if (isset($controller['requirements'])) {
+            $requirements = $controller['requirements'];
+        } else {
+            $requirements = [];
+        }
+
+        if (isset($controller['options'])) {
+            $options = $controller['options'];
+        } else {
+            $options = [];
+        }
+
+        return new Route(
+            $path,
+            $defaults,
+            $requirements,
+            $options,
+            '',
+            [],
+            [$type],
+            ''
+        );
     }
 
     /**
