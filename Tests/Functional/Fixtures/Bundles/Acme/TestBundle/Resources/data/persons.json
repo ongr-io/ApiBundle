@@ -1,0 +1,6 @@
+[
+  {"count":3,"date":"2014-10-27T14:46:21+0200"},
+  {"_type":"person", "_id":"123", "_source":{"name": "TestName1", "surname" : "TestSurname1"}},
+  {"_type":"person", "_id":"1234", "_source":{"name": "TestName2", "surname" : "TestSurname2"}},
+  {"_type":"person", "_id":"12345", "_source":{"name": "TestName3", "surname" : "TestSurname3"}}
+]
