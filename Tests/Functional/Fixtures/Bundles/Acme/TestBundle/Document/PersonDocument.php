@@ -12,13 +12,14 @@
 namespace ONGR\ApiBundle\Tests\Functional\Fixtures\Bundles\Acme\TestBundle\Document;
 
 use ONGR\ElasticsearchBundle\Annotation as ES;
+use ONGR\ElasticsearchBundle\Document\AbstractDocument;
 
 /**
  * Class Person Document.
  *
  * @ES\Document(type="person")
  */
-class PersonDocument
+class PersonDocument extends AbstractDocument
 {
     /**
      * @var string
@@ -33,4 +34,36 @@ class PersonDocument
      * @ES\Property(name="surname", type="string", index="not_analyzed")
      */
     protected $surname;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSurname()
+    {
+        return $this->surname;
+    }
+
+    /**
+     * @param string $surname
+     */
+    public function setSurname($surname)
+    {
+        $this->surname = $surname;
+    }
 }
