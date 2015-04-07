@@ -71,28 +71,24 @@ class CustomApiControllerTest extends AbstractElasticsearchTestCase
                 'POST',
                 '/v3/persons',
                 'Custom controller POST',
-                Response::HTTP_OK,
             ],
             // Case #1.
             [
                 'GET',
                 '/v3/persons',
                 'Custom controller GET',
-                Response::HTTP_OK,
             ],
             // Case #2.
             [
                 'PUT',
                 '/v3/persons',
                 'Custom controller PUT',
-                Response::HTTP_OK,
             ],
             // Case #3.
             [
                 'DELETE',
                 '/v3/persons',
                 'Custom controller DELETE',
-                Response::HTTP_OK,
             ],
         ];
     }
