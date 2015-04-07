@@ -52,12 +52,35 @@ ongr_elasticsearch:
 
 ongr_api:
     versions:
-        test:
+        v1:
             endpoints:
-                magic:
+                persons:
                     manager: es.manager.default
                     document: AcmeTestBundle:PersonDocument
-                black_magic:
-                    parent: magic
+                people:
+                    parent: persons
                     manager: es.manager.not_default
+                people_names:
+                    manager: es.manager.default
                     document: AcmeTestBundle:PersonDocument
+                    include_fields:
+                        - name
+                people_surnames:
+                    manager: es.manager.default
+                    document: AcmeTestBundle:PersonDocument
+                    exclude_fields:
+                        - name
+        v2:
+            endpoints:
+                persons:
+                    manager: es.manager.default
+                    document: AcmeTestBundle:PersonDocument
+                people:
+                    parent: persons
+                    manager: es.manager.not_default
+        v3:
+            endpoints:
+                persons:
+                    manager: es.manager.default
+                    document: AcmeTestBundle:PersonDocument
+                    controller : AcmeTestBundle:CustomApi

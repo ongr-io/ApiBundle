@@ -1,0 +1,3 @@
+ongr_api_route:
+    resource: .
+    type: apiroute
