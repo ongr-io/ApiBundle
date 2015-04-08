@@ -76,7 +76,7 @@ class ApiRouteLoader implements LoaderInterface
 
                 $controller = $this->container->getParameter("ongr_api.$version.$endpoint.controller");
                 foreach (self::$supportedTypes as $type) {
-                    if ($controller != 'default') {
+                    if ($controller['name'] != 'default') {
                         $route = $this->createCustomRoute(
                             $path,
                             $type,
@@ -125,8 +125,7 @@ class ApiRouteLoader implements LoaderInterface
      */
     private function createCustomRoute($path, $type, $controller, $endpoint)
     {
-        $method = "{$controller['controller']}:{$type}";
-
+        $method = "{$controller['name']}:{$type}";
         $defaults = [
             '_controller' => $method,
             'endpoint' => $endpoint,
