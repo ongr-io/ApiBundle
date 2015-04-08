@@ -74,7 +74,9 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
                         'people' => [
                             'parent' => 'persons',
                             'manager' => 'es.manager.default',
-                            'controller' => 'CustomApi',
+                            'controller' => [
+                                'name' => 'CustomApi',
+                            ],
                         ],
                     ],
                 ],
@@ -109,11 +111,13 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
 
         $parameterKey = '.v1.persons.controller';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals('default', $container->getParameter($this->root . $parameterKey));
+        $controller = $container->getParameter($this->root . $parameterKey);
+        $this->assertEquals('default', $controller['name']);
 
         $parameterKey = '.v1.people.controller';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals('CustomApi', $container->getParameter($this->root . $parameterKey));
+        $controller = $container->getParameter($this->root . $parameterKey);
+        $this->assertEquals('CustomApi', $controller['name']);
 
         $parameterKey = '.v2.endpoints';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
@@ -121,11 +125,13 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
 
         $parameterKey = '.v2.people_names.controller';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals('default', $container->getParameter($this->root . $parameterKey));
+        $controller = $container->getParameter($this->root . $parameterKey);
+        $this->assertEquals('default', $controller['name']);
 
         $parameterKey = '.v2.people_surnames.controller';
         $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals('default', $container->getParameter($this->root . $parameterKey));
+        $controller = $container->getParameter($this->root . $parameterKey);
+        $this->assertEquals('default', $controller['name']);
     }
 
     /**

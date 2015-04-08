@@ -83,4 +83,5 @@ ongr_api:
                 persons:
                     manager: es.manager.default
                     document: AcmeTestBundle:PersonDocument
-                    controller : AcmeTestBundle:CustomApi
+                    controller:
+                        name: AcmeTestBundle:CustomApi

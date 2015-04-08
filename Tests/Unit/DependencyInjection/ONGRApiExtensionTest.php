@@ -29,7 +29,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public static function setUpBeforeClass()
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         self::$extension = new ONGRApiExtension();
     }

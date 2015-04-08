@@ -55,16 +55,14 @@ class ONGRApiExtension extends Extension
                     );
                 }
 
-                if (!isset($endpoint['controller'])) {
-                    $endpoint['controller'] = 'default';
-                } elseif (isset($endpoint['controller']['path'])
+                if (isset($endpoint['controller']['path'])
                     && strpos($endpoint['controller']['path'], '/') !== 0
                 ) {
                     $endpoint['controller']['path'] = '/' . $endpoint['controller']['path'];
                 }
 
                 // Data request services are generated only for endpoints with default controllers.
-                if ($endpoint['controller'] === 'default') {
+                if ($endpoint['controller']['name'] === 'default') {
                     $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
                 }
 
