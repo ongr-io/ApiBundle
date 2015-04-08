@@ -64,7 +64,10 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
         $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp($exceptionName, '/^No manager set for endpoint \'persons\'.$/');
+        $this->setExpectedExceptionRegExp(
+            $exceptionName,
+            '/^Manager must be set, when using default controller\. \(Endpoint: \'persons\'\)$/'
+        );
         self::$extension->load([$config], $this->getDIContainer());
     }
 
@@ -88,7 +91,10 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
         $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp($exceptionName, '/^No document set for endpoint \'persons\'.$/');
+        $this->setExpectedExceptionRegExp(
+            $exceptionName,
+            '/^Document must be set, when using default controller\. \(Endpoint: \'persons\'\)$/'
+        );
         self::$extension->load([$config], $this->getDIContainer());
     }
 

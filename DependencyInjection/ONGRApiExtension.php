@@ -40,14 +40,18 @@ class ONGRApiExtension extends Extension
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
-                } elseif (!isset($endpoint['manager'])) {
-                    throw new InvalidConfigurationException(
-                        "No manager set for endpoint '$endpointName'."
-                    );
-                } elseif (!isset($endpoint['document'])) {
-                    throw new InvalidConfigurationException(
-                        "No document set for endpoint '$endpointName'."
-                    );
+                }
+                if ($endpoint['controller']['name'] === 'default') {
+                    if (!isset($endpoint['manager'])) {
+                        throw new InvalidConfigurationException(
+                            "Manager must be set, when using default controller. (Endpoint: '$endpointName')"
+                        );
+                    }
+                    if (!isset($endpoint['document'])) {
+                        throw new InvalidConfigurationException(
+                            "Document must be set, when using default controller. (Endpoint: '$endpointName')"
+                        );
+                    }
                 }
                 if (!empty($endpoint['include_fields']) && !empty($endpoint['exclude_fields'])) {
                     throw new InvalidConfigurationException(
