@@ -41,7 +41,8 @@ class ONGRApiExtension extends Extension
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
                 }
-                if ($endpoint['controller']['name'] === 'default') {
+                if (!isset($endpoint['controller'])) {
+                    $endpoint['controller'] = ['name' => 'default'];
                     if (!isset($endpoint['manager'])) {
                         throw new InvalidConfigurationException(
                             "Manager must be set, when using default controller. (Endpoint: '$endpointName')"
