@@ -180,4 +180,329 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
         );
         self::$extension->load([$config], $this->getDIContainer());
     }
+
+    /**
+     * Provider for testParent.
+     *
+     * @return array
+     */
+    public function parentProvider()
+    {
+        return [
+            // Case #0. All fields.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                ],
+            ],
+            // Case #1. Override some fields.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                    'include_fields' => ['field'],
+                                    'controller' => ['name' => 'notDefault'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #2. Chain inheritance.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                    'include_fields' => ['field'],
+                                    'controller' => ['name' => 'notDefault'],
+                                ],
+                                'grandchild' => [
+                                    'parent' => 'child',
+                                    'manager' => 'es.manager.test',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.grandchild' => [
+                        'parent' => 'child',
+                        'manager' => 'es.manager.test',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        // This is an issue include fields should have been inherited.
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #3. Conflicting inheritance.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'include_fields' => ['field'],
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                    'exclude_fields' => ['field2'],
+                                    'controller' => [
+                                        'name' => 'notDefault',
+                                        'path' => '{param}',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => ['field2'],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'path' => '/{param}',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #4. Chain inheritance with randomized order.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'greatGrandchild' => [
+                                    'parent' => 'grandchild',
+                                    'controller' => [
+                                        'name' => 'notDefault2',
+                                    ],
+                                ],
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                ],
+                                'grandchild' => [
+                                    'parent' => 'child',
+                                    'manager' => 'es.manager.test',
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                    'include_fields' => ['field'],
+                                    'controller' => [
+                                        'name' => 'notDefault',
+                                        'defaults' => [
+                                            'param' => 'default',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [
+                                'param' => 'default',
+                            ],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.grandchild' => [
+                        'parent' => 'child',
+                        'manager' => 'es.manager.test',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        // This is an issue include fields should have been inherited.
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [
+                                'param' => 'default',
+                            ],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.greatGrandchild' => [
+                        'parent' => 'grandchild',
+                        'manager' => 'es.manager.test',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        // This is an issue include fields should have been inherited.
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault2',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Tests whether parent configuration is inherited correctly.
+     *
+     * @param array  $config
+     * @param array  $expectedConfig
+     * @param string $expectedException
+     * @param string $expectedExceptionMessage
+     *
+     * @dataProvider parentProvider
+     */
+    public function testParent($config, $expectedConfig, $expectedException = null, $expectedExceptionMessage = null)
+    {
+        if ($expectedException) {
+            $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        }
+
+        $container = $this->getDIContainer();
+        self::$extension->load([$config], $container);
+
+        foreach ($expectedConfig as $id => $value) {
+            $this->assertEquals($container->getParameter($id), $value, "{$id} does not match expected value.");
+        }
+    }
 }
