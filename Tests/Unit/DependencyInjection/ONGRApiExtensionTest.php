@@ -322,8 +322,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                         'parent' => 'child',
                         'manager' => 'es.manager.test',
                         'document' => 'AcmeTestBundle:ParentDocument',
-                        // This is an issue include fields should have been inherited.
-                        'include_fields' => [],
+                        'include_fields' => ['field'],
                         'exclude_fields' => [],
                         'controller' => [
                             'name' => 'notDefault',
@@ -449,8 +448,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                         'parent' => 'child',
                         'manager' => 'es.manager.test',
                         'document' => 'AcmeTestBundle:ParentDocument',
-                        // This is an issue include fields should have been inherited.
-                        'include_fields' => [],
+                        'include_fields' => ['field'],
                         'exclude_fields' => [],
                         'controller' => [
                             'name' => 'notDefault',
@@ -466,11 +464,55 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                         'parent' => 'grandchild',
                         'manager' => 'es.manager.test',
                         'document' => 'AcmeTestBundle:ParentDocument',
-                        // This is an issue include fields should have been inherited.
-                        'include_fields' => [],
+                        'include_fields' => ['field'],
                         'exclude_fields' => [],
                         'controller' => [
                             'name' => 'notDefault2',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #5. Override some fields.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'include_fields' => ['field'],
+                                ],
+                                'child' => [
+                                    'parent' => 'parent',
+                                    'controller' => ['name' => 'notDefault'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
                             'defaults' => [],
                             'requirements' => [],
                             'options' => [],
