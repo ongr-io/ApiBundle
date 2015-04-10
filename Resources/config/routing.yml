@@ -1,3 +1,6 @@
 ONGRApiBundle_ApiRoute:
    resource: .
    type: apiroute
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /_doc
