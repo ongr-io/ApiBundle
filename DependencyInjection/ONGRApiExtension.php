@@ -37,6 +37,13 @@ class ONGRApiExtension extends Extension
 
         $container->setParameter('ongr_api.versions', array_keys($config['versions']));
         foreach ($config['versions'] as $versionName => $version) {
+            if (isset($version['parent'])) {
+                $version = $this->appendParentConfig($version, $version['parent'], $config['versions'], [], true);
+            } elseif (empty($version['endpoints'])) {
+                throw new InvalidConfigurationException(
+                    "At least one endpoint must be configured in version '$versionName'."
+                );
+            }
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
@@ -83,41 +90,45 @@ class ONGRApiExtension extends Extension
     /**
      * Appends settings to endpoint from parent endpoint.
      *
-     * @param array  $endpoint
+     * @param array  $node
      * @param string $parentName
-     * @param array  $endpoints
+     * @param array  $nodeset
      * @param array  $children
+     * @param bool   $version
      *
      * @return array
      * @throws InvalidConfigurationException
      */
-    private function appendParentConfig($endpoint, $parentName, $endpoints, $children = [])
+    private function appendParentConfig($node, $parentName, $nodeset, $children = [], $version = false)
     {
-        if (!array_key_exists($parentName, $endpoints)) {
+        if (!array_key_exists($parentName, $nodeset)) {
             throw new InvalidConfigurationException(
-                "Invalid parent endpoint '$parentName'."
+                "Invalid parent '$parentName'."
             );
         }
-        $parent = $endpoints[$parentName];
-        if (in_array($parent, $children)) {
+        $parent = $nodeset[$parentName];
+        if (in_array($parentName, $children)) {
             throw new InvalidConfigurationException(
-                "Endpoint '$parentName' can not be ancestor of itself."
+                "'$parentName' can not be ancestor of itself."
             );
         }
 
-        $children[] = $parent;
+        $children[] = $parentName;
         if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
+            $parent = $this->appendParentConfig($parent, $parent['parent'], $nodeset, $children, $version);
         }
 
-        if (isset($endpoint['include_fields']) || isset($endpoint['exclude_fields'])) {
+        if ($version) {
+            $node['endpoints'] = array_merge($parent['endpoints'], $node['endpoints']);
+
+            return $node;
+        } elseif (isset($node['include_fields']) || isset($node['exclude_fields'])) {
             $parent['include_fields'] = [];
             $parent['exclude_fields'] = [];
         }
+        $node = array_merge($parent, $node);
 
-        $endpoint = array_merge($parent, $endpoint);
-
-        return $endpoint;
+        return $node;
     }
 
     /**
@@ -200,12 +211,12 @@ class ONGRApiExtension extends Extension
             }
 
             if (!is_array($endpoint[$fieldName])) {
-                throw new InvalidConfigurationException("{$fieldName} should be array");
+                throw new InvalidConfigurationException("'{$fieldName}' must be type of array.");
             }
 
             foreach ($endpoint[$fieldName] as $field) {
                 if (!is_scalar($field)) {
-                    throw new InvalidConfigurationException("{$fieldName} elements should scalar");
+                    throw new InvalidConfigurationException("'{$fieldName}' elements must be type of string.");
                 }
             }
         }
