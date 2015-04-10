@@ -521,6 +521,238 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            // Case #6. Complex tree.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'child3' => [
+                                    'parent' => 'parent',
+                                    'document' => 'AcmeTestBundle:ChildDocument',
+                                ],
+                                'greatGrandchild1_1_1' => [
+                                    'parent' => 'grandchild1_1',
+                                    'controller' => [
+                                        'name' => 'notDefault2',
+                                    ],
+                                ],
+                                'parent' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                ],
+                                'grandchild1_1' => [
+                                    'parent' => 'child1',
+                                    'manager' => 'es.manager.test',
+                                ],
+                                'child1' => [
+                                    'parent' => 'parent',
+                                    'include_fields' => ['field'],
+                                    'controller' => [
+                                        'name' => 'notDefault',
+                                        'defaults' => [
+                                            'param' => 'default',
+                                        ],
+                                    ],
+                                ],
+                                'child2' => [
+                                    'parent' => 'parent',
+                                    'exclude_fields' => ['field'],
+                                ],
+                                'grandchild1_2' => [
+                                    'parent' => 'child1',
+                                    'exclude_fields' => ['field'],
+                                ],
+                                'grandchild2_2' => [
+                                    'parent' => 'child2',
+                                    'exclude_fields' => ['field2'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.parent' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.child1' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [
+                                'param' => 'default',
+                            ],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.child2' => [
+                        'parent' => 'parent',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => ['field'],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.grandchild1_1' => [
+                        'parent' => 'child1',
+                        'manager' => 'es.manager.test',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [
+                                'param' => 'default',
+                            ],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.grandchild1_2' => [
+                        'parent' => 'child1',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => ['field'],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [
+                                'param' => 'default',
+                            ],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v1.grandchild2_2' => [
+                        'parent' => 'child2',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => ['field2'],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.greatGrandchild1_1_1' => [
+                        'parent' => 'grandchild1_1',
+                        'manager' => 'es.manager.test',
+                        'document' => 'AcmeTestBundle:ParentDocument',
+                        'include_fields' => ['field'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault2',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #7. Include not array.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'endpoint' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'include_fields' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'include_fields should be array',
+            ],
+            // Case #8. Exclude not array.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'endpoint' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'exclude_fields' => 'wrong',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'exclude_fields should be array',
+            ],
+            // Case #8. Include field not scalar.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'endpoint' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'include_fields' => ['field1', ['wrong']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'include_fields elements should scalar',
+            ],
+            // Case #9. Exclude field not scalar.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'endpoint' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:ParentDocument',
+                                    'exclude_fields' => [['wrong'], 'field2'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'exclude_fields elements should scalar',
+            ],
         ];
     }
 
