@@ -560,7 +560,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'exclude_fields should be array',
             ],
-            // Case #8. Include field not scalar.
+            // Case #9. Include field not scalar.
             [
                 // Config.
                 [
@@ -583,7 +583,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'include_fields elements should scalar',
             ],
-            // Case #9. Exclude field not scalar.
+            // Case #10. Exclude field not scalar.
             [
                 // Config.
                 [
@@ -606,7 +606,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'exclude_fields elements should scalar',
             ],
-            // Case #10. Invalid manager.
+            // Case #11. Invalid manager.
             [
                 // Config.
                 [
@@ -628,7 +628,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'Manager must be set, when using default controller. (Endpoint: \'persons\')',
             ],
-            // Case #11. Invalid document.
+            // Case #12. Invalid document.
             [
                 // Config.
                 [
@@ -650,7 +650,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'Document must be set, when using default controller. (Endpoint: \'persons\')',
             ],
-            // Case #12. Invalid include exclude option.
+            // Case #13. Invalid include exclude option.
             [
                 // Config.
                 [
@@ -674,7 +674,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 '\'include_fields\' and \'exclude_fields\' can not be used together in endpoint \'persons\'.',
             ],
-            // Case #13. Parent to self.
+            // Case #14. Parent to self.
             [
                 // Config.
                 [
@@ -696,7 +696,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'Endpoint \'persons\' can not be ancestor of itself.',
             ],
-            // Case #14. Invalid parent.
+            // Case #15. Invalid parent.
             [
                 // Config.
                 [
@@ -718,7 +718,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'Invalid parent endpoint \'not_exist\'.',
             ],
-            // Case #15. Cyclical inheritance.
+            // Case #16. Cyclical inheritance.
             [
                 // Config.
                 [
