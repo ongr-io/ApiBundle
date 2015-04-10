@@ -45,148 +45,11 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test whether exception is thrown when no manager is passed.
-     */
-    public function testInvalidEndpointManagerException()
-    {
-        $config = [
-            'versions' => [
-                'v1' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'manager' => null,
-                            'document' => 'AcmeTestBundle:PersonDocument',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
-        $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp(
-            $exceptionName,
-            '/^Manager must be set, when using default controller\. \(Endpoint: \'persons\'\)$/'
-        );
-        self::$extension->load([$config], $this->getDIContainer());
-    }
-
-    /**
-     * Test whether exception is thrown when no document is passed.
-     */
-    public function testInvalidEndpointDocumentException()
-    {
-        $config = [
-            'versions' => [
-                'v1' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'manager' => 'es.manager.default',
-                            'document' => null,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
-        $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp(
-            $exceptionName,
-            '/^Document must be set, when using default controller\. \(Endpoint: \'persons\'\)$/'
-        );
-        self::$extension->load([$config], $this->getDIContainer());
-    }
-
-    /**
-     * Test whether exception is thrown when include and exclude fields are set at the same time.
-     */
-    public function testInvalidIncludeExcludeException()
-    {
-        $config = [
-            'versions' => [
-                'v1' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'manager' => 'es.manager.default',
-                            'document' => 'AcmeTestBundle:PersonDocument',
-                            'include_fields' => ['foo'],
-                            'exclude_fields' => ['bar'],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
-        $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp(
-            $exceptionName,
-            '/^\'include_fields\' and \'exclude_fields\' can not be used together in endpoint \'persons\'.$/'
-        );
-        self::$extension->load([$config], $this->getDIContainer());
-    }
-
-    /**
-     * Test whether exception is thrown when endpoint's parent is set to itself.
-     */
-    public function testParentToItselfException()
-    {
-        $config = [
-            'versions' => [
-                'v1' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'manager' => 'es.manager.default',
-                            'parent' => 'persons',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
-        $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp(
-            $exceptionName,
-            '/^Endpoint \'persons\' can not be ancestor of itself.$/'
-        );
-        self::$extension->load([$config], $this->getDIContainer());
-    }
-
-    /**
-     * Test whether exception is thrown when not existing parent is supplied.
-     */
-    public function testNotExistingParentException()
-    {
-        $config = [
-            'versions' => [
-                'v1' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'manager' => 'es.manager.default',
-                            'parent' => 'not_exist',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $exceptionName = 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException';
-        $this->setExpectedException($exceptionName);
-        $this->setExpectedExceptionRegExp(
-            $exceptionName,
-            '/^Invalid parent endpoint \'not_exist\'.$/'
-        );
-        self::$extension->load([$config], $this->getDIContainer());
-    }
-
-    /**
-     * Provider for testParent.
+     * Provider for testConfiguration.
      *
      * @return array
      */
-    public function parentProvider()
+    public function configurationProvider()
     {
         return [
             // Case #0. All fields.
@@ -753,6 +616,118 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'exclude_fields elements should scalar',
             ],
+            // Case #10. Invalid manager.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => null,
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Manager must be set, when using default controller. (Endpoint: \'persons\')',
+            ],
+            // Case #11. Invalid document.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Document must be set, when using default controller. (Endpoint: \'persons\')',
+            ],
+            // Case #12. Invalid include exclude option.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                    'include_fields' => ['foo'],
+                                    'exclude_fields' => ['bar'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                '\'include_fields\' and \'exclude_fields\' can not be used together in endpoint \'persons\'.',
+            ],
+            // Case #13. Parent to self.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'parent' => 'persons',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Endpoint \'persons\' can not be ancestor of itself.',
+            ],
+            // Case #14. Invalid parent.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'parent' => 'not_exist',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Invalid parent endpoint \'not_exist\'.',
+            ],
         ];
     }
 
@@ -764,10 +739,14 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $expectedException
      * @param string $expectedExceptionMessage
      *
-     * @dataProvider parentProvider
+     * @dataProvider configurationProvider
      */
-    public function testParent($config, $expectedConfig, $expectedException = null, $expectedExceptionMessage = null)
-    {
+    public function testConfiguration(
+        $config,
+        $expectedConfig,
+        $expectedException = null,
+        $expectedExceptionMessage = null
+    ) {
         if ($expectedException) {
             $this->setExpectedException($expectedException, $expectedExceptionMessage);
         }
