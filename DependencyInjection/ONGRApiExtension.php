@@ -105,15 +105,16 @@ class ONGRApiExtension extends Extension
             );
         }
 
+        $children[] = $parent;
+        if (isset($parent['parent'])) {
+            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
+        }
+
         if (isset($endpoint['include_fields']) || isset($endpoint['exclude_fields'])) {
             $parent['include_fields'] = [];
             $parent['exclude_fields'] = [];
         }
 
-        $children[] = $parent;
-        if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
-        }
         $endpoint = array_merge($parent, $endpoint);
 
         return $endpoint;
