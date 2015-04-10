@@ -41,6 +41,8 @@ class ONGRApiExtension extends Extension
                 if (isset($endpoint['parent'])) {
                     $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
                 }
+                $endpoint = $this->checkIncludeExclude($endpoint);
+
                 if (!isset($endpoint['controller'])) {
                     $endpoint['controller'] = ['name' => 'default'];
                     if (!isset($endpoint['manager'])) {
@@ -102,6 +104,12 @@ class ONGRApiExtension extends Extension
                 "Endpoint '$parentName' can not be ancestor of itself."
             );
         }
+
+        if (isset($endpoint['include_fields']) || isset($endpoint['exclude_fields'])) {
+            $parent['include_fields'] = [];
+            $parent['exclude_fields'] = [];
+        }
+
         $children[] = $parent;
         if (isset($parent['parent'])) {
             $parent = $this->appendParentConfig($parent, $parent['parent'], $endpoints, $children);
@@ -172,5 +180,35 @@ class ONGRApiExtension extends Extension
     public static function getServiceNameWithNamespace($name, $namespace)
     {
         return sprintf($namespace, $name);
+    }
+
+    /**
+     * Validates include/exclude fields.
+     *
+     * @param array $endpoint
+     *
+     * @return array
+     *
+     * @throws InvalidConfigurationException
+     */
+    private function checkIncludeExclude($endpoint)
+    {
+        foreach (['include_fields', 'exclude_fields'] as $fieldName) {
+            if (!isset($endpoint[$fieldName])) {
+                $endpoint[$fieldName] = [];
+            }
+
+            if (!is_array($endpoint[$fieldName])) {
+                throw new InvalidConfigurationException("{$fieldName} should be array");
+            }
+
+            foreach ($endpoint[$fieldName] as $field) {
+                if (!is_scalar($field)) {
+                    throw new InvalidConfigurationException("{$fieldName} elements should scalar");
+                }
+            }
+        }
+
+        return $endpoint;
     }
 }
