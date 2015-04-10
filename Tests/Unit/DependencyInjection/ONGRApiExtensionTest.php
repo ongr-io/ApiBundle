@@ -35,16 +35,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ContainerBuilder
-     */
-    private function getDIContainer()
-    {
-        $container = new ContainerBuilder();
-
-        return $container;
-    }
-
-    /**
      * Provider for testConfiguration.
      *
      * @return array
@@ -728,6 +718,54 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 'Invalid parent endpoint \'not_exist\'.',
             ],
+            // Case #15. Cyclical inheritance.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'endpoint0' => [
+                                    'parent' => 'endpoint9',
+                                ],
+                                'endpoint1' => [
+                                    'parent' => 'endpoint0',
+                                ],
+                                'endpoint2' => [
+                                    'parent' => 'endpoint1',
+                                ],
+                                'endpoint3' => [
+                                    'parent' => 'endpoint2',
+                                ],
+                                'endpoint4' => [
+                                    'parent' => 'endpoint3',
+                                ],
+                                'endpoint5' => [
+                                    'parent' => 'endpoint4',
+                                ],
+                                'endpoint6' => [
+                                    'parent' => 'endpoint5',
+                                ],
+                                'endpoint7' => [
+                                    'parent' => 'endpoint6',
+                                ],
+                                'endpoint8' => [
+                                    'parent' => 'endpoint7',
+                                ],
+                                'endpoint9' => [
+                                    'parent' => 'endpoint8',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Endpoint \'endpoint9\' can not be ancestor of itself.',
+            ],
         ];
     }
 
@@ -757,5 +795,15 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
         foreach ($expectedConfig as $id => $value) {
             $this->assertEquals($container->getParameter($id), $value, "{$id} does not match expected value.");
         }
+    }
+
+    /**
+     * @return ContainerBuilder
+     */
+    private function getDIContainer()
+    {
+        $container = new ContainerBuilder();
+
+        return $container;
     }
 }
