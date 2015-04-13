@@ -34,7 +34,7 @@ Let's create new custom controller and call it ``AcmeApiController`` :
 
 Then we must register it in our ``config.yml`` :
 
-.. code:: yml
+.. code:: yaml
 
     // app/config/config.yml
     ...

@@ -6,7 +6,7 @@ Api bundle requires configuration for building API interface and easing backend 
 Config.yml structure
 --------------------
 
-.. code:: yml
+.. code:: yaml
 
     ongr_api:
         versions:
@@ -26,7 +26,7 @@ Config.yml structure
 
 - ``versions`` : here you should define multiple API versions
 
-.. code:: yml
+.. code:: yaml
 
     versions:
         version_name1:
@@ -39,7 +39,7 @@ Config.yml structure
 
 - ``endpoints`` : here you should define multiple API endpoints
 
-.. code:: yml
+.. code:: yaml
 
     endpoints:
         endpoint_name1:
@@ -53,7 +53,7 @@ Config.yml structure
 
 - ``document`` : defined document type. Read more about defining elasticsearch documents `here <http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html>`_
 
-- ``controller`` (optional) : if you wish to customize default actions or implement your own, you should define a custom controller. If no controller is specified, ``ONGRApiBundle:Api`` controller is called. You can read more about customizing controller `here <controller.html>`_
+- ``controller`` (optional) : if you wish to customize default actions or implement your own, you should define a custom controller. If no controller is specified, ``ONGRApiBundle:Api`` controller is called. You can read more about customizing controller `here <controller.rst>`_
 
 - ``include_fields`` (optional) : in case you want to allow access only to certain fields of the document you can define those fields here
 
