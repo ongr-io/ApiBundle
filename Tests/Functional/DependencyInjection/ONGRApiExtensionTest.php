@@ -76,6 +76,9 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
                             'manager' => 'es.manager.default',
                             'controller' => [
                                 'name' => 'CustomApi',
+                                'params' => [
+                                    'service' => 'test_service',
+                                ],
                             ],
                         ],
                     ],
@@ -92,8 +95,73 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
                             'document' => 'AcmeTestBundle:PersonDocument',
                             'exclude_fields' => ['name'],
                         ],
+                        'person' => [
+                            'manager' => 'es.manager.default',
+                            'document' => 'AcmeTestBundle:PersonDocument',
+                            'controller' => [
+                                'name' => 'CustomPersonApi',
+                                'path' => 'person/{id}',
+                                'defaults' => [
+                                    'id' => null,
+                                ],
+                            ],
+                        ],
                     ],
                 ],
+            ],
+        ];
+
+        $expected = [
+            '.versions' => ['v1', 'v2'],
+            '.v1.endpoints' => ['persons', 'people'],
+            '.v1.persons.controller' => ['name' => 'default'],
+            '.v1.people.controller' => [
+                'name' => 'CustomApi',
+                'params' => [
+                    'service' => 'test_service',
+                ],
+                'defaults' => [],
+                'requirements' => [],
+                'options' => [],
+            ],
+            '.v2.endpoints' => ['people_names', 'people_surnames', 'person'],
+            '.v2.people_names.controller' => ['name' => 'default'],
+            '.v2.people_surnames.controller' => ['name' => 'default'],
+            '.v1.people' => [
+                'manager' => 'es.manager.default',
+                'document' => 'AcmeTestBundle:PersonDocument',
+                'include_fields' => [],
+                'exclude_fields' => [],
+                'controller' => [
+                    'name' => 'CustomApi',
+                    'params' => [
+                        'service' => 'test_service',
+                    ],
+                    'defaults' => [],
+                    'requirements' => [],
+                    'options' => [],
+                ],
+            ],
+            '.v2.person' => [
+                'manager' => 'es.manager.default',
+                'document' => 'AcmeTestBundle:PersonDocument',
+                'include_fields' => [],
+                'exclude_fields' => [],
+                'controller' => [
+                    'name' => 'CustomPersonApi',
+                    'path' => '/person/{id}',
+                    'defaults' => ['id' => null],
+                    'params' => [],
+                    'requirements' => [],
+                    'options' => [],
+                ],
+            ],
+            '.v2.people_surnames' => [
+                'manager' => 'es.manager.default',
+                'document' => 'AcmeTestBundle:PersonDocument',
+                'include_fields' => [],
+                'exclude_fields' => ['name'],
+                'controller' => ['name' => 'default'],
             ],
         ];
 
@@ -101,37 +169,11 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
         $container = $this->getDIContainer();
         $extension->load([$config], $container);
 
-        $parameterKey = '.versions';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals(['v1', 'v2'], $container->getParameter($this->root . $parameterKey));
-
-        $parameterKey = '.v1.endpoints';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals(['persons', 'people'], $container->getParameter($this->root . $parameterKey));
-
-        $parameterKey = '.v1.persons.controller';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $controller = $container->getParameter($this->root . $parameterKey);
-        $this->assertEquals('default', $controller['name']);
-
-        $parameterKey = '.v1.people.controller';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $controller = $container->getParameter($this->root . $parameterKey);
-        $this->assertEquals('CustomApi', $controller['name']);
-
-        $parameterKey = '.v2.endpoints';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $this->assertEquals(['people_names', 'people_surnames'], $container->getParameter($this->root . $parameterKey));
-
-        $parameterKey = '.v2.people_names.controller';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $controller = $container->getParameter($this->root . $parameterKey);
-        $this->assertEquals('default', $controller['name']);
-
-        $parameterKey = '.v2.people_surnames.controller';
-        $this->assertTrue($container->hasParameter($this->root . $parameterKey));
-        $controller = $container->getParameter($this->root . $parameterKey);
-        $this->assertEquals('default', $controller['name']);
+        foreach ($expected as $key => $value) {
+            $parameter = $this->root . $key;
+            $this->assertTrue($container->hasParameter($parameter));
+            $this->assertEquals($value, $container->getParameter($parameter));
+        }
     }
 
     /**
