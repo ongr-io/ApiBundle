@@ -53,13 +53,15 @@ class Configuration implements ConfigurationInterface
                                             ->info('Logical document class name.')
                                             ->example('ONGRDemoBundle:ProductDocument')
                                         ->end()
-                                        ->variableNode('include_fields')
+                                        ->arrayNode('include_fields')
+                                            ->prototype('scalar')->end()
                                             ->info(
                                                 'Document fields to include. Can not be used with \'exclude_fields\'.'
                                             )
                                             ->example(['title', 'price'])
                                         ->end()
-                                        ->variableNode('exclude_fields')
+                                        ->arrayNode('exclude_fields')
+                                            ->prototype('scalar')->end()
                                             ->info(
                                                 'Document fields to exclude. Can not be used with \'include_fields\'.'
                                             )
@@ -110,10 +112,6 @@ class Configuration implements ConfigurationInterface
                                                     ->prototype('variable')->end()
                                                 ->end()
                                             ->end()
-                                        ->end()
-                                        ->scalarNode('parent')
-                                            ->info('Defines endpoint from which configuration will be inherited.')
-                                            ->example('product')
                                         ->end()
                                     ->end()
                                 ->end()

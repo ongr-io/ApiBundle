@@ -38,18 +38,13 @@ class ONGRApiExtension extends Extension
         $container->setParameter('ongr_api.versions', array_keys($config['versions']));
         foreach ($config['versions'] as $versionName => $version) {
             if (isset($version['parent'])) {
-                $version = $this->appendParentConfig($version, $version['parent'], $config['versions'], [], true);
+                $version = $this->appendParentConfig($version, $version['parent'], $config['versions']);
             } elseif (empty($version['endpoints'])) {
                 throw new InvalidConfigurationException(
                     "At least one endpoint must be configured in version '$versionName'."
                 );
             }
             foreach ($version['endpoints'] as $endpointName => $endpoint) {
-                if (isset($endpoint['parent'])) {
-                    $endpoint = $this->appendParentConfig($endpoint, $endpoint['parent'], $version['endpoints']);
-                }
-                $endpoint = $this->checkIncludeExclude($endpoint);
-
                 if (!isset($endpoint['controller'])) {
                     $endpoint['controller'] = ['name' => 'default'];
                     if (!isset($endpoint['manager'])) {
@@ -94,12 +89,11 @@ class ONGRApiExtension extends Extension
      * @param string $parentName
      * @param array  $nodeset
      * @param array  $children
-     * @param bool   $version
      *
      * @return array
      * @throws InvalidConfigurationException
      */
-    private function appendParentConfig($node, $parentName, $nodeset, $children = [], $version = false)
+    private function appendParentConfig($node, $parentName, $nodeset, $children = [])
     {
         if (!array_key_exists($parentName, $nodeset)) {
             throw new InvalidConfigurationException(
@@ -115,18 +109,10 @@ class ONGRApiExtension extends Extension
 
         $children[] = $parentName;
         if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $nodeset, $children, $version);
+            $parent = $this->appendParentConfig($parent, $parent['parent'], $nodeset, $children);
         }
 
-        if ($version) {
-            $node['endpoints'] = array_merge($parent['endpoints'], $node['endpoints']);
-
-            return $node;
-        } elseif (isset($node['include_fields']) || isset($node['exclude_fields'])) {
-            $parent['include_fields'] = [];
-            $parent['exclude_fields'] = [];
-        }
-        $node = array_merge($parent, $node);
+        $node['endpoints'] = array_merge($parent['endpoints'], $node['endpoints']);
 
         return $node;
     }
@@ -192,35 +178,5 @@ class ONGRApiExtension extends Extension
     public static function getServiceNameWithNamespace($name, $namespace)
     {
         return sprintf($namespace, $name);
-    }
-
-    /**
-     * Validates include/exclude fields.
-     *
-     * @param array $endpoint
-     *
-     * @return array
-     *
-     * @throws InvalidConfigurationException
-     */
-    private function checkIncludeExclude($endpoint)
-    {
-        foreach (['include_fields', 'exclude_fields'] as $fieldName) {
-            if (!isset($endpoint[$fieldName])) {
-                $endpoint[$fieldName] = [];
-            }
-
-            if (!is_array($endpoint[$fieldName])) {
-                throw new InvalidConfigurationException("'{$fieldName}' must be type of array.");
-            }
-
-            foreach ($endpoint[$fieldName] as $field) {
-                if (!is_scalar($field)) {
-                    throw new InvalidConfigurationException("'{$fieldName}' elements must be type of string.");
-                }
-            }
-        }
-
-        return $endpoint;
     }
 }

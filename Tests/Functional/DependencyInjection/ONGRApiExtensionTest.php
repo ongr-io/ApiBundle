@@ -72,7 +72,7 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
                             'document' => 'AcmeTestBundle:PersonDocument',
                         ],
                         'people' => [
-                            'parent' => 'persons',
+                            'document' => 'AcmeTestBundle:PersonDocument',
                             'manager' => 'es.manager.default',
                             'controller' => [
                                 'name' => 'CustomApi',
