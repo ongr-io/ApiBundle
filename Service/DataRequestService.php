@@ -11,11 +11,11 @@
 
 namespace ONGR\ApiBundle\Service;
 
-use ONGR\ElasticsearchBundle\ORM\Repository;
-use Symfony\Component\DependencyInjection\Container;
-use ONGR\ElasticsearchBundle\ORM\Manager;
 use ONGR\ElasticsearchBundle\DSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchBundle\DSL\Search;
+use ONGR\ElasticsearchBundle\ORM\Manager;
+use ONGR\ElasticsearchBundle\ORM\Repository;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,6 +40,11 @@ class DataRequestService
     protected $fields;
 
     /**
+     * @var string
+     */
+    private $document;
+
+    /**
      * @param Container $container
      * @param string    $manager
      * @param string    $document
@@ -51,6 +56,7 @@ class DataRequestService
         $document,
         $fields
     ) {
+        $this->document = $document;
         $this->dataManager = $container->get($manager);
         $this->dataRepository = $this->dataManager->getRepository($document);
         $this->fields = $fields;
@@ -148,5 +154,37 @@ class DataRequestService
         }
 
         return $types[$format];
+    }
+
+    /**
+     * @return Manager
+     */
+    public function getDataManager()
+    {
+        return $this->dataManager;
+    }
+
+    /**
+     * @return Repository
+     */
+    public function getDataRepository()
+    {
+        return $this->dataRepository;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

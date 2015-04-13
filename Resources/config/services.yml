@@ -2,6 +2,13 @@ parameters:
   ongr_api.data_request.class: ONGR\ApiBundle\Service\DataRequestService
 
 services:
+    ongr_api.api_doc.extractor:
+            class: ONGR\ApiBundle\Service\NelmioExtractor
+            calls:
+                - [ setContainer, [ @service_container ] ]
+            tags:
+                - { name: nelmio_api_doc.extractor.handler }
+
     ongr_api.route_loader:
         class: ONGR\ApiBundle\Routing\ApiRouteLoader
         calls:
