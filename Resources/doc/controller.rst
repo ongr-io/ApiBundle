@@ -11,7 +11,9 @@ Custom controller
 If you want to perform custom actions or modify response, you can create your own controller and register it in config.
 
 Let's create new custom controller and call it ``AcmeApiController`` :
+
 .. code:: php
+
     // Controller/AcmeApiController.php
 
     namespace Acme\DemoBundle\Controller;
@@ -31,7 +33,9 @@ Let's create new custom controller and call it ``AcmeApiController`` :
     }
 
 Then we must register it in our ``config.yml`` :
+
 .. code:: yml
+
     // app/config/config.yml
     ...
     ongr_api:

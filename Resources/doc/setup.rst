@@ -51,7 +51,7 @@ Add minimal configuration for Api bundle.
                        manager: es.manager.default
                        document: AcmeDemoBundle:Product
 
-.. note:: If you have altered default Elasticsearch bundle configuration, you might need to change ``managers`` and ``documents``. Head to `configuration page<configuration.html>`_ for more information.
+.. note:: If you have altered default Elasticsearch bundle configuration, you might need to change ``managers`` and ``documents``. Head to `configuration page <configuration.html>`_ for more information.
 
 .. code:: yaml
 
@@ -70,5 +70,5 @@ Try your new API. Open ``yourdomain.com/api/v1/product`` page in your browser. Y
 What's next ?
 -------------
 
-Head to `configuration page<configuration.html>`_ to learn how to customise your API.
+Head to `configuration page <configuration.html>`_ to learn how to customise your API.
 

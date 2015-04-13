@@ -10,10 +10,10 @@ Installation
 ------------
 
 .. toctree::
-:maxdepth: 1
-        :titlesonly:
+    :maxdepth: 1
+    :titlesonly:
 
-        setup
+    setup
 
 Bundle documentation
 --------------------
@@ -21,11 +21,11 @@ Bundle documentation
 Main things you should know while working with this bundle.
 
 .. toctree::
-:maxdepth: 1
-        :titlesonly:
+    :maxdepth: 1
+    :titlesonly:
 
-        configuration
-        controller
+    configuration
+    controller
 
 Cookbook
 --------
