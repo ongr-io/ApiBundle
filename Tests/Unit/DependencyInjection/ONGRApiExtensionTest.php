@@ -535,7 +535,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'include_fields should be array',
+                '\'include_fields\' must be type of array.',
             ],
             // Case #8. Exclude not array.
             [
@@ -558,9 +558,9 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'exclude_fields should be array',
+                '\'exclude_fields\' must be type of array.',
             ],
-            // Case #9. Include field not scalar.
+            // Case #9. Include field not string.
             [
                 // Config.
                 [
@@ -581,9 +581,9 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'include_fields elements should scalar',
+                '\'include_fields\' elements must be type of string',
             ],
-            // Case #10. Exclude field not scalar.
+            // Case #10. Exclude field not string.
             [
                 // Config.
                 [
@@ -604,7 +604,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'exclude_fields elements should scalar',
+                '\'exclude_fields\' elements must be type of string',
             ],
             // Case #11. Invalid manager.
             [
@@ -674,7 +674,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception message.
                 '\'include_fields\' and \'exclude_fields\' can not be used together in endpoint \'persons\'.',
             ],
-            // Case #14. Parent to self.
+            // Case #14. Parent to self (endpoint).
             [
                 // Config.
                 [
@@ -694,9 +694,9 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'Endpoint \'persons\' can not be ancestor of itself.',
+                '\'persons\' can not be ancestor of itself.',
             ],
-            // Case #15. Invalid parent.
+            // Case #15. Invalid parent (endpoint).
             [
                 // Config.
                 [
@@ -716,9 +716,9 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'Invalid parent endpoint \'not_exist\'.',
+                'Invalid parent \'not_exist\'.',
             ],
-            // Case #16. Cyclical inheritance.
+            // Case #16. Cyclical endpoint inheritance.
             [
                 // Config.
                 [
@@ -764,7 +764,376 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                 // Exception.
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 // Exception message.
-                'Endpoint \'endpoint9\' can not be ancestor of itself.',
+                '\'endpoint9\' can not be ancestor of itself.',
+            ],
+            // Case #17. Version inheritance.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                                'people' => [
+                                    'parent' => 'persons',
+                                    'include_fields' => ['name', 'age'],
+                                    'controller' => ['name' => 'notDefault'],
+                                ],
+                            ],
+                        ],
+                        'v2' => [
+                            'endpoints' => [
+                                'people_names' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                    'include_fields' => ['name'],
+                                ],
+                            ],
+                            'parent' => 'v1',
+                        ],
+
+                        'v3' => [
+                            'parent' => 'v2',
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.persons' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v2.people_names' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v2.persons' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v2.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v3.people_names' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v3.persons' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v3.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+
+            // Case #18. Version inherited endpoint overriding.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                                'people' => [
+                                    'parent' => 'persons',
+                                    'include_fields' => ['name', 'age'],
+                                    'controller' => ['name' => 'notDefault'],
+                                ],
+                            ],
+                        ],
+                        'v2' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.not_default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                    'include_fields' => ['name', 'age', 'profession'],
+                                ],
+                            ],
+                            'parent' => 'v1',
+                        ],
+
+                        'v3' => [
+                            'endpoints' => [
+                                'people' => [
+                                    'parent' => 'persons',
+                                    'include_fields' => ['name', 'age'],
+                                    'controller' => ['name' => 'custom'],
+                                ],
+                            ],
+                            'parent' => 'v2',
+                        ],
+
+                        'v4' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.custom',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                    'exclude_fields' => ['id'],
+                                ],
+                            ],
+                            'parent' => 'v2',
+                        ],
+                    ],
+                ],
+                // Expected.
+                [
+                    'ongr_api.v1.persons' => [
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v1.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v2.persons' => [
+                        'manager' => 'es.manager.not_default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age', 'profession'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v2.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.not_default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v3.persons' => [
+                        'manager' => 'es.manager.not_default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age', 'profession'],
+                        'exclude_fields' => [],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v3.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.not_default',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'custom',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                    'ongr_api.v4.persons' => [
+                        'manager' => 'es.manager.custom',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => [],
+                        'exclude_fields' => ['id'],
+                        'controller' => ['name' => 'default'],
+                    ],
+                    'ongr_api.v4.people' => [
+                        'parent' => 'persons',
+                        'manager' => 'es.manager.custom',
+                        'document' => 'AcmeTestBundle:PersonDocument',
+                        'include_fields' => ['name', 'age'],
+                        'exclude_fields' => [],
+                        'controller' => [
+                            'name' => 'notDefault',
+                            'defaults' => [],
+                            'requirements' => [],
+                            'options' => [],
+                            'params' => [],
+                        ],
+                    ],
+                ],
+            ],
+            // Case #19. Cyclical endpoint inheritance.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'v4',
+                        ],
+                        'v2' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'v1',
+                        ],
+                        'v3' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'v2',
+                        ],
+                        'v4' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'v3',
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                '\'v4\' can not be ancestor of itself.',
+            ],
+            // Case #20. Empty version.
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [],
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'At least one endpoint must be configured in version \'v1\'.',
+            ],
+            // Case #21. Parent to self (version).
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'v1',
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                '\'v1\' can not be ancestor of itself.',
+            ],
+            // Case #22. Invalid parent (version).
+            [
+                // Config.
+                [
+                    'versions' => [
+                        'v1' => [
+                            'endpoints' => [
+                                'persons' => [
+                                    'manager' => 'es.manager.default',
+                                    'document' => 'AcmeTestBundle:PersonDocument',
+                                ],
+                            ],
+                            'parent' => 'not_exist',
+                        ],
+                    ],
+                ],
+                // Expected.
+                [],
+                // Exception.
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                // Exception message.
+                'Invalid parent \'not_exist\'.',
             ],
         ];
     }

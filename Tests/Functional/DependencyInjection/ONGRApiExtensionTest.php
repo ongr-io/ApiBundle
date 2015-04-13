@@ -160,10 +160,12 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
         $request->headers->set('Content-Type', 'application/json');
 
         $result = $dataRequest->getResponse($request);
+        $result->headers->set('Date', '');
 
         $response = new Response();
         $response->setContent(json_encode([]));
         $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Date', '');
 
         $this->assertEquals($response, $result);
     }
