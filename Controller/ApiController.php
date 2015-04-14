@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,6 +45,11 @@ class ApiController extends Controller implements ApiControllerInterface
      * @param string  $endpoint
      *
      * @return Response
+     *
+     * @ApiDoc(
+     *  description="Gets documents from ES",
+     *  documentation="Will return whole document from ES"
+     * )
      */
     public function getAction(Request $request, $endpoint = null)
     {

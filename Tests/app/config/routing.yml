@@ -1,3 +1,2 @@
 ongr_api_route:
-    resource: .
-    type: apiroute
+    resource: "@ONGRApiBundle/Resources/config/routing.yml"

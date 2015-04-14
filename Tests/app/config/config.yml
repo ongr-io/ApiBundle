@@ -85,3 +85,5 @@ ongr_api:
                     document: AcmeTestBundle:PersonDocument
                     controller:
                         name: AcmeTestBundle:CustomApi
+
+nelmio_api_doc: ~
