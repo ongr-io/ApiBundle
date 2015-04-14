@@ -11,11 +11,11 @@
 
 namespace ONGR\ApiBundle\Tests\Functional\Fixtures\Bundles\Acme\TestBundle\Controller;
 
+use ONGR\ApiBundle\Controller\ApiControllerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use ONGR\ApiBundle\Controller\ApiControllerInterface;
 
 /**
  * CRUD implementation for Custom Api Controller.

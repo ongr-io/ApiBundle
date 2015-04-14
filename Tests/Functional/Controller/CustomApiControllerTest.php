@@ -12,6 +12,7 @@
 namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
