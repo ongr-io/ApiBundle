@@ -18,10 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
- *
- * Abstract class ApiControllerInterface
- *
- * @package ONGR\ApiBundle\Controller
  */
 class ApiController extends Controller implements ApiControllerInterface
 {
