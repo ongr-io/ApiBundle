@@ -11,15 +11,11 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * CRUD implementation for Api Controller.
- *
- * Interface ApiControllerInterface
- *
- * @package ONGR\ApiBundle\Controller
+ * CRUD interface for Api Controller.
  */
 interface ApiControllerInterface
 {

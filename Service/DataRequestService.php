@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class DataRequestService, for managing request to a Document repository.
+ * Manages requests to a Document repository.
  */
 class DataRequestService
 {

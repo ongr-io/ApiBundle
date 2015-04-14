@@ -18,11 +18,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class for loading api routes.
- *
- * Class ApiRouteLoader
- *
- * @package Acme\DemoBundle\Routing
+ * Loads api routes.
  */
 class ApiRouteLoader implements LoaderInterface
 {

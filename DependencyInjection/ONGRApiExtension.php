@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * This is the class that loads and manages your bundle configuration.
+ * Loads and manages your bundle configuration.
  */
 class ONGRApiExtension extends Extension
 {

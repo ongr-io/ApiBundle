@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
- * Class NelmioExtractor.
+ * Generates api doc for returned items from documents mapping.
  */
 class NelmioExtractor implements HandlerInterface
 {
