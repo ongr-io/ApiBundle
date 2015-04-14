@@ -77,7 +77,7 @@ class Configuration implements ConfigurationInterface
                                                 ->end()
                                                 ->scalarNode('path')
                                                     ->info('Routing path, where endpoint will be available.')
-                                                    ->example('/products/{id}/{field}')
+                                                    ->example('/{id}/{field}')
                                                 ->end()
                                                 ->arrayNode('defaults')
                                                     ->prototype('variable')->end()

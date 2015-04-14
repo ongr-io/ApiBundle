@@ -64,8 +64,7 @@ Add minimal configuration for Api bundle.
     #app/config/routing.yml
     ...
     ONGRApiBundle_ApiRoute:
-       resource: .
-       type: apiroute
+       resource: @ONGRApiBundle/Resources/config/routing.yml
        prefix: /api
 
 ..
