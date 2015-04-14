@@ -35,6 +35,7 @@ Config.yml structure
             ...
 
 - ``version_name`` : version name that will correspond to first url parameter e.g. '/v1'
+
 .. note:: You should be consistent with version naming. Think of version naming conventions and stick to them e.g. ``v1``, ``v2`` ... or ``1.0``, ``2.0`` ...
 
 - ``endpoints`` : here you should define multiple API endpoints
