@@ -16,6 +16,8 @@ Api bundle is installed using `Composer <https://getcomposer.org>`_.
 
     php composer.phar require ongr/api-bundle "master-dev"
 
+..
+
 .. note:: composer.phar file is typically found in your project's main dir e.g. 'var/www'
 
 Step 3: Enable Api bundle
@@ -34,6 +36,8 @@ Step 3: Enable Api bundle
         );
     }
 
+..
+
 Step 4: Add configuration
 -------------------------
 
@@ -51,6 +55,8 @@ Add minimal configuration for Api bundle.
                        manager: es.manager.default
                        document: AcmeDemoBundle:Product
 
+..
+
 .. note:: If you have altered default Elasticsearch bundle configuration, you might need to change ``managers`` and ``documents``. Head to `configuration page <configuration.rst>`_ for more information.
 
 .. code:: yaml
@@ -61,6 +67,8 @@ Add minimal configuration for Api bundle.
        resource: .
        type: apiroute
        prefix: /api
+
+..
 
 Step 5: That's it
 -----------------

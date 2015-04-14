@@ -24,6 +24,8 @@ Config.yml structure
                                 - field_name4
                         parent: parent_endpoint_name
 
+..
+
 - ``versions`` : here you should define multiple API versions
 
 .. code:: yaml
@@ -33,6 +35,8 @@ Config.yml structure
             ...
         version_name2:
             ...
+
+..
 
 - ``version_name`` : version name that will correspond to first url parameter e.g. '/v1'
 
@@ -48,11 +52,13 @@ Config.yml structure
         endpoint_name2:
             ...
 
+..
+
 - ``endpoint_name`` : endpoint name that will correspond to second url parameter e.g. '/v1/users'
 
 - ``manager`` : elasticsearch manager. Default: ``es.manager.default``
 
-- ``document`` : defined document type. Read more about defining elasticsearch documents `here <http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html>`_
+- ``document`` : defined document type. Read more about defining elasticsearch documents `defining elasticsearch documents <http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html>`_
 
 - ``controller`` (optional) : if you wish to customize default actions or implement your own, you should define a custom controller. If no controller is specified, ``ONGRApiBundle:Api`` controller is called. You can read more about customizing controller `here <controller.rst>`_
 

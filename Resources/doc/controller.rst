@@ -32,6 +32,8 @@ Let's create new custom controller and call it ``AcmeApiController`` :
         ...
     }
 
+..
+
 Then we must register it in our ``config.yml`` :
 
 .. code:: yaml
@@ -44,5 +46,7 @@ Then we must register it in our ``config.yml`` :
                 endpoints:
                     picture:
                         controller: "AcmeDemoBundle:AcmeApi"
+
+..
 
 That's it. Now every request for ``/v1/picture`` will be redirected to your controller.
