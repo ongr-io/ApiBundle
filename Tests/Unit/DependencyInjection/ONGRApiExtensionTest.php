@@ -139,7 +139,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                             ],
                             'parent' => 'v1',
                         ],
-
                         'v3' => [
                             'parent' => 'v2',
                         ],
@@ -223,7 +222,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-
             // Case #4. Version inherited endpoint overriding.
             [
                 // Config.
@@ -253,7 +251,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                             ],
                             'parent' => 'v1',
                         ],
-
                         'v3' => [
                             'endpoints' => [
                                 'people' => [
@@ -265,7 +262,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                             ],
                             'parent' => 'v2',
                         ],
-
                         'v4' => [
                             'endpoints' => [
                                 'persons' => [

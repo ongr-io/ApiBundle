@@ -28,6 +28,7 @@ Main things you should know while working with this bundle.
 
     configuration
     controller
+    events
 
 ..
 
