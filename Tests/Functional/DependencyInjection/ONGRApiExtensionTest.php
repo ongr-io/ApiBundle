@@ -196,12 +196,14 @@ class ONGRApiExtensionTest extends AbstractElasticsearchTestCase
         /** @var DataRequestService $dataRequest */
         $dataRequest = $this->getContainer()->get($serviceName);
         $this->assertEquals('ONGR\ApiBundle\Service\DataRequestService', get_class($dataRequest));
+        $responseBuilder = $this->getContainer()->get('ongr_api.response_builder');
 
         $request = new Request();
         $request->setMethod('get');
         $request->headers->set('Content-Type', 'application/json');
 
-        $result = $dataRequest->getResponse($request);
+        $data = $dataRequest->get($request);
+        $result = $responseBuilder->getResponse($request, $data);
         $result->headers->set('Date', '');
 
         $response = new Response();

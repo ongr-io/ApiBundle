@@ -49,8 +49,10 @@ class ApiController extends Controller implements ApiControllerInterface
      */
     public function getAction(Request $request, $endpoint = null)
     {
-        $service = $this->get($endpoint);
-        $response = $service->getResponse($request);
+        $dataRequest = $this->get($endpoint);
+        $responseBuilder = $this->get('ongr_api.response_builder');
+        $data = $dataRequest->get($request);
+        $response = $responseBuilder->getResponse($request, $data);
 
         return $response;
     }

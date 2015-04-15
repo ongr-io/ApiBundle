@@ -3,11 +3,11 @@ parameters:
 
 services:
     ongr_api.api_doc.extractor:
-            class: ONGR\ApiBundle\Service\NelmioExtractor
-            calls:
-                - [ setContainer, [ @service_container ] ]
-            tags:
-                - { name: nelmio_api_doc.extractor.handler }
+        class: ONGR\ApiBundle\Service\NelmioExtractor
+        calls:
+            - [ setContainer, [ @service_container ] ]
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
 
     ongr_api.route_loader:
         class: ONGR\ApiBundle\Routing\ApiRouteLoader
@@ -15,6 +15,9 @@ services:
             - [ setContainer,[ @service_container ] ]
         tags:
             - { name: routing.loader }
+
+    ongr_api.response_builder:
+        class: ONGR\ApiBundle\Service\ResponseBuilder
 
 #  ongr_api.api.[version].[endpoint].controller
 #  ongr_api.api.[version].[endpoint].data_request
