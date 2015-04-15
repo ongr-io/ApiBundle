@@ -14,7 +14,7 @@ Api bundle is installed using `Composer <https://getcomposer.org>`_.
 
 .. code:: bash
 
-    php composer.phar require ongr/api-bundle "master-dev"
+    php composer.phar require ongr/api-bundle "dev-master"
 
 ..
 
