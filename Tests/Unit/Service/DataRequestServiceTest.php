@@ -37,13 +37,13 @@ class DataRequestServiceTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())->method('get')->willReturnArgument(0);
 
-        /** @var Search||\PHPUnit_Framework_MockObject_MockObject $search */
+        /** @var Search|\PHPUnit_Framework_MockObject_MockObject $search */
         $search = $this->getMock('ONGR\ElasticsearchBundle\DSL\Search');
         /** @var Repository|\PHPUnit_Framework_MockObject_MockObject $repository */
         $repository = $this->getMock('ONGR\ElasticsearchBundle\ORM\Repository', [], [], '', false);
         $repository->expects($this->any())->method('createSearch')->willReturn($search);
 
-        /** @var Manager|\PHPUnit_Framework_MockObject_MockObject $maneger */
+        /** @var Manager|\PHPUnit_Framework_MockObject_MockObject $manager */
         $manager = $this->getMock('ONGR\ElasticsearchBundle\ORM\Manager', [], [], '', false);
         $manager->expects($this->any())->method('getRepository')->willReturn($repository);
 
