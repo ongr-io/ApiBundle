@@ -140,6 +140,8 @@ class ONGRApiExtension extends Extension
                 $endpoint['manager'],
                 $endpoint['document'],
                 $fields,
+                $endpointName,
+                new Reference('event_dispatcher'),
             ]
         );
 
