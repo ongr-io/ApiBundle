@@ -52,7 +52,7 @@ class ResponseBuilder
      */
     private function encodeArray($data, $format)
     {
-        switch($format){
+        switch ($format) {
             case 'json':
                 return json_encode($data);
             default:

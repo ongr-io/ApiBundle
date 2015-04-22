@@ -102,11 +102,10 @@ class Configuration implements ConfigurationInterface
                                                     ->example(
                                                         [
                                                             'simple_param' => 123,
-                                                            'array_param' =>
-                                                                [
-                                                                    'some_string' => 'string',
-                                                                    'some_int' => 321,
-                                                                ],
+                                                            'array_param' => [
+                                                                'some_string' => 'string',
+                                                                'some_int' => 321,
+                                                            ],
                                                         ]
                                                     )
                                                     ->prototype('variable')->end()
