@@ -13,12 +13,11 @@ install:
   - mkdir _static
   - composer require --no-update symfony/symfony:${SYMFONY}
 before_script:
-  - composer self-update
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
-  - composer update --prefer-source
+  - composer install
 script:
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-  - vendor/bin/phpcs -p --standard=$TRAVIS_BUILD_DIR/vendor/ongr/ongr-strict-standard/Ongr --ignore=vendor/,Tests/app/,Resources/public/ ./
+  - vendor/bin/phpcs -p --standard=./vendor/ongr/ongr-strict-standard/Ongr --ignore=vendor/,Tests/app/,Resources/public/ ./
   - sphinx-build -nWq -b html -c . Resources/doc _build/html
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
