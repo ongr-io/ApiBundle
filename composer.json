@@ -16,7 +16,7 @@
         "doctrine/orm": "~2.4",
         "doctrine/doctrine-bundle": "~1.2",
         "symfony/monolog-bundle": "~2.0",
-        "ongr/elasticsearch-bundle": ">=0.1,<2",
+        "ongr/elasticsearch-bundle": "~0.9",
         "nelmio/api-doc-bundle": "~2.8"
     },
     "require-dev": {
