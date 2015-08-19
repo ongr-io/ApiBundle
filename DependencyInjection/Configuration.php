@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -29,6 +30,16 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->scalarNode('default_encoding')
+                    ->defaultValue('json')
+                    ->example('json')
+                    ->info('Default encoding type. Changed through headers')
+                    ->isRequired()
+                    ->validate()
+                        ->ifNotInArray(['json', 'xml'])
+                        ->thenInvalid('Currently valid encoders are only json and xml!')
+                    ->end()
+                ->end()
                 ->arrayNode('versions')
                     ->info('Defines api versions.')
                     ->isRequired()
@@ -36,94 +47,99 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('version')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('version')->end()
-                            ->arrayNode('endpoints')
-                                ->info('Defines version endpoints.')
-                                ->useAttributeAsKey('endpoint')
-
-                                ->prototype('array')
-                                    ->info('Holds endpoint config.')
-                                    ->children()
-                                        ->scalarNode('endpoint')->end()
-                                        ->scalarNode('manager')
-                                            ->info('Elastic search manager name.')
-                                            ->example('es.manager.default')
-                                        ->end()
-                                        ->scalarNode('document')
-                                            ->info('Logical document class name.')
-                                            ->example('ONGRDemoBundle:ProductDocument')
-                                        ->end()
-                                        ->arrayNode('include_fields')
-                                            ->prototype('scalar')->end()
-                                            ->info(
-                                                'Document fields to include. Can not be used with \'exclude_fields\'.'
-                                            )
-                                            ->example(['title', 'price'])
-                                        ->end()
-                                        ->arrayNode('exclude_fields')
-                                            ->prototype('scalar')->end()
-                                            ->info(
-                                                'Document fields to exclude. Can not be used with \'include_fields\'.'
-                                            )
-                                            ->example(['id', 'slug'])
-                                        ->end()
-                                        ->arrayNode('controller')
-                                            ->info('Defines controller to override default one.')
-                                            ->children()
-                                                ->scalarNode('name')
-                                                    ->isRequired()
-                                                    ->info('Logical controller name.')
-                                                    ->example('ONGRDemoBundle:CustomApi')
-                                                ->end()
-                                                ->scalarNode('path')
-                                                    ->info('Routing path, where endpoint will be available.')
-                                                    ->example('/{id}/{field}')
-                                                ->end()
-                                                ->arrayNode('defaults')
-                                                    ->prototype('variable')->end()
-                                                    ->info('Route parameters defaults.')
-                                                    ->example(
-                                                        [
-                                                            'id' => 1,
-                                                            'field' => 'title',
-                                                        ]
-                                                    )
-                                                ->end()
-                                                ->arrayNode('requirements')
-                                                    ->info('Route requirements.')
-                                                    ->prototype('variable')->end()
-                                                ->end()
-                                                ->arrayNode('options')
-                                                    ->info('Route options.')
-                                                    ->prototype('variable')->end()
-                                                ->end()
-                                                ->arrayNode('params')
-                                                    ->info('Anything you want to pass to controller as parameters.')
-                                                    ->example(
-                                                        [
-                                                            'simple_param' => 123,
-                                                            'array_param' => [
-                                                                'some_string' => 'string',
-                                                                'some_int' => 321,
-                                                            ],
-                                                        ]
-                                                    )
-                                                    ->prototype('variable')->end()
-                                                ->end()
-                                            ->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
+                            ->scalarNode('version')
+                                ->info('Defines a version for current api')
+                                ->example('v2')
                             ->end()
-                            ->scalarNode('parent')
-                                ->info('Defines version from which configuration will be inherited.')
-                                ->example('v1')
-                            ->end()
+                            ->append($this->getEndpointNode())
                         ->end()
                     ->end()
                 ->end()
             ->end();
 
         return $treeBuilder;
+    }
+
+    /**
+     * Builds configuration tree for endpoints.
+     *
+     * @return NodeDefinition
+     */
+    public function getEndpointNode()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('endpoints');
+
+        $node
+            ->requiresAtLeastOneElement()
+            ->info('Defines version endpoints.')
+            ->useAttributeAsKey('endpoint')
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('endpoint')
+                        ->info('Endpoint name (will be included in url (excl. default))')
+                        ->example('custom')
+                    ->end()
+                    ->scalarNode('manager')
+                        ->isRequired()
+                        ->info('Elasticsearch manager which will be used for document fetching')
+                        ->example('es.manager.custom')
+                    ->end()
+                    ->append($this->getDocumentNode())
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Builds configuration tree for documents
+     *
+     * @return NodeDefinition
+     */
+    public function getDocumentNode()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('documents');
+
+        $node
+            ->beforeNormalization()
+                ->ifNull()
+                ->thenEmptyArray()
+            ->end()
+            ->prototype('array')
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(function ($string) {
+                        return ['name' => $string];
+                    })
+                ->end()
+                ->children()
+                    ->scalarNode('name')
+                        ->isRequired()
+                        ->info('Document name (AKA Repository name)')
+                        ->example('ONGRDemoBundle:Product')
+                    ->end()
+                    ->scalarNode('controller')
+                        ->defaultValue('ONGRApiBundle:Rest')
+                        ->info('Front controller for rest actions')
+                    ->end()
+                    ->arrayNode('methods')
+                        ->requiresAtLeastOneElement()
+                        ->defaultValue(['POST', 'GET', 'PUT', 'DELETE'])
+                        ->prototype('scalar')
+                            ->validate()
+                                ->ifNotInArray(['POST', 'GET', 'PUT', 'DELETE'])
+                                ->thenInvalid(
+                                    'Invalid method used! Available methods: POST, GET, PUT, DELETE.'
+                                    . 'Please check your ongr_api configuration.'
+                                )
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
     }
 }
