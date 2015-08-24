@@ -12,9 +12,11 @@
 namespace ONGR\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -43,34 +45,35 @@ class ONGRApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $collection = new Definition('Symfony\Component\Routing\RouteCollection');
-
-        foreach ($config['versions'] as $versionName => $version) {
-            $this->collectRoutes($versionName, $version['endpoints'], $collection);
-        }
-
-        $collection->setPublic(false);
-        $container->setDefinition('ongr_api.route_collection', $collection);
+        $this->collectRoutes($config['versions'], $container);
         $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
     }
 
     /**
      * Populates endpoints into route collection
      *
-     * @param array      $endpoints
-     * @param string     $version
-     * @param Definition $collectionDefinition
+     * @param array            $endpoints
+     * @param string           $version
+     * @param ContainerBuilder $builder
      */
-    private function collectRoutes($version, array $endpoints, $collectionDefinition)
+    private function collectRoutes(array $config, ContainerBuilder $builder)
     {
-        $this
-            ->setEndpointConfig($endpoints)
-            ->setVersion($version);
+        $collection = new Definition('Symfony\Component\Routing\RouteCollection');
 
-        foreach ($this->generate() as $name => $config) {
-            $route = new Definition('Symfony\Component\Routing\Route', $config);
-            $collectionDefinition->addMethodCall('add', [$name, $route]);
+        foreach ($config as $version => $endpoints) {
+            $this
+                ->setEndpointConfig($endpoints['endpoints'])
+                ->setVersion($version);
+
+            foreach ($this->generate() as $name => $config) {
+                $route = new Definition('Symfony\Component\Routing\Route', $config);
+                $collection->addMethodCall('add', [$name, $route]);
+            }
         }
+
+        $collection->setPublic(false);
+        $builder->setDefinition('ongr_api.route_collection', $collection);
+
     }
 
     /**
@@ -87,6 +90,7 @@ class ONGRApiExtension extends Extension
                     'url' => $this->formatUrl($name, $type),
                     'defaults' => [
                         'id' => null,
+                        'type' => strtolower($type),
                         'manager' => $config['manager'],
                         'repository' => $docConfig['name'],
                     ]

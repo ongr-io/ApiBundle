@@ -2,6 +2,12 @@ parameters:
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
     ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
 
+    ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
+    ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
+    ongr_api.rest_request_proxy_factory.class: ONGR\ApiBundle\Request\RestRequestProxyFactory
+    ongr_api.rest_request_proxy.class: ONGR\ApiBundle\Request\RestRequestProxy
+    ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
+
     ongr_api.form.float_type.class: ONGR\ApiBundle\Form\FloatType
     ongr_api.form.string_type.class: ONGR\ApiBundle\Form\StringType
     ongr_api.form.geo_point_type.class: ONGR\ApiBundle\Form\GeoPointType
@@ -19,6 +25,40 @@ services:
             - [setCollection, [@ongr_api.route_collection]]
         tags:
             - { name: routing.loader }
+
+    ongr_api.rest_response_view_handler:
+        class: %ongr_api.rest_response_view_handler.class%
+        arguments:
+            - @ongr_api.rest_request_proxy
+        scope: request
+
+    ongr_api.rest.validator:
+        class: %ongr_api.rest.validator.class%
+        arguments:
+            - @form.factory
+
+    ongr_api.event_listener.rest_request:
+        class: %ongr_api.event_listener.rest_request.class%
+        arguments:
+            - @ongr_api.rest_request_proxy
+        scope: request
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    ongr_api.rest_request_proxy_factory:
+        class: %ongr_api.rest_request_proxy_factory.class%
+        scope: request
+        arguments:
+            - @service_container
+
+    ongr_api.rest_request_proxy:
+        class: %ongr_api.rest_request_proxy.class%
+        factory_service: ongr_api.rest_request_proxy_factory
+        factory_method: get
+        scope: request
+        public: false
+        calls:
+            - [setDefaultAcceptType, [%ongr_api.default_encoding%]]
 
     ongr_api.document_type_factory:
         class: %ongr_api.form.document_type_factory.class%
