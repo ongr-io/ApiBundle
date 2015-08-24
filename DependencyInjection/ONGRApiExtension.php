@@ -44,6 +44,7 @@ class ONGRApiExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('types.yml');
 
         $this->collectRoutes($config['versions'], $container);
         $this->registerAuthenticationListener($config, $container);
