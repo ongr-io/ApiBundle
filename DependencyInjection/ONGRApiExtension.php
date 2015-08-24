@@ -56,22 +56,24 @@ class ONGRApiExtension extends Extension
      */
     private function registerAuthenticationListener(array $config, ContainerBuilder $container)
     {
-        $definition = new Definition(
-            $container->getParameter('ongr_api.event_listener.authentication.class'),
-            [
-                new Reference('service_container'),
-                $config['secret']
-            ]
-        );
-        $definition->setTags(
-            [
-                'kernel.event_listener' => [
-                    ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10]
+        if ($config['authorization']['enabled']) {
+            $definition = new Definition(
+                $container->getParameter('ongr_api.event_listener.authentication.class'),
+                [
+                    new Reference('service_container'),
+                    $config['authorization']['secret']
                 ]
-            ]
-        );
+            );
+            $definition->setTags(
+                [
+                    'kernel.event_listener' => [
+                        ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10]
+                    ]
+                ]
+            );
 
-        $container->setDefinition('ongr_api.event_listener.authentication', $definition);
+            $container->setDefinition('ongr_api.event_listener.authentication', $definition);
+        }
     }
 
     /**
