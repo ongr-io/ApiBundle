@@ -46,7 +46,32 @@ class ONGRApiExtension extends Extension
         $loader->load('services.yml');
 
         $this->collectRoutes($config['versions'], $container);
+        $this->registerAuthenticationListener($config, $container);
         $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
+    }
+
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    private function registerAuthenticationListener(array $config, ContainerBuilder $container)
+    {
+        $definition = new Definition(
+            $container->getParameter('ongr_api.event_listener.authentication.class'),
+            [
+                new Reference('service_container'),
+                $config['secret']
+            ]
+        );
+        $definition->setTags(
+            [
+                'kernel.event_listener' => [
+                    ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10]
+                ]
+            ]
+        );
+
+        $container->setDefinition('ongr_api.event_listener.authentication', $definition);
     }
 
     /**
@@ -73,7 +98,6 @@ class ONGRApiExtension extends Extension
 
         $collection->setPublic(false);
         $builder->setDefinition('ongr_api.route_collection', $collection);
-
     }
 
     /**

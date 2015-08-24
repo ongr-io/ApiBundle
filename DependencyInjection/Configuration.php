@@ -30,6 +30,10 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->scalarNode('secret')
+                    ->isRequired()
+                    ->info('Secret used for authentication')
+                ->end()
                 ->scalarNode('default_encoding')
                     ->defaultValue('json')
                     ->example('json')

@@ -4,6 +4,7 @@ parameters:
 
     ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
+    ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
     ongr_api.rest_request_proxy_factory.class: ONGR\ApiBundle\Request\RestRequestProxyFactory
     ongr_api.rest_request_proxy.class: ONGR\ApiBundle\Request\RestRequestProxy
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
@@ -30,7 +31,6 @@ services:
         class: %ongr_api.rest_response_view_handler.class%
         arguments:
             - @ongr_api.rest_request_proxy
-        scope: request
 
     ongr_api.rest.validator:
         class: %ongr_api.rest.validator.class%
@@ -41,13 +41,11 @@ services:
         class: %ongr_api.event_listener.rest_request.class%
         arguments:
             - @ongr_api.rest_request_proxy
-        scope: request
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     ongr_api.rest_request_proxy_factory:
         class: %ongr_api.rest_request_proxy_factory.class%
-        scope: request
         arguments:
             - @service_container
 
@@ -55,7 +53,6 @@ services:
         class: %ongr_api.rest_request_proxy.class%
         factory_service: ongr_api.rest_request_proxy_factory
         factory_method: get
-        scope: request
         public: false
         calls:
             - [setDefaultAcceptType, [%ongr_api.default_encoding%]]
