@@ -9,30 +9,20 @@ ONGR ApiBundle is meant to simplify elasticsearch data access for remote clients
 Installation
 ------------
 
-.. toctree::
-    :maxdepth: 1
-    :titlesonly:
+ - [Setup][1]
 
-    setup
-
-..
 
 Bundle documentation
 --------------------
 
 Main things you should know while working with this bundle.
 
-.. toctree::
-    :maxdepth: 1
-    :titlesonly:
+ - [Configuration][2]
+ - [Endpoints][3]
+ - [Custom controller][4]
 
-    configuration
-    controller
-    events
 
-..
-
-Cookbook
---------
-
-More specific features and usages that you might need.
+[1]: setup.md
+[2]: configuration.md
+[3]: endpoints.md
+[4]: custom_controller.md
