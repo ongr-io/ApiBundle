@@ -11,6 +11,8 @@
 
 namespace ONGR\ApiBundle\Validator;
 
+use ONGR\ApiBundle\Request\RestRequest;
+use ONGR\ElasticsearchBundle\ORM\Repository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -27,6 +29,11 @@ class DocumentValidator implements ValidatorInterface
     private $form;
 
     /**
+     * @var Repository
+     */
+    private $repository;
+
+    /**
      * @param FormFactoryInterface $formFactory
      */
     public function __construct(FormFactoryInterface $formFactory)
@@ -35,21 +42,20 @@ class DocumentValidator implements ValidatorInterface
     }
 
     /**
-     * Validates data for submission.
-     *
-     * @param array $data
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function validate(array $data)
+    public function validate(RestRequest $restRequest)
     {
+        $this->setRepository($restRequest->getRepository());
+
+        $data = $restRequest->getData();
         $this->getForm(true)->submit($data);
 
-        return $this->getForm()->isValid();
+        return $this->getForm()->isValid() ? $data : false;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getErrors()
     {
@@ -93,9 +99,64 @@ class DocumentValidator implements ValidatorInterface
         }
 
         if (!isset($this->form)) {
-            $this->form = $this->formFactory->create('ongr_api_document_type');
+            $this->form = $this->getFormFactory()->create(
+                'ongr_api_document_type',
+                null,
+                ['metadata' => $this->getMetadata()]
+            );
         }
 
         return $this->form;
+    }
+
+    /**
+     * @return DocumentTypeFactory
+     */
+    private function getTypeFactory()
+    {
+        return $this->typeFactory;
+    }
+
+    /**
+     * @return FormFactoryInterface
+     */
+    private function getFormFactory()
+    {
+        return $this->formFactory;
+    }
+
+    /**
+     * @return Repository
+     */
+    private function getMetadata()
+    {
+        $types = $this->getRepository()->getManager()->getTypesMapping();
+        $repositoryTypes = $this->getRepository()->getTypes();
+        $meta = $this
+            ->getRepository()
+            ->getManager()
+            ->getBundlesMapping([$types[reset($repositoryTypes)]]);
+
+        return reset($meta);
+    }
+
+    /**
+     * @return Repository
+     */
+    private function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param Repository $repository
+     *
+     * @return $this
+     */
+    private function setRepository($repository)
+    {
+        $this->repository = $repository;
+
+        return $this;
     }
 }

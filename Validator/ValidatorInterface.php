@@ -11,14 +11,18 @@
 
 namespace ONGR\ApiBundle\Validator;
 
+use ONGR\ApiBundle\Request\RestRequest;
+
 interface ValidatorInterface
 {
     /**
-     * @param array $data
+     * Validates data for submission.
      *
-     * @return bool
+     * @param RestRequest $restRequest
+     *
+     * @return array|bool
      */
-    public function validate(array $data);
+    public function validate(RestRequest $restRequest);
 
     /**
      * @return array
