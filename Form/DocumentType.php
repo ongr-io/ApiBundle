@@ -11,9 +11,9 @@
 
 namespace ONGR\ApiBundle\Form;
 
-use ONGR\ElasticsearchBundle\Mapping\ClassMetadata;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DocumentType extends AbstractType
@@ -21,24 +21,11 @@ class DocumentType extends AbstractType
     use ObjectResolverTrait;
 
     /**
-     * @var ClassMetadata
-     */
-    private $metadata;
-
-    /**
-     * @param ClassMetadata $repository
-     */
-    public function __construct(ClassMetadata $metadata)
-    {
-        $this->metadata = $metadata;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($this->getMetadata()->getAliases() as $name => $alias) {
+        foreach ($options['metadata']->getAliases() as $name => $alias) {
             $this->resolveField($builder, $name, $alias);
         }
 
@@ -55,11 +42,15 @@ class DocumentType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'data_class' => $this->getMetadata()->getNamespace(),
                     'csrf_protection' => false,
                     'extra_fields' => ['id' => ['type' => 'string']],
                 ]
-            );
+            )
+            ->setRequired(['metadata'])
+            ->setAllowedTypes(['metadata' => 'ONGR\ElasticsearchBundle\Mapping\ClassMetadata'])
+            ->setDefault('data_class', function (Options $options) {
+                return $options['metadata']->getNamespace();
+            });
     }
 
     /**
@@ -68,13 +59,5 @@ class DocumentType extends AbstractType
     public function getName()
     {
         return 'ongr_api_document_type';
-    }
-
-    /**
-     * @return ClassMetadata
-     */
-    protected function getMetadata()
-    {
-        return $this->metadata;
     }
 }

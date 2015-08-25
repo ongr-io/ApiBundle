@@ -5,20 +5,11 @@ parameters:
     ongr_api.form.completion_type.class: ONGR\ApiBundle\Form\CompletionType
     ongr_api.form.object_type.class: ONGR\ApiBundle\Form\ObjectType
     ongr_api.form.nested_type.class: ONGR\ApiBundle\Form\NestedType
-
     ongr_api.form.document_type.class: ONGR\ApiBundle\Form\DocumentType
-    ongr_api.form.document_type_factory.class: ONGR\ApiBundle\Form\DocumentTypeFactory
 
 services:
-    ongr_api.document_type_factory:
-        class: %ongr_api.form.document_type_factory.class%
-        arguments:
-            - @service_container
-        public: false
-
     ongr_api.document_type:
         class: %ongr_api.form.document_type.class%
-        factory: ["@ongr_api.document_type_factory", get]
         tags:
             - { name: form.type, alias: ongr_api_document_type }
 
