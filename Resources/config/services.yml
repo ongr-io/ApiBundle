@@ -5,10 +5,13 @@ parameters:
     ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
     ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
-    ongr_api.rest_request_proxy_factory.class: ONGR\ApiBundle\Request\RestRequestProxyFactory
-    ongr_api.rest_request_proxy.class: ONGR\ApiBundle\Request\RestRequestProxy
+    ongr_api.rest_request_factory.class: ONGR\ApiBundle\Request\RestRequestFactory
+    ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
+    ongr_api.batch_processor.class: ONGR\ApiBundle\Request\BatchProcessor
 
+    ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
+    ongr_api.batch_controller.class: ONGR\ApiBundle\Controller\BatchController
 services:
     ongr_api.elasticsearch_loader:
         class: %ongr_api.elasticsearch_loader.class%
@@ -20,7 +23,7 @@ services:
     ongr_api.rest_response_view_handler:
         class: %ongr_api.rest_response_view_handler.class%
         arguments:
-            - @ongr_api.rest_request_proxy
+            - @ongr_api.rest_request
 
     ongr_api.rest.validator:
         class: %ongr_api.rest.validator.class%
@@ -30,19 +33,36 @@ services:
     ongr_api.event_listener.rest_request:
         class: %ongr_api.event_listener.rest_request.class%
         arguments:
-            - @ongr_api.rest_request_proxy
+            - @ongr_api.rest_request
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
-    ongr_api.rest_request_proxy_factory:
-        class: %ongr_api.rest_request_proxy_factory.class%
+    ongr_api.rest_request_factory:
+        class: %ongr_api.rest_request_factory.class%
         arguments:
             - @service_container
 
-    ongr_api.rest_request_proxy:
-        class: %ongr_api.rest_request_proxy.class%
-        factory_service: ongr_api.rest_request_proxy_factory
+    ongr_api.rest_request:
+        class: %ongr_api.rest_request.class%
+        factory_service: ongr_api.rest_request_factory
         factory_method: get
         public: false
         calls:
             - [setDefaultAcceptType, [%ongr_api.default_encoding%]]
+
+    ongr_api.rest_controller:
+        class: %ongr_api.rest_controller.class%
+        calls:
+            - [setContainer, [@service_container]]
+
+    ongr_api.batch_controller:
+        class: %ongr_api.batch_controller.class%
+        calls:
+            - [setContainer, [@service_container]]
+
+    ongr_api.batch_processor:
+        class: %ongr_api.batch_processor.class%
+        arguments:
+            - @router
+        calls:
+            - [setContainer, [@service_container]]

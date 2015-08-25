@@ -2,8 +2,3 @@ ongr_api_main_route:
     resource: .
     type: ongr_api
 
-ongr_api_batch_route:
-    pattern: batch
-    defaults:
-        _controller: ONGRApiBundle:Batch:batch
-    methods: ["POST"]

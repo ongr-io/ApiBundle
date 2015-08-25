@@ -93,9 +93,14 @@ class ONGRApiExtension extends Extension
                 ->setEndpointConfig($endpoints['endpoints'])
                 ->setVersion($version);
 
-            foreach ($this->generate() as $name => $config) {
-                $route = new Definition('Symfony\Component\Routing\Route', $config);
+            foreach ($this->generate() as $name => $routeConfig) {
+                $route = new Definition('Symfony\Component\Routing\Route', $routeConfig);
                 $collection->addMethodCall('add', [$name, $route]);
+            }
+
+            if ($endpoints['batch']['enabled']) {
+                $route = $this->getBatchRoute($endpoints['batch']);
+                $collection->addMethodCall('add', [sprintf('ongr_api_%s_batch', $this->getVersion()), $route]);
             }
         }
 
@@ -120,11 +125,12 @@ class ONGRApiExtension extends Extension
                         'type' => strtolower($type),
                         'manager' => $config['manager'],
                         'repository' => $docConfig['name'],
+                        '_version' => $this->getVersion(),
                     ]
                 ];
 
                 foreach ($docConfig['methods'] as $method) {
-                    $c['defaults']['_controller'] = $docConfig['controller'] . ':' . strtolower($method);
+                    $c['defaults']['_controller'] = $docConfig['controller'] . ':' . strtolower($method) . 'Action';
                     $c['requirements']['_method'] = $method;
 
                     yield $this->formatName($name, $type, $method) => $c;
@@ -141,7 +147,7 @@ class ONGRApiExtension extends Extension
      *
      * @return string
      */
-    protected function formatUrl($endpoint, $type)
+    private function formatUrl($endpoint, $type)
     {
         return sprintf(
             "%s%s%s/{id}",
@@ -160,9 +166,33 @@ class ONGRApiExtension extends Extension
      *
      * @return string
      */
-    protected function formatName($endpoint, $type, $method)
+    private function formatName($endpoint, $type, $method)
     {
         return strtolower(sprintf('ongr_api_%s_%s_%s_%s', $this->getVersion(), $endpoint, $type, $method));
+    }
+
+    /**
+     * Builds batch route definition.
+     *
+     * @param array$config
+     *
+     * @return Definition
+     */
+    private function getBatchRoute(array $config)
+    {
+        return new Definition(
+            'Symfony\Component\Routing\Route',
+            [
+                'url' => $this->getVersion() . '/batch',
+                'defaults' => [
+                    '_version' => $this->getVersion(),
+                    '_controller' => $config['controller'] . ':batchAction',
+                ],
+                'requirements' => [
+                    '_method' => 'POST'
+                ]
+            ]
+        );
     }
 
     /**
