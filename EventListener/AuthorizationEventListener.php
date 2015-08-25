@@ -46,7 +46,7 @@ class AuthorizationEventListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$event->isMasterRequest() && strpos($request->attributes->get('_route', ''), 'ongr_api_') === false) {
+        if (!$event->isMasterRequest() || strpos($request->attributes->get('_route', ''), 'ongr_api_') === false) {
             return;
         }
 
