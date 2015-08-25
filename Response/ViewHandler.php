@@ -11,22 +11,22 @@
 
 namespace ONGR\ApiBundle\Response;
 
-use ONGR\ApiBundle\Request\RestRequestProxy;
+use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class ViewHandler
 {
     /**
-     * @var RestRequestProxy
+     * @var RestRequest
      */
-    private $requestProxy;
+    private $restRequest;
 
     /**
-     * @param RestRequestProxy $restRequestProxy
+     * @param RestRequest $restRequest
      */
-    public function __construct(RestRequestProxy $restRequestProxy)
+    public function __construct(RestRequest $restRequest)
     {
-        $this->requestProxy = $restRequestProxy;
+        $this->restRequest = $restRequest;
     }
 
     /**
@@ -34,23 +34,27 @@ class ViewHandler
      *
      * @param mixed $data
      * @param int   $statusCode
+     * @param array $headers
      *
      * @return Response
      */
-    public function handleView($data, $statusCode = Response::HTTP_OK)
+    public function handleView($data, $statusCode = Response::HTTP_OK, $headers = [])
     {
         return new Response(
-            $this->getRequestProxy()->serialize($data),
+            $this->getRestRequest()->serialize($data),
             $statusCode,
-            ['Content-Type' => 'application/' . $this->getRequestProxy()->checkAcceptHeader()]
+            array_merge(
+                ['Content-Type' => 'application/' . $this->getRestRequest()->checkAcceptHeader()],
+                $headers
+            )
         );
     }
 
     /**
-     * @return RestRequestProxy
+     * @return RestRequest
      */
-    protected function getRequestProxy()
+    public function getRestRequest()
     {
-        return $this->requestProxy;
+        return $this->restRequest;
     }
 }
