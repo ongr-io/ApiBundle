@@ -11,14 +11,15 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use ONGR\ApiBundle\Request\RestRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 interface BatchControllerInterface extends ApiInterface
 {
     /**
-     * @param Request $request
+     * @param RestRequest $restRequest
      *
      * @return Response
      */
-    public function batchAction(Request $request);
+    public function batchAction(RestRequest $restRequest);
 }

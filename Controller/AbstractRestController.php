@@ -17,15 +17,39 @@ use Symfony\Component\HttpFoundation\Response;
 class AbstractRestController extends Controller
 {
     /**
+     * @var bool
+     */
+    private $batch = false;
+
+    /**
+     * @return boolean
+     */
+    public function isBatch()
+    {
+        return $this->batch;
+    }
+
+    /**
+     * @param boolean $batch
+     */
+    public function setBatch($batch)
+    {
+        $this->batch = $batch;
+    }
+
+    /**
      * Renders rest response.
      *
      * @param mixed $data
      * @param int   $statusCode
+     * @param array $headers
      *
-     * @return Response
+     * @return Response|array
      */
-    public function renderRest($data, $statusCode = Response::HTTP_OK)
+    public function renderRest($data, $statusCode = Response::HTTP_OK, $headers = [])
     {
-        return $this->get('ongr_api.rest_response_view_handler')->handleView($data, $statusCode);
+        return $this->isBatch()
+            ? ['status_code' => $statusCode, 'response' => $data]
+            : $this->get('ongr_api.rest_response_view_handler')->handleView($data, $statusCode, $headers);
     }
 }
