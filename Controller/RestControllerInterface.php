@@ -11,7 +11,7 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use ONGR\ApiBundle\Request\RestRequestProxy;
+use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -22,40 +22,40 @@ interface RestControllerInterface extends ApiInterface
     /**
      * Create operation.
      *
-     * @param RestRequestProxy $requestProxy
-     * @param srting   $id
+     * @param RestRequest $restRequest
+     * @param srting      $id
      *
      * @return Response
      */
-    public function postAction(RestRequestProxy $requestProxy, $id = null);
+    public function postAction(RestRequest $restRequest, $id = null);
 
     /**
      * Read operation.
      *
-     * @param RestRequestProxy $requestProxy
-     * @param srting   $id
+     * @param RestRequest $restRequest
+     * @param srting      $id
      *
      * @return Response
      */
-    public function getAction(RestRequestProxy $requestProxy, $id = null);
+    public function getAction(RestRequest $restRequest, $id = null);
 
     /**
      * Update operation.
      *
-     * @param RestRequestProxy $requestProxy
-     * @param srting   $id
+     * @param RestRequest $restRequest
+     * @param srting      $id
      *
      * @return Response
      */
-    public function putAction(RestRequestProxy $requestProxy, $id = null);
+    public function putAction(RestRequest $restRequest, $id = null);
 
     /**
      * Delete operation.
      *
-     * @param RestRequestProxy $requestProxy
-     * @param srting   $id
+     * @param RestRequest $restRequest
+     * @param srting      $id
      *
      * @return Response
      */
-    public function deleteAction(RestRequestProxy $requestProxy, $id = null);
+    public function deleteAction(RestRequest $restRequest, $id = null);
 }

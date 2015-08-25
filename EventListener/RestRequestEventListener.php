@@ -11,23 +11,23 @@
 
 namespace ONGR\ApiBundle\EventListener;
 
-use ONGR\ApiBundle\Controller\RestControllerInterface;
-use ONGR\ApiBundle\Request\RestRequestProxy;
+use ONGR\ApiBundle\Controller\ApiInterface;
+use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class RestRequestEventListener
 {
     /**
-     * @var RestRequestProxy
+     * @var RestRequest
      */
-    private $restRequestProxy;
+    private $restRequest;
 
     /**
-     * @param RestRequestProxy $requestProxy
+     * @param RestRequest $restRequest
      */
-    public function __construct(RestRequestProxy $requestProxy)
+    public function __construct(RestRequest $restRequest)
     {
-        $this->restRequestProxy = $requestProxy;
+        $this->restRequest = $restRequest;
     }
 
     /**
@@ -38,7 +38,7 @@ class RestRequestEventListener
     public function onKernelController(FilterControllerEvent $event)
     {
         if ($this->support($event->getController()[0])) {
-            $event->getRequest()->attributes->set('requestProxy', $this->getRequestProxy());
+            $event->getRequest()->attributes->set('restRequest', $this->getRestRequest());
         }
     }
 
@@ -51,14 +51,14 @@ class RestRequestEventListener
      */
     public function support($controller)
     {
-        return $controller instanceof RestControllerInterface;
+        return $controller instanceof ApiInterface;
     }
 
     /**
-     * @return RestRequestProxy
+     * @return RestRequest
      */
-    private function getRequestProxy()
+    public function getRestRequest()
     {
-        return $this->restRequestProxy;
+        return $this->restRequest;
     }
 }

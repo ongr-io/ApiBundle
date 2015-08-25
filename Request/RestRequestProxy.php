@@ -11,22 +11,14 @@
 
 namespace ONGR\ApiBundle\Request;
 
-use JMS\Serializer\SerializerInterface;
 use ONGR\ElasticsearchBundle\ORM\Repository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
-class RestRequestProxy
+class RestRequestProxy extends RestRequest
 {
     /**
-     * @var SerializerInterface
+     * @var array
      */
-    private $serializer;
-
-    /**
-     * @var Request
-     */
-    private $request;
+    private $data;
 
     /**
      * @var Repository
@@ -34,51 +26,23 @@ class RestRequestProxy
     private $repository;
 
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    private $defaultAcceptType;
-
-    /**
-     * @param Request             $request
-     * @param SerializerInterface $serializer
-     * @param Repository          $repository
-     */
-    public function __construct(Request $request, SerializerInterface $serializer, Repository $repository = null)
+    public function getData()
     {
-        $this->request = $request;
-        $this->serializer = $serializer;
-        $this->repository = $repository;
+        return $this->data;
     }
 
     /**
-     * @param string $name
-     * @param array  $arguments
-     *
-     * @return mixed
-     *
-     * @throws \BadMethodCallException
+     * @param mixed $data
      */
-    public function __call($name, $arguments)
+    public function setData($data)
     {
-        if (method_exists($this->getRequest(), $name)) {
-            return call_user_func_array([$this->getRequest(), $name], $arguments);
-        }
-
-        throw new \BadMethodCallException(sprintf("'%s' method does not exist!", $name));
+        $this->data = $data;
     }
 
     /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->getRequest()->{$name};
-    }
-
-    /**
-     * @return Repository|null
+     * {@inheritdoc}
      */
     public function getRepository()
     {
@@ -86,99 +50,22 @@ class RestRequestProxy
     }
 
     /**
-     * Fethes deserialized request content.
-     *
-     * @return array
+     * @param Repository $repository
      */
-    public function getData()
+    public function setRepository(Repository $repository)
     {
-        return $this->deserialize($this->getRequest()->getContent());
+        $this->repository = $repository;
     }
 
     /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * @return string
+     * Initializes proxy rest request.
      *
-     * @throws RuntimeException
-     */
-    public function getDefaultAcceptType()
-    {
-        if (!$this->defaultAcceptType) {
-            throw new \RuntimeException('Please set acceptable content type to request or set default accept type.');
-        }
-
-        return $this->defaultAcceptType;
-    }
-
-    /**
-     * @param string $defaultAcceptType
-     */
-    public function setDefaultAcceptType($defaultAcceptType)
-    {
-        $this->defaultAcceptType = $defaultAcceptType;
-    }
-
-    /**
-     * Encodes data for response.
+     * @param RestRequest $restRequest
      *
-     * @param array $data
-     *
-     * @return string
+     * @return RestRequestProxy
      */
-    public function serialize($data)
+    public static function initialize(RestRequest $restRequest)
     {
-        return $this
-            ->getSerializer()
-            ->serialize($data, $this->checkAcceptHeader());
-    }
-
-    /**
-     * Deserializes content.
-     *
-     * @param mixed $data
-     *
-     * @return array|null
-     */
-    public function deserialize($data)
-    {
-        try {
-            return $this
-                ->getSerializer()
-                ->deserialize($data, 'array', $this->checkAcceptHeader());
-        } catch (\Exception $e) {
-        }
-    }
-
-    /**
-     * @return SerializerInterface
-     */
-    protected function getSerializer()
-    {
-        return $this->serializer;
-    }
-
-    /**
-     * Returns accpetance type based on given request.
-     *
-     * @return string
-     */
-    public function checkAcceptHeader()
-    {
-        $headers = $this->getRequest()->getAcceptableContentTypes();
-
-        if (array_intersect($headers, ['application/xml', 'text/xml'])) {
-            return 'xml';
-        } elseif (array_intersect($headers, ['application/json', 'text/json'])) {
-            return 'json';
-        }
-
-        return $this->getDefaultAcceptType();
+        return new self($restRequest->getRequest(), $restRequest->getSerializer());
     }
 }

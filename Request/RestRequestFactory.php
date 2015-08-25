@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RestRequestProxyFactory
+class RestRequestFactory
 {
     /**
      * @var ContainerInterface
@@ -40,11 +40,11 @@ class RestRequestProxyFactory
     /**
      * Instantiates rest request proxy object.
      *
-     * @return RestRequestProxy
+     * @return RestRequest
      */
     public function get()
     {
-        return new RestRequestProxy(
+        return new RestRequest(
             $this->getRequest(),
             $this->container->get('serializer'),
             $this->getRepository()

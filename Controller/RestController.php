@@ -12,7 +12,7 @@
 namespace ONGR\ApiBundle\Controller;
 
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use ONGR\ApiBundle\Request\RestRequestProxy;
+use ONGR\ApiBundle\Request\RestRequest;
 use ONGR\ElasticsearchBundle\DSL\Search;
 use ONGR\ElasticsearchBundle\ORM\Manager;
 use ONGR\ElasticsearchBundle\ORM\Repository;
@@ -27,10 +27,16 @@ class RestController extends AbstractRestController implements RestControllerInt
     /**
      * {@inheritdoc}
      */
-    public function postAction(RestRequestProxy $requestProxy, $id = null)
+    public function postAction(RestRequest $restRequest, $id = null)
     {
-        $data = $requestProxy->getData();
         $validator = $this->get('ongr_api.rest.validator');
+
+        if (($data = $validator->validate($restRequest)) === false) {
+            return $this->renderRest(
+                ['message' => 'Validation error!', 'errors' => $validator->getErrors()],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
 
         if ($id !== null) {
             $data['id'] = $id;
@@ -38,44 +44,38 @@ class RestController extends AbstractRestController implements RestControllerInt
             $id = $data['id'];
         }
 
-        if (!$validator->validate($data)) {
-            return $this->renderRest(
-                ['message' => 'Validation error!', 'errors' => $validator->getErrors()],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        $repository = $requestProxy->getRepository();
+        $repository = $restRequest->getRepository();
         $types = $repository->getTypes();
 
         $data['_id'] = $id;
         $repository->getManager()->getConnection()->bulk('create', reset($types), $data);
         $repository->getManager()->commit();
 
-        $response = $this->renderRest(null, Response::HTTP_CREATED);
-        $response->headers->set('Location', $this->generateRestUrl($requestProxy->getRequest(), $id));
-
-        return $response;
+        return $this->renderRest(
+            null,
+            Response::HTTP_CREATED,
+            ['Location' => $this->generateRestUrl($restRequest->getRequest(), $id)]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAction(RestRequestProxy $requestProxy, $id = null)
+    public function getAction(RestRequest $restRequest, $id = null)
     {
         if ($id !== null) {
-            if (($data = $requestProxy->getRepository()->find($id, Repository::RESULTS_ARRAY)) === null) {
+            if (($data = $restRequest->getRepository()->find($id, Repository::RESULTS_ARRAY)) === null) {
                 return $this->renderRest(null, Response::HTTP_GONE);
             }
         } else {
             $search = new Search();
-            if ($requestProxy->query->has('from')) {
-                $search->setFrom($requestProxy->query->get('from'));
+            if ($restRequest->query->has('from')) {
+                $search->setFrom($restRequest->query->get('from'));
             }
-            if ($requestProxy->query->has('size')) {
-                $search->setSize($requestProxy->query->get('size'));
+            if ($restRequest->query->has('size')) {
+                $search->setSize($restRequest->query->get('size'));
             }
-            $data = $requestProxy->getRepository()->execute($search, Repository::RESULTS_ARRAY);
+            $data = $restRequest->getRepository()->execute($search, Repository::RESULTS_ARRAY);
         }
 
         return $this->renderRest($data);
@@ -84,18 +84,12 @@ class RestController extends AbstractRestController implements RestControllerInt
     /**
      * {@inheritdoc}
      */
-    public function putAction(RestRequestProxy $requestProxy, $id = null)
+    public function putAction(RestRequest $restRequest, $id = null)
     {
-        $data = $requestProxy->getData();
+        $data = $restRequest->getData();
         $validator = $this->get('ongr_api.rest.validator');
 
-        if ($id !== null) {
-            $data['id'] = $id;
-        } else {
-            $id = $data['id'];
-        }
-
-        if (!$validator->validate($data)) {
+        if (($data = $validator->validate($restRequest)) === false) {
             return $this->renderRest(
                 [
                     'message' => 'Validation error!',
@@ -105,34 +99,41 @@ class RestController extends AbstractRestController implements RestControllerInt
             );
         }
 
-        $repository = $requestProxy->getRepository();
+        if ($id !== null) {
+            $data['id'] = $id;
+        } else {
+            $id = $data['id'];
+        }
+
+        $repository = $restRequest->getRepository();
         $types = $repository->getTypes();
 
         $data['_id'] = $id;
         $repository->getManager()->getConnection()->bulk('index', reset($types), $data);
         $repository->getManager()->commit();
 
-        $response = $this->renderRest(null, Response::HTTP_NO_CONTENT);
-        $response->headers->set('Location', $this->generateRestUrl($requestProxy->getRequest(), $id));
-
-        return $response;
+        return $this->renderRest(
+            null,
+            Response::HTTP_NO_CONTENT,
+            ['Location' => $this->generateRestUrl($restRequest->getRequest(), $id)]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteAction(RestRequestProxy $requestProxy, $id = null)
+    public function deleteAction(RestRequest $restRequest, $id = null)
     {
         if ($id === null) {
             return $this->renderRest(null, Response::HTTP_BAD_REQUEST);
         }
 
-        $connection = $requestProxy->getRepository()->getManager()->getConnection();
+        $connection = $restRequest->getRepository()->getManager()->getConnection();
         try {
             $connection->delete(
                 [
                     'id' => $id,
-                    'type' => $requestProxy->getRepository()->getTypes(),
+                    'type' => $restRequest->getRepository()->getTypes(),
                     'index' => $connection->getIndexName()
                 ]
             );
@@ -154,6 +155,10 @@ class RestController extends AbstractRestController implements RestControllerInt
      */
     protected function generateRestUrl(Request $request, $id = null, $method = 'GET')
     {
+        if ($this->isBatch()) {
+            return;
+        }
+
         $route = $request->attributes->get('_route');
         $route = substr_replace($route, strtolower($method), strrpos($route, '_') + 1);
 
