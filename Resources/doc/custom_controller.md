@@ -71,4 +71,4 @@ ongr_api:
                             - { name: "ONGRDemoBundle:Product", controller: "acme_demo.rest_controller" }
 ```
 
-That's it. Now every request for `/v1/product` will be handled by your new controller.
+That's it. Now every request for `/v1/product` will be handled by our new controller.

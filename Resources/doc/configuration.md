@@ -32,7 +32,7 @@ ongr_api:
 
 - `default_encoding` - default encoding used if unknown `Accept` value set in header.
 
-- `versions` - define multiple API versions. Version name will correspond to first url parameter e.g. '/v1'
+- `versions` - define multiple API versions. Version name will correspond to first url parameter e.g. `/v1`
 > You should be consistent with version naming. Think of version naming conventions and stick to them e.g. ``v1``, ``v2``, ...
 
 - `endpoints` - here you can define multiple API endpoints. Name will correspond to second url parameter, e.g. `/v1/users`. One endpoint is responsible for one elasticsearch manager.
