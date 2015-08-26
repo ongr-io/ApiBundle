@@ -38,6 +38,8 @@ class ElasticsearchLoader extends Loader
             throw new \RuntimeException('Do not add the "ongr_api" loader twice');
         }
 
+        $this->loaded = true;
+
         return $this->getCollection();
     }
 
