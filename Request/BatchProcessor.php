@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Handles multiple actions on one request.
+ */
 class BatchProcessor implements ContainerAwareInterface
 {
     /**
@@ -60,7 +63,6 @@ class BatchProcessor implements ContainerAwareInterface
         foreach ($data as $action) {
             $action = $this->resolver->resolve($action);
             $this->getRouter()->getContext()->setMethod($action['method']);
-            // TODO: figure out how to filter routes
             $options = $this->getRouter()->match('/api/' . $restRequest->getVersion() . '/' . $action['path']);
             list($id, $method) = explode(':', $options['_controller'], 2);
             $controller = $this->getContainer()->get($id);
@@ -107,6 +109,8 @@ class BatchProcessor implements ContainerAwareInterface
     }
 
     /**
+     * Options resolver setup.
+     *
      * @param OptionsResolver $resolver
      */
     protected function configureResolver(OptionsResolver $resolver)
@@ -117,11 +121,14 @@ class BatchProcessor implements ContainerAwareInterface
                 [
                     'method' => 'string',
                     'path' => 'string',
-                    'body' => 'array'
+                    'body' => 'array',
                 ]
             )
-            ->setNormalizer('method', function ($options, $value) {
-                return strtoupper($value);
-            });
+            ->setNormalizer(
+                'method',
+                function ($options, $value) {
+                    return strtoupper($value);
+                }
+            );
     }
 }

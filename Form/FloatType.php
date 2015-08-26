@@ -13,6 +13,9 @@ namespace ONGR\ApiBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 
+/**
+ * Float alias for number.
+ */
 class FloatType extends AbstractType
 {
     /**

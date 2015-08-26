@@ -14,6 +14,9 @@ namespace ONGR\ApiBundle\Response;
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * View handler for displaying in correct content type.
+ */
 class ViewHandler
 {
     /**

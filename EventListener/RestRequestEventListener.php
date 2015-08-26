@@ -15,6 +15,9 @@ use ONGR\ApiBundle\Controller\ApiInterface;
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
+/**
+ * Listener for injecting rest request into controller.
+ */
 class RestRequestEventListener
 {
     /**
@@ -31,7 +34,7 @@ class RestRequestEventListener
     }
 
     /**
-     * Injects rest request proxy into request attributes
+     * Injects rest request proxy into request attributes.
      *
      * @param FilterControllerEvent $event
      */

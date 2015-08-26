@@ -14,6 +14,9 @@ namespace ONGR\ApiBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Abstraction for rest api controller.
+ */
 class AbstractRestController extends Controller
 {
     /**
@@ -22,7 +25,7 @@ class AbstractRestController extends Controller
     private $batch = false;
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isBatch()
     {
@@ -30,7 +33,7 @@ class AbstractRestController extends Controller
     }
 
     /**
-     * @param boolean $batch
+     * @param bool $batch
      */
     public function setBatch($batch)
     {
@@ -48,8 +51,10 @@ class AbstractRestController extends Controller
      */
     public function renderRest($data, $statusCode = Response::HTTP_OK, $headers = [])
     {
-        return $this->isBatch()
-            ? ['status_code' => $statusCode, 'response' => $data]
-            : $this->get('ongr_api.rest_response_view_handler')->handleView($data, $statusCode, $headers);
+        if ($this->isBatch()) {
+            return ['status_code' => $statusCode, 'response' => $data];
+        }
+
+        return $this->get('ongr_api.rest_response_view_handler')->handleView($data, $statusCode, $headers);
     }
 }

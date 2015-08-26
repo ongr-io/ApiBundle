@@ -15,6 +15,9 @@ use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
+/**
+ * Controller for handling batch requests.
+ */
 class BatchController extends AbstractRestController implements BatchControllerInterface
 {
     /**
@@ -30,12 +33,12 @@ class BatchController extends AbstractRestController implements BatchControllerI
         } catch (ResourceNotFoundException $e) {
             $error = [
                 'message' => 'Could not resolve path!',
-                'error'   => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         } catch (Exception $e) {
             $error = [
                 'message' => 'Error',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
 

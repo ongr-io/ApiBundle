@@ -31,7 +31,8 @@ class RestController extends AbstractRestController implements RestControllerInt
     {
         $validator = $this->get('ongr_api.rest.validator');
 
-        if (($data = $validator->validate($restRequest)) === false) {
+        $data = $validator->validate($restRequest);
+        if ($data === false) {
             return $this->renderRest(
                 ['message' => 'Validation error!', 'errors' => $validator->getErrors()],
                 Response::HTTP_BAD_REQUEST
@@ -71,7 +72,8 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function getAction(RestRequest $restRequest, $id = null)
     {
         if ($id !== null) {
-            if (($data = $restRequest->getRepository()->find($id, Repository::RESULTS_ARRAY)) === null) {
+            $data = $restRequest->getRepository()->find($id, Repository::RESULTS_ARRAY);
+            if ($data === null) {
                 return $this->renderRest(null, Response::HTTP_GONE);
             }
         } else {
@@ -95,12 +97,13 @@ class RestController extends AbstractRestController implements RestControllerInt
     {
         $data = $restRequest->getData();
         $validator = $this->get('ongr_api.rest.validator');
+        $data = $validator->validate($restRequest);
 
-        if (($data = $validator->validate($restRequest)) === false) {
+        if ($data === false) {
             return $this->renderRest(
                 [
                     'message' => 'Validation error!',
-                    'errors' => $validator->getErrors()
+                    'errors' => $validator->getErrors(),
                 ],
                 Response::HTTP_BAD_REQUEST
             );
@@ -148,7 +151,7 @@ class RestController extends AbstractRestController implements RestControllerInt
                 [
                     'id' => $id,
                     'type' => $restRequest->getRepository()->getTypes(),
-                    'index' => $connection->getIndexName()
+                    'index' => $connection->getIndexName(),
                 ]
             );
         } catch (Missing404Exception $e) {
@@ -161,6 +164,8 @@ class RestController extends AbstractRestController implements RestControllerInt
     }
 
     /**
+     * Generates rest uri from request.
+     *
      * @param Request $request
      * @param string  $id
      * @param string  $method
@@ -170,7 +175,7 @@ class RestController extends AbstractRestController implements RestControllerInt
     protected function generateRestUrl(Request $request, $id = null, $method = 'GET')
     {
         if ($this->isBatch()) {
-            return;
+            return null;
         }
 
         $route = $request->attributes->get('_route');

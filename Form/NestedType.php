@@ -13,6 +13,9 @@ namespace ONGR\ApiBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 
+/**
+ * Nested type as object alias.
+ */
 class NestedType extends AbstractType
 {
     /**

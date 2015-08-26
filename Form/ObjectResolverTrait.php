@@ -43,7 +43,7 @@ trait ObjectResolverTrait
         $typeOptions = [
             'data_class' => $alias['namespace'],
             'types' => $alias['aliases'],
-            'multiple' => (bool) $alias['multiple']
+            'multiple' => (bool)$alias['multiple'],
         ];
 
         if ($typeOptions['multiple']) {

@@ -13,6 +13,9 @@ namespace ONGR\ApiBundle\Request;
 
 use ONGR\ElasticsearchBundle\ORM\Repository;
 
+/**
+ * Rest request proxy used in batch requests.
+ */
 class RestRequestProxy extends RestRequest
 {
     /**

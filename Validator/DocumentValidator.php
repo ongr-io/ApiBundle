@@ -16,6 +16,9 @@ use ONGR\ElasticsearchBundle\ORM\Repository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Validates document using symfony forms.
+ */
 class DocumentValidator implements ValidatorInterface
 {
     /**
@@ -78,7 +81,8 @@ class DocumentValidator implements ValidatorInterface
 
         foreach ($form->all() as $childForm) {
             if ($childForm instanceof FormInterface) {
-                if ($childErrors = $this->getFormErrors($childForm)) {
+                $childErrors = $this->getFormErrors($childForm);
+                if ($childErrors) {
                     $errors[$childForm->getName()] = $childErrors;
                 }
             }

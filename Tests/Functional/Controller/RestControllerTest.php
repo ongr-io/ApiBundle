@@ -39,8 +39,8 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                         'name' => 'TestName3',
                         'surname' => 'TestSurname3',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -149,7 +149,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
     }
 
     /**
-     * Test post api with document id passed. Inc headers
+     * Test post api with document id passed, inc headers.
      */
     public function testPostApiWithId()
     {
@@ -161,7 +161,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 json_encode(
                     [
                         'name' => 'foo_name',
-                        'surname' => 'foo_surname'
+                        'surname' => 'foo_surname',
                     ]
                 )
             );
@@ -185,7 +185,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 json_encode(
                     [
                         'name' => 'foo_name',
-                        'unknown' => 'Dont know this'
+                        'unknown' => 'Dont know this',
                     ]
                 )
             );
@@ -286,7 +286,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 json_encode(
                     [
                         'name' => 'foo_name',
-                        'unknown' => 'Dont know this'
+                        'unknown' => 'Dont know this',
                     ]
                 )
             );

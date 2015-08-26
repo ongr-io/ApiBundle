@@ -35,8 +35,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
-                    '_controller' => 'ongr_api.rest_controller:getAction'
-                ]
+                    '_controller' => 'ongr_api.rest_controller:getAction',
+                ],
             ],
             [
                 'ongr_api_v1_custom_person_post',
@@ -48,8 +48,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.not_default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
-                    '_controller' => 'ongr_api.rest_controller:postAction'
-                ]
+                    '_controller' => 'ongr_api.rest_controller:postAction',
+                ],
             ],
             [
                 'ongr_api_v1_custom_person_get',
@@ -61,8 +61,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.not_default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
-                    '_controller' => 'ongr_api.rest_controller:getAction'
-                ]
+                    '_controller' => 'ongr_api.rest_controller:getAction',
+                ],
             ],
             [
                 'ongr_api_v1_custom_person_put',
@@ -74,8 +74,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.not_default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
-                    '_controller' => 'ongr_api.rest_controller:putAction'
-                ]
+                    '_controller' => 'ongr_api.rest_controller:putAction',
+                ],
             ],
             [
                 'ongr_api_v1_custom_person_delete',
@@ -87,8 +87,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.not_default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
-                    '_controller' => 'ongr_api.rest_controller:deleteAction'
-                ]
+                    '_controller' => 'ongr_api.rest_controller:deleteAction',
+                ],
             ],
             [
                 'ongr_api_v2_default_person_post',
@@ -100,8 +100,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
-                    '_controller' => 'ongr_api_test.rest_controller:postAction'
-                ]
+                    '_controller' => 'ongr_api_test.rest_controller:postAction',
+                ],
             ],
             [
                 'ongr_api_v2_batch',
@@ -109,9 +109,9 @@ class ElasticsearchLoaderTest extends WebTestCase
                 'POST',
                 [
                     '_version' => 'v2',
-                    '_controller' => 'ongr_api.batch_controller:batchAction'
-                ]
-            ]
+                    '_controller' => 'ongr_api.batch_controller:batchAction',
+                ],
+            ],
         ];
     }
 
@@ -140,7 +140,7 @@ class ElasticsearchLoaderTest extends WebTestCase
     }
 
     /**
-     * Tests if exception is thown when loading more than once
+     * Tests if exception is thown when loading more than once.
      *
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Do not add the "ongr_api" loader twice

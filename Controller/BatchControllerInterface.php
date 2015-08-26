@@ -14,9 +14,14 @@ namespace ONGR\ApiBundle\Controller;
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Interface for controller which handles batch requests.
+ */
 interface BatchControllerInterface extends ApiInterface
 {
     /**
+     * Handles batch request.
+     *
      * @param RestRequest $restRequest
      *
      * @return Response

@@ -14,6 +14,9 @@ namespace ONGR\ApiBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * String type as text alias.
+ */
 class StringType extends AbstractType
 {
     /**

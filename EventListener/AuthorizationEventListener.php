@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
+/**
+ * Authenticates request if route is from api.
+ */
 class AuthorizationEventListener
 {
     /**
@@ -41,6 +44,8 @@ class AuthorizationEventListener
     }
 
     /**
+     * Authenticates if request is valid.
+     *
      * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)

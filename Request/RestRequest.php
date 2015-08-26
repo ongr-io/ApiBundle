@@ -15,6 +15,9 @@ use JMS\Serializer\SerializerInterface;
 use ONGR\ElasticsearchBundle\ORM\Repository;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Object for representing rest request.
+ */
 class RestRequest
 {
     /**
@@ -50,6 +53,8 @@ class RestRequest
     }
 
     /**
+     * Proxy call method to original request.
+     *
      * @param string $name
      * @param array  $arguments
      *
@@ -67,6 +72,8 @@ class RestRequest
     }
 
     /**
+     * Proxy get metod for original properties.
+     *
      * @param string $name
      *
      * @return mixed
@@ -152,6 +159,7 @@ class RestRequest
                 ->getSerializer()
                 ->deserialize($data, 'array', $this->checkAcceptHeader());
         } catch (\Exception $e) {
+            // Do nothing, returns null.
         }
     }
 

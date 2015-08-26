@@ -52,6 +52,8 @@ class ONGRApiExtension extends Extension
     }
 
     /**
+     * If authorization is enabled authentication listener is registered.
+     *
      * @param array            $config
      * @param ContainerBuilder $container
      */
@@ -62,14 +64,14 @@ class ONGRApiExtension extends Extension
                 $container->getParameter('ongr_api.event_listener.authentication.class'),
                 [
                     new Reference('service_container'),
-                    $config['authorization']['secret']
+                    $config['authorization']['secret'],
                 ]
             );
             $definition->setTags(
                 [
                     'kernel.event_listener' => [
-                        ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10]
-                    ]
+                        ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10],
+                    ],
                 ]
             );
 
@@ -78,10 +80,9 @@ class ONGRApiExtension extends Extension
     }
 
     /**
-     * Populates endpoints into route collection
+     * Populates endpoints into route collection.
      *
-     * @param array            $endpoints
-     * @param string           $version
+     * @param array            $config
      * @param ContainerBuilder $builder
      */
     private function collectRoutes(array $config, ContainerBuilder $builder)
@@ -126,7 +127,7 @@ class ONGRApiExtension extends Extension
                         'manager' => $config['manager'],
                         'repository' => $docConfig['name'],
                         '_version' => $this->getVersion(),
-                    ]
+                    ],
                 ];
 
                 foreach ($docConfig['methods'] as $method) {
@@ -140,7 +141,7 @@ class ONGRApiExtension extends Extension
     }
 
     /**
-     * Formats url for endpoint
+     * Formats url for endpoint.
      *
      * @param string $endpoint
      * @param string $type
@@ -150,7 +151,7 @@ class ONGRApiExtension extends Extension
     private function formatUrl($endpoint, $type)
     {
         return sprintf(
-            "%s%s%s/{id}",
+            '%s%s%s/{id}',
             $this->getVersion() . '/',
             $endpoint === 'default' ? '' : strtolower($endpoint) . '/',
             strtolower($type)
@@ -174,7 +175,7 @@ class ONGRApiExtension extends Extension
     /**
      * Builds batch route definition.
      *
-     * @param array$config
+     * @param array $config
      *
      * @return Definition
      */
@@ -189,8 +190,8 @@ class ONGRApiExtension extends Extension
                     '_controller' => $config['controller'] . ':batchAction',
                 ],
                 'requirements' => [
-                    '_method' => 'POST'
-                ]
+                    '_method' => 'POST',
+                ],
             ]
         );
     }

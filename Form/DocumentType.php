@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * Populates form based on document metadata.
+ */
 class DocumentType extends AbstractType
 {
     use ObjectResolverTrait;
@@ -48,9 +51,12 @@ class DocumentType extends AbstractType
             )
             ->setRequired(['metadata'])
             ->setAllowedTypes(['metadata' => 'ONGR\ElasticsearchBundle\Mapping\ClassMetadata'])
-            ->setDefault('data_class', function (Options $options) {
-                return $options['metadata']->getNamespace();
-            });
+            ->setDefault(
+                'data_class',
+                function (Options $options) {
+                    return $options['metadata']->getNamespace();
+                }
+            );
     }
 
     /**

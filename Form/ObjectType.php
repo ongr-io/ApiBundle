@@ -15,6 +15,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * Type for object property.
+ */
 class ObjectType extends AbstractType
 {
     use ObjectResolverTrait;

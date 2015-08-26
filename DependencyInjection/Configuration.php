@@ -33,9 +33,11 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('authorization')
                     ->addDefaultsIfNotSet()
                     ->validate()
-                        ->ifTrue(function ($node) {
-                            return $node['enabled'] && !isset($node['secret']);
-                        })
+                        ->ifTrue(
+                            function ($node) {
+                                return $node['enabled'] && !isset($node['secret']);
+                            }
+                        )
                         ->thenInvalid("'secret' for api must be set if authorization is enabled.")
                     ->end()
                     ->children()
@@ -72,9 +74,11 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('batch')
                                 ->addDefaultsIfNotSet()
                                 ->validate()
-                                    ->ifTrue(function ($node) {
-                                        return $node['enabled'] && !isset($node['controller']);
-                                    })
+                                    ->ifTrue(
+                                        function ($node) {
+                                            return $node['enabled'] && !isset($node['controller']);
+                                        }
+                                    )
                                     ->thenInvalid("'controller' for batch api must be set if batch is enabled.")
                                 ->end()
                                 ->children()
@@ -128,7 +132,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Builds configuration tree for documents
+     * Builds configuration tree for documents.
      *
      * @return NodeDefinition
      */
@@ -145,9 +149,11 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(function ($string) {
-                        return ['name' => $string];
-                    })
+                    ->then(
+                        function ($string) {
+                            return ['name' => $string];
+                        }
+                    )
                 ->end()
                 ->children()
                     ->scalarNode('name')

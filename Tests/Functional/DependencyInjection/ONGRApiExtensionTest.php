@@ -29,7 +29,7 @@ class ONGRApiExtensionTest extends WebTestCase
             ],
             [
                 'ongr_api.rest.validator',
-                'ONGR\ApiBundle\Validator\DocumentValidator'
+                'ONGR\ApiBundle\Validator\DocumentValidator',
             ],
             [
                 'ongr_api.event_listener.rest_request',
@@ -38,11 +38,11 @@ class ONGRApiExtensionTest extends WebTestCase
             ],
             [
                 'ongr_api.event_listener.authentication',
-                'ONGR\ApiBundle\EventListener\AuthorizationEventListener'
+                'ONGR\ApiBundle\EventListener\AuthorizationEventListener',
             ],
             [
                 'ongr_api.rest_request_factory',
-                'ONGR\ApiBundle\Request\RestRequestFactory'
+                'ONGR\ApiBundle\Request\RestRequestFactory',
             ],
             [
                 'ongr_api.rest_request',
@@ -56,21 +56,21 @@ class ONGRApiExtensionTest extends WebTestCase
             ],
             [
                 'ongr_api.batch_processor',
-                'ONGR\ApiBundle\Request\BatchProcessor'
+                'ONGR\ApiBundle\Request\BatchProcessor',
             ],
             [
                 'ongr_api.rest_controller',
-                'ONGR\ApiBundle\Controller\RestController'
+                'ONGR\ApiBundle\Controller\RestController',
             ],
             [
                 'ongr_api.batch_controller',
-                'ONGR\ApiBundle\Controller\BatchController'
+                'ONGR\ApiBundle\Controller\BatchController',
             ],
         ];
     }
 
     /**
-     * Tests if all services exists
+     * Tests if all services exists.
      *
      * @param string $id
      * @param string $instance

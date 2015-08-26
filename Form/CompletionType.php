@@ -14,6 +14,9 @@ namespace ONGR\ApiBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Type for completion property.
+ */
 class CompletionType extends AbstractType
 {
     /**
