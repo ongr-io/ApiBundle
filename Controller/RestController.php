@@ -38,6 +38,13 @@ class RestController extends AbstractRestController implements RestControllerInt
             );
         }
 
+        if ($id === null && !isset($data['id'])) {
+            return $this->renderRest(
+                ['message' => 'No identifier found!'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
         if ($id !== null) {
             $data['id'] = $id;
         } else {
@@ -95,6 +102,13 @@ class RestController extends AbstractRestController implements RestControllerInt
                     'message' => 'Validation error!',
                     'errors' => $validator->getErrors()
                 ],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        if ($id === null && !isset($data['id'])) {
+            return $this->renderRest(
+                ['message' => 'No identifier found!'],
                 Response::HTTP_BAD_REQUEST
             );
         }
