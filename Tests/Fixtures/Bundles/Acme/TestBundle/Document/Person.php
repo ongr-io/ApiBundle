@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle\Tests\Functional\Fixtures\Bundles\Acme\TestBundle\Document;
+namespace ONGR\ApiBundle\Tests\Fixtures\Bundles\Acme\TestBundle\Document;
 
 use ONGR\ElasticsearchBundle\Annotation as ES;
 use ONGR\ElasticsearchBundle\Document\AbstractDocument;
@@ -19,7 +19,7 @@ use ONGR\ElasticsearchBundle\Document\AbstractDocument;
  *
  * @ES\Document(type="person")
  */
-class PersonDocument extends AbstractDocument
+class Person extends AbstractDocument
 {
     /**
      * @var string
