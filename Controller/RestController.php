@@ -155,8 +155,9 @@ class RestController extends AbstractRestController implements RestControllerInt
                 ]
             );
         } catch (Missing404Exception $e) {
-            throw $this->createNotFoundException(
-                sprintf('No document found with id "%s"', $id)
+            return $this->renderRest(
+                ['message' => sprintf('No document found with id "%s"', $id)],
+                Response::HTTP_NOT_FOUND
             );
         }
 
