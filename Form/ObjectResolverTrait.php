@@ -27,7 +27,13 @@ trait ObjectResolverTrait
         if (in_array($alias['type'], ['object', 'nested'])) {
             $this->addObjectToForm($builder, $name, $alias);
         } else {
-            $builder->add($name, $alias['type'], ['property_path' => $alias['propertyName']]);
+            $options = ['property_path' => $alias['propertyName']];
+
+            if ($alias['type'] === 'date') {
+                $alias['type'] = 'string';
+            }
+
+            $builder->add($name, $alias['type'], $options);
         }
     }
 
