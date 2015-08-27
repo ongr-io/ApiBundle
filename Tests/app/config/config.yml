@@ -63,7 +63,7 @@ ongr_api:
                default:
                    manager: es.manager.default
                    documents:
-                       - { name: "AcmeTestBundle:Person", methods: ["GET"] }
+                       - { name: "AcmeTestBundle:Person", methods: ["GET", "POST"] }
                custom:
                    manager: es.manager.not_default
                    documents:
@@ -73,4 +73,4 @@ ongr_api:
                default:
                    manager: es.manager.default
                    documents:
-                       - { name: "AcmeTestBundle:Person", "methods": ["POST"], controller: "ongr_api_test.rest_controller" }
+                       - { name: "AcmeTestBundle:Person" }

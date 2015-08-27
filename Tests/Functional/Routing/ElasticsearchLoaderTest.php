@@ -39,6 +39,19 @@ class ElasticsearchLoaderTest extends WebTestCase
                 ],
             ],
             [
+                'ongr_api_v1_default_person_post',
+                '/v1/person/{id}',
+                'POST',
+                [
+                    'id' => null,
+                    'type' => 'person',
+                    'manager' => 'es.manager.default',
+                    'repository' => 'AcmeTestBundle:Person',
+                    '_version' => 'v1',
+                    '_controller' => 'ongr_api.rest_controller:postAction',
+                ],
+            ],
+            [
                 'ongr_api_v1_custom_person_post',
                 '/v1/custom/person/{id}',
                 'POST',
@@ -100,7 +113,46 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'manager' => 'es.manager.default',
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
-                    '_controller' => 'ongr_api_test.rest_controller:postAction',
+                    '_controller' => 'ongr_api.rest_controller:postAction',
+                ],
+            ],
+            [
+                'ongr_api_v2_default_person_get',
+                '/v2/person/{id}',
+                'GET',
+                [
+                    'id' => null,
+                    'type' => 'person',
+                    'manager' => 'es.manager.default',
+                    'repository' => 'AcmeTestBundle:Person',
+                    '_version' => 'v2',
+                    '_controller' => 'ongr_api.rest_controller:getAction',
+                ],
+            ],
+            [
+                'ongr_api_v2_default_person_put',
+                '/v2/person/{id}',
+                'PUT',
+                [
+                    'id' => null,
+                    'type' => 'person',
+                    'manager' => 'es.manager.default',
+                    'repository' => 'AcmeTestBundle:Person',
+                    '_version' => 'v2',
+                    '_controller' => 'ongr_api.rest_controller:putAction',
+                ],
+            ],
+            [
+                'ongr_api_v2_default_person_delete',
+                '/v2/person/{id}',
+                'DELETE',
+                [
+                    'id' => null,
+                    'type' => 'person',
+                    'manager' => 'es.manager.default',
+                    'repository' => 'AcmeTestBundle:Person',
+                    '_version' => 'v2',
+                    '_controller' => 'ongr_api.rest_controller:deleteAction',
                 ],
             ],
             [
@@ -130,13 +182,13 @@ class ElasticsearchLoaderTest extends WebTestCase
         /** @var RouteCollection $collection */
         $collection = $this->getLoader()->load('');
 
-        $this->assertEquals(7, $collection->count());
+        $this->assertEquals(11, $collection->count(), 'Loaded route number has changed!');
         $route = $collection->get($name);
 
-        $this->assertNotNull($route);
-        $this->assertEquals($path, $route->getPath());
-        $this->assertEquals([$method], $route->getMethods());
-        $this->assertEquals($defaults, $route->getDefaults());
+        $this->assertNotNull($route, 'Route cannot be null');
+        $this->assertEquals($path, $route->getPath(), 'Route path does not match');
+        $this->assertEquals([$method], $route->getMethods(), 'Route has wrong method');
+        $this->assertEquals($defaults, $route->getDefaults(), 'Route default params does not match');
     }
 
     /**
