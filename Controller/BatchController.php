@@ -13,7 +13,6 @@ namespace ONGR\ApiBundle\Controller;
 
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Controller for handling batch requests.
@@ -25,23 +24,12 @@ class BatchController extends AbstractRestController implements BatchControllerI
      */
     public function batchAction(RestRequest $restRequest)
     {
-        try {
-            return $this->renderRest(
-                $this->get('ongr_api.batch_processor')->handle($restRequest),
-                Response::HTTP_ACCEPTED
-            );
-        } catch (ResourceNotFoundException $e) {
-            $error = [
-                'message' => 'Could not resolve path!',
-                'error' => $e->getMessage(),
-            ];
-        } catch (Exception $e) {
-            $error = [
-                'message' => 'Error',
-                'error' => $e->getMessage(),
-            ];
+        $data = $this->get('ongr_api.batch_processor')->handle($restRequest);
+
+        if ($data !== false) {
+            return $this->renderRest($data, Response::HTTP_ACCEPTED);
         }
 
-        return $this->renderRest($error, Response::HTTP_BAD_REQUEST);
+        return $this->renderRest(['message' => 'Deserialization error!'], Response::HTTP_BAD_REQUEST);
     }
 }

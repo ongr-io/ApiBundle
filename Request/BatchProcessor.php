@@ -13,7 +13,9 @@ namespace ONGR\ApiBundle\Request;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -51,11 +53,16 @@ class BatchProcessor implements ContainerAwareInterface
      *
      * @param RestRequest $restRequest
 
-     * @return array
+     * @return array|bool Returns false on deserialization error.
      */
     public function handle(RestRequest $restRequest)
     {
         $data = $restRequest->getData();
+
+        if ($data === null) {
+            return false;
+        }
+
         $proxy = RestRequestProxy::initialize($restRequest);
         $out = [];
         $currentMethod = $this->getRouter()->getContext()->getMethod();
@@ -63,7 +70,16 @@ class BatchProcessor implements ContainerAwareInterface
         foreach ($data as $action) {
             $action = $this->resolver->resolve($action);
             $this->getRouter()->getContext()->setMethod($action['method']);
-            $options = $this->getRouter()->match('/api/' . $restRequest->getVersion() . '/' . $action['path']);
+            try {
+                $options = $this->getRouter()->match('/api/' . $restRequest->getVersion() . '/' . $action['path']);
+            } catch (ResourceNotFoundException $e) {
+                $out[] = [
+                    'status_code' => Response::HTTP_BAD_REQUEST,
+                    'message' => 'Could not resolve path!',
+                    'error' => $e->getMessage(),
+                ];
+                continue;
+            }
             list($id, $method) = explode(':', $options['_controller'], 2);
             $controller = $this->getContainer()->get($id);
             $controller->setBatch(true);
