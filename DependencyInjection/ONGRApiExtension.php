@@ -127,6 +127,7 @@ class ONGRApiExtension extends Extension
                         'manager' => $config['manager'],
                         'repository' => $docConfig['name'],
                         '_version' => $this->getVersion(),
+                        '_allow_extra_fields' => $docConfig['allow_extra_fields'],
                     ],
                 ];
 
