@@ -68,10 +68,10 @@ ongr_api:
                custom:
                    manager: es.manager.not_default
                    documents:
-                       - "AcmeTestBundle:Person"
+                       - { name: "AcmeTestBundle:Person", allow_extra_fields: false }
        v2:
            endpoints:
                default:
                    manager: es.manager.default
                    documents:
-                       - { name: "AcmeTestBundle:Person" }
+                       - "AcmeTestBundle:Person"

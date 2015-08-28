@@ -36,6 +36,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:getAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
@@ -49,6 +50,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:postAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
@@ -62,6 +64,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:postAction',
+                    '_allow_extra_fields' => false,
                 ],
             ],
             [
@@ -75,6 +78,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:getAction',
+                    '_allow_extra_fields' => false,
                 ],
             ],
             [
@@ -88,6 +92,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:putAction',
+                    '_allow_extra_fields' => false,
                 ],
             ],
             [
@@ -101,6 +106,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v1',
                     '_controller' => 'ongr_api.rest_controller:deleteAction',
+                    '_allow_extra_fields' => false,
                 ],
             ],
             [
@@ -114,6 +120,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
                     '_controller' => 'ongr_api.rest_controller:postAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
@@ -127,6 +134,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
                     '_controller' => 'ongr_api.rest_controller:getAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
@@ -140,6 +148,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
                     '_controller' => 'ongr_api.rest_controller:putAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
@@ -153,6 +162,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'AcmeTestBundle:Person',
                     '_version' => 'v2',
                     '_controller' => 'ongr_api.rest_controller:deleteAction',
+                    '_allow_extra_fields' => true,
                 ],
             ],
             [
