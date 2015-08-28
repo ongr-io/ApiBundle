@@ -59,7 +59,9 @@ class RestRequestFactory
      */
     private function getRepository()
     {
-        if ($this->getRequest()->attributes->has('manager')) {
+        if ($this->getRequest()->attributes->has('manager')
+            && $this->getRequest()->attributes->has('repository')
+        ) {
             return $this
                 ->container
                 ->get($this->getRequest()->attributes->get('manager'))
