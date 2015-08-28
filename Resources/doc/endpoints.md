@@ -114,7 +114,7 @@ Response should be similar to this:
 ```
 
 Last request got 410 response because document did not exist.
-> Batch Api returns **202** status code on success.
+> Batch Api returns **200** status code on success.
 
 Command
 -------
