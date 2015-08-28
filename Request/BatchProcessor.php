@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Request;
 
+use ONGR\ApiBundle\Controller\RestControllerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,12 +64,12 @@ class BatchProcessor implements ContainerAwareInterface
             return false;
         }
 
-        $proxy = RestRequestProxy::initialize($restRequest);
         $out = [];
+        $proxy = RestRequestProxy::initialize($restRequest);
         $currentMethod = $this->getRouter()->getContext()->getMethod();
 
         foreach ($data as $action) {
-            $action = $this->resolver->resolve($action);
+            $action = $this->getResolver()->resolve($action);
             $this->getRouter()->getContext()->setMethod($action['method']);
             try {
                 $options = $this->getRouter()->match('/api/' . $restRequest->getVersion() . '/' . $action['path']);
@@ -81,18 +82,9 @@ class BatchProcessor implements ContainerAwareInterface
                 continue;
             }
             list($id, $method) = explode(':', $options['_controller'], 2);
-            $controller = $this->getContainer()->get($id);
-            $controller->setBatch(true);
+            $this->prepareProxy($proxy, $action['body'], $options);
 
-            $proxy->setData($action['body']);
-            $proxy->setRepository(
-                $this
-                    ->getContainer()
-                    ->get($options['manager'])
-                    ->getRepository($options['repository'])
-            );
-
-            $out[] = call_user_func_array([$controller, $method], [$proxy, $options['id']]);
+            $out[] = call_user_func_array([$this->getController($id), $method], [$proxy, $options['id']]);
         }
 
         $this->getRouter()->getContext()->setMethod($currentMethod);
@@ -125,6 +117,14 @@ class BatchProcessor implements ContainerAwareInterface
     }
 
     /**
+     * @return OptionsResolver
+     */
+    protected function getResolver()
+    {
+        return $this->resolver;
+    }
+
+    /**
      * Options resolver setup.
      *
      * @param OptionsResolver $resolver
@@ -146,5 +146,42 @@ class BatchProcessor implements ContainerAwareInterface
                     return strtoupper($value);
                 }
             );
+    }
+
+    /**
+     * Sets data into proxy.
+     *
+     * @param RestRequestProxy $proxy
+     * @param mixed            $body
+     * @param array            $options
+     */
+    private function prepareProxy(RestRequestProxy $proxy, $body, $options)
+    {
+        $proxy
+            ->setData($body)
+            ->setRepository(
+                $this
+                    ->getContainer()
+                    ->get($options['manager'])
+                    ->getRepository($options['repository'])
+            )
+            ->setAllowedExtraFields($options['_allow_extra_fields']);
+    }
+
+    /**
+     * Retrieves controller from container and sets batch flag.
+     *
+     * @param string $id Service id.
+     *
+     * @return RestControllerInterface
+     */
+    private function getController($id)
+    {
+        $controller = $this->getContainer()->get($id);
+        if (method_exists($controller, 'setBatch')) {
+            $controller->setBatch(true);
+        }
+
+        return $controller;
     }
 }

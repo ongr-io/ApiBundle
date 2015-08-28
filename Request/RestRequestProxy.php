@@ -29,6 +29,11 @@ class RestRequestProxy extends RestRequest
     private $repository;
 
     /**
+     * @var bool
+     */
+    private $allowedExtraFields = false;
+
+    /**
      * {@inheritdoc}
      */
     public function getData()
@@ -38,10 +43,14 @@ class RestRequestProxy extends RestRequest
 
     /**
      * @param mixed $data
+     *
+     * @return $this
      */
     public function setData($data)
     {
         $this->data = $data;
+
+        return $this;
     }
 
     /**
@@ -54,10 +63,34 @@ class RestRequestProxy extends RestRequest
 
     /**
      * @param Repository $repository
+     *
+     * @return $this
      */
     public function setRepository(Repository $repository)
     {
         $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedExtraFields()
+    {
+        return $this->allowedExtraFields;
+    }
+
+    /**
+     * @param bool $allowedExtraFields
+     *
+     * @return $this
+     */
+    public function setAllowedExtraFields($allowedExtraFields)
+    {
+        $this->allowedExtraFields = $allowedExtraFields;
+
+        return $this;
     }
 
     /**
