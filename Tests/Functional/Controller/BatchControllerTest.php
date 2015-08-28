@@ -51,7 +51,7 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
     {
         $response = $this->sendBatchRequest(json_encode($this->getBatchContent()));
 
-        $this->assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals($this->getBatchResponse(), json_decode($response->getContent(), true));
     }
 
@@ -152,7 +152,7 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
         ];
 
         $respose = $this->sendBatchRequest(json_encode($content));
-        $this->assertEquals(Response::HTTP_ACCEPTED, $respose->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $respose->getStatusCode());
         $this->assertEquals(
             [
                 [
