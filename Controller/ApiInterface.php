@@ -11,6 +11,9 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+/**
+ * Used to detect if controller is for an api and should RestRequest be injected in attribues.
+ */
 interface ApiInterface
 {
 }
