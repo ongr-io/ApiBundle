@@ -164,6 +164,36 @@ class ElasticsearchLoaderTest extends WebTestCase
                     '_controller' => 'ongr_api.batch_controller:batchAction',
                 ],
             ],
+            [
+                'ongr_api_command_v1_default_index_create',
+                '/v1/_command/index/create',
+                'POST',
+                [
+                    '_controller' => 'ongr_api.command_controller:createIndexAction',
+                    '_version' => 'v1',
+                    'manager' => 'es.manager.default',
+                ],
+            ],
+            [
+                'ongr_api_command_v1_default_index_drop',
+                '/v1/_command/index/drop',
+                'POST',
+                [
+                    '_controller' => 'ongr_api.command_controller:dropIndexAction',
+                    '_version' => 'v1',
+                    'manager' => 'es.manager.default',
+                ],
+            ],
+            [
+                'ongr_api_command_v1_default_schema_update',
+                '/v1/_command/schema/update',
+                'POST',
+                [
+                    '_controller' => 'ongr_api.command_controller:updateSchemaAction',
+                    '_version' => 'v1',
+                    'manager' => 'es.manager.default',
+                ],
+            ],
         ];
     }
 
@@ -182,7 +212,7 @@ class ElasticsearchLoaderTest extends WebTestCase
         /** @var RouteCollection $collection */
         $collection = $this->getLoader()->load('');
 
-        $this->assertEquals(11, $collection->count(), 'Loaded route number has changed!');
+        $this->assertEquals(14, $collection->count(), 'Loaded route number has changed!');
         $route = $collection->get($name);
 
         $this->assertNotNull($route, 'Route cannot be null');
