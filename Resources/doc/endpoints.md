@@ -16,7 +16,7 @@ If endpoint is set to *default* then pattern would look like this:
 <yourdomain.com>/api/{version}/{document_type}/{id}
 ```
 
-Status codes:
+Default controller status codes:
 
 | Method | Success | Error | Extra                       |
 |--------|---------|-------|-----------------------------|
@@ -115,6 +115,47 @@ Response should be similar to this:
 
 Last request got 410 response because document did not exist.
 > Batch Api returns **202** status code on success.
+
+Command
+-------
+
+Command endpoint is disabled by default, but it can be enabled in configuration like so:
+
+```yaml
+#app/config/config.yml
+
+ongr_api:
+    versions:
+        v1:
+            endpoints:
+                default:
+                    commands:
+                        enabled: true
+                    ...
+```
+
+Similar to [Rest](#rest), except it includes fields like `command` and `action`. For example `command` could be an `index` and `action` is `create`, so in result index is created. Simple right? Heres how the uri pattern looks like: 
+
+```
+<yourdomain.com>/api/{version}/{endpoint}/_command/{command}/{action}
+```
+
+If endpoint is set to *default* then pattern would look like this:
+
+```
+<yourdomain.com>/api/{version}/_command/{command}/{action}
+```
+
+For example to create an index your url will look like this: `<yourdomain.com>/api/v1/_command/index/create`.
+
+Default controller status codes:
+
+| Command       | Success | Error | Extra                                |
+|---------------|---------|-------|--------------------------------------|
+| index/create  | 204     | 400   |                                      |
+| index/drop    | 204     | 400   |                                      |
+| schema/update | 200     | 400   | Body contains `status` and `message` |
+
 
 Customization
 -------------

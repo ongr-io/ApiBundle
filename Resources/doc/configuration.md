@@ -19,6 +19,10 @@ ongr_api:
             endpoints:
                 default:
                     manager: es.manager.default
+                    commands:
+                        enabled: true
+                        controller: "ongr_api.command_controller"
+                        commands: ["index:create", "index:drop", "schema:update"]
                     documents:
                         - { name: "ONGRDemoBundle:Product", controller: "ongr_api.rest_controller", methods: ["GET", "POST"] }
                         - "ONGRDemoBundle:Category"
@@ -39,6 +43,9 @@ ongr_api:
 
 - `manager` - elasticsearch manager name, e.g. `es.manager.default`
 
+- `commands` - Exposes index create, drop, schema update commands through an api. More about how to access them look in [endpoint commands][4] part.
+> **Commands are disabled by default**. In this example they are enabled for `v1` default endpoint, but they wont be accessible through custom endpoint. When they are enabled all commands are added, but that can be changed with inner commands array.
+
 - `documents` - exposed documents to API. Read more about defining elasticsearch documents [here][1]. For each document you can also define a custom controller with custom logic for your API and methods which will be available.
 > About custom controllers read more [here][2].
 
@@ -49,3 +56,4 @@ Let's learn more about [endpoints][3].
 [1]: http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html
 [2]: custom_controller.md
 [3]: endpoints.md
+[4]: endpoints.md#command

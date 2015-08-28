@@ -1,10 +1,12 @@
 Custom controller
 =================
 
-There are two types of controllers:
+There are three types of controllers:
  - `RestController` extends `AbstractRestController` implements `RestControllerInterface`. Handles batch requests.
 
  - `BatchController` extends `AbstractRestController` implements `BatchControllerInterface`. Handlles *post*, *get*, *put*, *delete* requests.
+ 
+ - `CommandController` extends `AbstractRestController` implements `CommandControllerInterface`. Handles command requests if they are enbaled in [configuration][1].
 
 ONGRApiBundle comes with default controllers which allows you to use API functionality right after bundle install. It also allows you to define custom controllers if default functionality is not enough.
 
@@ -72,3 +74,5 @@ ongr_api:
 ```
 
 That's it. Now every request for `/v1/product` will be handled by our new controller.
+
+[1]: configuration.md
