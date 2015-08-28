@@ -60,43 +60,57 @@ class Configuration implements ConfigurationInterface
                         ->thenInvalid('Currently valid encoders are only json and xml!')
                     ->end()
                 ->end()
-                ->arrayNode('versions')
-                    ->info('Defines api versions.')
-                    ->isRequired()
-                    ->requiresAtLeastOneElement()
-                    ->useAttributeAsKey('version')
-                    ->prototype('array')
-                        ->children()
-                            ->scalarNode('version')
-                                ->info('Defines a version for current api')
-                                ->example('v2')
-                            ->end()
-                            ->arrayNode('batch')
-                                ->addDefaultsIfNotSet()
-                                ->validate()
-                                    ->ifTrue(
-                                        function ($node) {
-                                            return $node['enabled'] && !isset($node['controller']);
-                                        }
-                                    )
-                                    ->thenInvalid("'controller' for batch api must be set if batch is enabled.")
-                                ->end()
-                                ->children()
-                                    ->booleanNode('enabled')
-                                        ->defaultTrue()
-                                    ->end()
-                                    ->scalarNode('controller')
-                                        ->defaultValue('ongr_api.batch_controller')
-                                    ->end()
-                                ->end()
-                            ->end()
-                            ->append($this->getEndpointNode())
-                        ->end()
-                    ->end()
-                ->end()
+                ->append($this->getVersionsNode())
             ->end();
 
         return $treeBuilder;
+    }
+
+    /**
+     * Builds configuration tree for endpoint versions.
+     *
+     * @return NodeDefinition
+     */
+    private function getVersionsNode()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('versions');
+
+        $node
+            ->info('Defines api versions.')
+            ->isRequired()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('version')
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('version')
+                        ->info('Defines a version for current api')
+                        ->example('v2')
+                    ->end()
+                    ->arrayNode('batch')
+                        ->addDefaultsIfNotSet()
+                        ->validate()
+                            ->ifTrue(
+                                function ($node) {
+                                    return $node['enabled'] && !isset($node['controller']);
+                                }
+                            )
+                            ->thenInvalid("'controller' for batch api must be set if batch is enabled.")
+                        ->end()
+                        ->children()
+                            ->booleanNode('enabled')
+                                ->defaultTrue()
+                            ->end()
+                            ->scalarNode('controller')
+                                ->defaultValue('ongr_api.batch_controller')
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->append($this->getEndpointNode())
+                ->end()
+            ->end();
+
+        return $node;
     }
 
     /**
@@ -125,6 +139,7 @@ class Configuration implements ConfigurationInterface
                         ->example('es.manager.custom')
                     ->end()
                     ->append($this->getDocumentNode())
+                    ->append($this->getCommandsNode())
                 ->end()
             ->end();
 
@@ -176,6 +191,58 @@ class Configuration implements ConfigurationInterface
                                     . 'Please check your ongr_api configuration.'
                                 )
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Builds commands node.
+     *
+     * @return NodeDefinition
+     */
+    private function getCommandsNode()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('commands');
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->beforeNormalization()
+                ->ifTrue(
+                    function ($value) {
+                        return is_bool($value);
+                    }
+                )
+                ->then(
+                    function ($value) {
+                        return ['enabled' => $value];
+                    }
+                )
+            ->end()
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                    ->info('Enables commands like index create for endpoint.')
+                ->end()
+                ->scalarNode('controller')
+                    ->defaultValue('ongr_api.command_controller')
+                    ->info('Controller used for command requests')
+                ->end()
+                ->arrayNode('commands')
+                    ->requiresAtLeastOneElement()
+                    ->defaultValue(['index:create', 'index:drop', 'schema:update'])
+                    ->prototype('scalar')
+                        ->validate()
+                        ->ifNotInArray(['index:create', 'index:drop', 'schema:update'])
+                        ->thenInvalid(
+                            'Invalid command used! Available commands: '
+                            . 'index:create, index:drop, schema:update. '
+                            . 'Please check your ongr_api configuration.'
+                        )
                         ->end()
                     ->end()
                 ->end()
