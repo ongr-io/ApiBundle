@@ -137,6 +137,24 @@ class ONGRApiExtension extends Extension
                     yield $this->formatName($name, $type, $method) => $c;
                 }
             }
+
+            if ($config['commands']['enabled']) {
+                foreach ($config['commands']['commands'] as $cmd) {
+                    list($command, $action) = explode(':', $cmd, 2);
+                    yield $this->formatCommandName($name, $command, $action) => [
+                        'url' => $this->formatCommandUrl($name, $command, $action),
+                        'defaults' => [
+                            '_controller' => $config['commands']['controller'] . ':'
+                                . strtolower($action) . ucfirst($command) . 'Action',
+                            '_version' => $this->getVersion(),
+                            'manager' => $config['manager'],
+                        ],
+                        'requirements' => [
+                            '_method' => 'POST',
+                        ],
+                    ];
+                }
+            }
         }
     }
 
@@ -150,11 +168,35 @@ class ONGRApiExtension extends Extension
      */
     private function formatUrl($endpoint, $type)
     {
-        return sprintf(
-            '%s%s%s/{id}',
-            $this->getVersion() . '/',
-            $endpoint === 'default' ? '' : strtolower($endpoint) . '/',
-            strtolower($type)
+        return strtolower(
+            sprintf(
+                '%s/%s%s/{id}',
+                $this->getVersion(),
+                $endpoint === 'default' ? '' : $endpoint . '/',
+                $type
+            )
+        );
+    }
+
+    /**
+     * Formats command route url.
+     *
+     * @param string $endpoint
+     * @param string $command
+     * @param string $action
+     *
+     * @return string
+     */
+    private function formatCommandUrl($endpoint, $command, $action)
+    {
+        return strtolower(
+            sprintf(
+                '%s/%s_command/%s/%s',
+                $this->getVersion(),
+                $endpoint === 'default' ? '' : $endpoint . '/',
+                $command,
+                $action
+            )
         );
     }
 
@@ -170,6 +212,28 @@ class ONGRApiExtension extends Extension
     private function formatName($endpoint, $type, $method)
     {
         return strtolower(sprintf('ongr_api_%s_%s_%s_%s', $this->getVersion(), $endpoint, $type, $method));
+    }
+
+    /**
+     * Formats command route name.
+     *
+     * @param string $endpoint
+     * @param string $command
+     * @param string $action
+     *
+     * @return string
+     */
+    private function formatCommandName($endpoint, $command, $action)
+    {
+        return strtolower(
+            sprintf(
+                'ongr_api_command_%s_%s_%s_%s',
+                $this->getVersion(),
+                $endpoint,
+                $command,
+                $action
+            )
+        );
     }
 
     /**
