@@ -198,4 +198,14 @@ class RestRequest
     {
         return $this->getRequest()->attributes->get('_version');
     }
+
+    /**
+     * Used for validator to check if it can ignore unknown fields.
+     *
+     * @return bool
+     */
+    public function isAllowedExtraFields()
+    {
+        return $this->getRequest()->attributes->get('_allow_extra_fields', false);
+    }
 }

@@ -37,6 +37,11 @@ class DocumentValidator implements ValidatorInterface
     private $repository;
 
     /**
+     * @var bool
+     */
+    private $allowExtraFields = false;
+
+    /**
      * @param FormFactoryInterface $formFactory
      */
     public function __construct(FormFactoryInterface $formFactory)
@@ -50,6 +55,7 @@ class DocumentValidator implements ValidatorInterface
     public function validate(RestRequest $restRequest)
     {
         $this->setRepository($restRequest->getRepository());
+        $this->setAllowExtraFields($restRequest->isAllowedExtraFields());
 
         $data = $restRequest->getData();
         $this->getForm(true)->submit($data);
@@ -106,7 +112,10 @@ class DocumentValidator implements ValidatorInterface
             $this->form = $this->getFormFactory()->create(
                 'ongr_api_document_type',
                 null,
-                ['metadata' => $this->getMetadata()]
+                [
+                    'metadata' => $this->getMetadata(),
+                    'allow_extra_fields' => $this->isAllowingExtraFields(),
+                ]
             );
         }
 
@@ -162,5 +171,21 @@ class DocumentValidator implements ValidatorInterface
         $this->repository = $repository;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowingExtraFields()
+    {
+        return $this->allowExtraFields;
+    }
+
+    /**
+     * @param bool $allowExtraFields
+     */
+    public function setAllowExtraFields($allowExtraFields)
+    {
+        $this->allowExtraFields = $allowExtraFields;
     }
 }
