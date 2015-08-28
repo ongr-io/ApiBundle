@@ -62,6 +62,7 @@ ongr_api:
            endpoints:
                default:
                    manager: es.manager.default
+                   commands: true
                    documents:
                        - { name: "AcmeTestBundle:Person", methods: ["GET", "POST"] }
                custom:
