@@ -190,7 +190,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 )
             );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
         $this->assertEquals(
             '{"message":"Validation error!","errors":["This form should not contain extra fields."]}',
             $response->getContent()
@@ -291,7 +291,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 )
             );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
         $this->assertEquals(
             '{"message":"Validation error!","errors":["This form should not contain extra fields."]}',
             $response->getContent()
