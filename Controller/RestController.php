@@ -35,7 +35,7 @@ class RestController extends AbstractRestController implements RestControllerInt
         if ($data === false) {
             return $this->renderRest(
                 ['message' => 'Validation error!', 'errors' => $validator->getErrors()],
-                Response::HTTP_BAD_REQUEST
+                Response::HTTP_NOT_ACCEPTABLE
             );
         }
 
@@ -105,7 +105,7 @@ class RestController extends AbstractRestController implements RestControllerInt
                     'message' => 'Validation error!',
                     'errors' => $validator->getErrors(),
                 ],
-                Response::HTTP_BAD_REQUEST
+                Response::HTTP_NOT_ACCEPTABLE
             );
         }
 
