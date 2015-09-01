@@ -20,7 +20,7 @@ Default controller status codes:
 
 | Method | Success | Error | Extra                       |
 |--------|---------|-------|-----------------------------|
-| GET    | 200     | 410   |                             |
+| GET    | 200     | 404   |                             |
 | POST   | 201     | 400   | includes `Location` header  |
 | PUT    | 204     | 400   | includes `Location` header  |
 | DELETE | 204     | 400   | 404 if not found            |
@@ -108,12 +108,12 @@ Response should be similar to this:
 		}
 	},
 	{
-		"status_code": 410
+		"status_code": 404
 	}
 ]
 ```
 
-Last request got 410 response because document did not exist.
+Last request got 404 response because document did not exist.
 > Batch Api returns **200** status code on success.
 
 Command
