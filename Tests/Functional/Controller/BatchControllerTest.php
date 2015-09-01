@@ -123,9 +123,9 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
                     'surname' => 'TestSurname1',
                 ],
             ],
-            ['status_code' => Response::HTTP_GONE],
+            ['status_code' => Response::HTTP_NOT_FOUND],
             ['status_code' => Response::HTTP_NO_CONTENT],
-            ['status_code' => Response::HTTP_GONE],
+            ['status_code' => Response::HTTP_NOT_FOUND],
             ['status_code' => Response::HTTP_NO_CONTENT],
             [
                 'status_code' => Response::HTTP_OK,

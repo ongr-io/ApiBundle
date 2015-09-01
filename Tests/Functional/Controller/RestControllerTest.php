@@ -145,7 +145,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         $manager = $this->getManager('not_default');
         $response = $this->sendApiRequest('GET', '/api/v1/custom/person/4');
 
-        $this->assertEquals(Response::HTTP_GONE, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     /**
