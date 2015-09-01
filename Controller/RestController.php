@@ -74,7 +74,7 @@ class RestController extends AbstractRestController implements RestControllerInt
         if ($id !== null) {
             $data = $restRequest->getRepository()->find($id, Repository::RESULTS_ARRAY);
             if ($data === null) {
-                return $this->renderRest(null, Response::HTTP_GONE);
+                return $this->renderRest(null, Response::HTTP_NOT_FOUND);
             }
         } else {
             $search = new Search();
