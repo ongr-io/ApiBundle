@@ -18,12 +18,12 @@ If endpoint is set to *default* then pattern would look like this:
 
 Default controller status codes:
 
-| Method | Success | Error | Extra                                            |
-|--------|---------|-------|--------------------------------------------------|
-| GET    | 200     | 404   |                                                  |
-| POST   | 201     | 400   | includes `Location` header. 406 validation error |
-| PUT    | 204     | 400   | includes `Location` header. 406 validation error |
-| DELETE | 204     | 400   | 404 if not found                                 |
+| Method | Success | Error | Extra                                                                  |
+|--------|---------|-------|------------------------------------------------------------------------|
+| GET    | 200     | 404   |                                                                        |
+| POST   | 201     | 400   | includes `Location` header. 406 validation error, 409 resource exists. |
+| PUT    | 204     | 400   | includes `Location` header. 406 validation error.                      |
+| DELETE | 204     | 400   | 404 if not found.                                                      |
 
 Batch
 -----
