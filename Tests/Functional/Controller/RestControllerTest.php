@@ -220,9 +220,9 @@ class RestControllerTest extends AbstractElasticsearchTestCase
     }
 
     /**
-     * Tests post api providing identifier in request body.
+     * Tests post api twice providing identifier in request body.
      */
-    public function testPostApiWithIdInBody()
+    public function testPostApiTwiceWithIdInBody()
     {
         $manager = $this->getManager('not_default');
         $response = $this
@@ -237,8 +237,21 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 )
             );
 
-        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertNotNull($manager->getRepository('AcmeTestBundle:Person')->find(4));
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode(), 'Resource should be created!');
+        $this->assertNotNull($manager->getRepository('AcmeTestBundle:Person')->find(4), 'Document should exist!');
+
+        $response = $this
+            ->sendApiRequest(
+                'POST',
+                '/api/v1/custom/person',
+                json_encode(
+                    [
+                        'id' => 4,
+                        'name' => 'foo_name',
+                    ]
+                )
+            );
+        $this->assertEquals(Response::HTTP_CONFLICT, $response->getStatusCode(), 'Resource should exist!');
     }
 
     /**
