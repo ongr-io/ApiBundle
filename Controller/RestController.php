@@ -53,8 +53,12 @@ class RestController extends AbstractRestController implements RestControllerInt
         }
 
         $repository = $restRequest->getRepository();
-        $types = $repository->getTypes();
 
+        if ($repository->find($id, Repository::RESULTS_RAW) !== null) {
+            return $this->renderRest(['message' => 'Resource already exists!'], Response::HTTP_CONFLICT);
+        }
+
+        $types = $repository->getTypes();
         $data['_id'] = $id;
         $repository->getManager()->getConnection()->bulk('create', reset($types), $data);
         $repository->getManager()->commit();
@@ -103,7 +107,7 @@ class RestController extends AbstractRestController implements RestControllerInt
             return $this->renderRest(
                 [
                     'message' => 'Validation error!',
-                    'errors' => $validator->getErrors(),
+                    'errors'  => $validator->getErrors(),
                 ],
                 Response::HTTP_NOT_ACCEPTABLE
             );
@@ -149,8 +153,8 @@ class RestController extends AbstractRestController implements RestControllerInt
         try {
             $connection->delete(
                 [
-                    'id' => $id,
-                    'type' => $restRequest->getRepository()->getTypes(),
+                    'id'    => $id,
+                    'type'  => $restRequest->getRepository()->getTypes(),
                     'index' => $connection->getIndexName(),
                 ]
             );
