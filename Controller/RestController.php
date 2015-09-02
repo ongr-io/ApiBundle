@@ -107,7 +107,7 @@ class RestController extends AbstractRestController implements RestControllerInt
             return $this->renderRest(
                 [
                     'message' => 'Validation error!',
-                    'errors'  => $validator->getErrors(),
+                    'errors' => $validator->getErrors(),
                 ],
                 Response::HTTP_NOT_ACCEPTABLE
             );
@@ -153,8 +153,8 @@ class RestController extends AbstractRestController implements RestControllerInt
         try {
             $connection->delete(
                 [
-                    'id'    => $id,
-                    'type'  => $restRequest->getRepository()->getTypes(),
+                    'id' => $id,
+                    'type' => $restRequest->getRepository()->getTypes(),
                     'index' => $connection->getIndexName(),
                 ]
             );
