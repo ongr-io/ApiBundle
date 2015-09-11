@@ -26,12 +26,10 @@ class AppKernel extends Kernel
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
-
             new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
             new ONGR\ApiBundle\ONGRApiBundle(),
-            new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
-
-            new ONGR\ApiBundle\Tests\Functional\Fixtures\Bundles\Acme\TestBundle\AcmeTestBundle(),
+            new JMS\SerializerBundle\JMSSerializerBundle(),
+            new ONGR\ApiBundle\Tests\Fixtures\Bundles\Acme\TestBundle\AcmeTestBundle(),
         ];
     }
 
@@ -41,6 +39,5 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__ . '/config/config.yml');
-        $loader->load(__DIR__ . '/config/services.yml');
     }
 }

@@ -9,13 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+namespace ONGR\ApiBundle\Controller;
 
 /**
- * Class ONGRApiBundle.
+ * Used to detect if controller is for an api and should RestRequest be injected in attribues.
  */
-class ONGRApiBundle extends Bundle
+interface ApiInterface
 {
 }

@@ -1,24 +1,73 @@
 parameters:
-  ongr_api.data_request.class: ONGR\ApiBundle\Service\DataRequestService
+    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
+    ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
 
+    ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
+    ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
+    ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
+    ongr_api.rest_request_factory.class: ONGR\ApiBundle\Request\RestRequestFactory
+    ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
+    ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
+    ongr_api.batch_processor.class: ONGR\ApiBundle\Request\BatchProcessor
+
+    ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
+    ongr_api.batch_controller.class: ONGR\ApiBundle\Controller\BatchController
+    ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CommandController
 services:
-    ongr_api.api_doc.extractor:
-        class: ONGR\ApiBundle\Service\NelmioExtractor
+    ongr_api.elasticsearch_loader:
+        class: %ongr_api.elasticsearch_loader.class%
         calls:
-            - [ setContainer, [ @service_container ] ]
-        tags:
-            - { name: nelmio_api_doc.extractor.handler }
-
-    ongr_api.route_loader:
-        class: ONGR\ApiBundle\Routing\ApiRouteLoader
-        calls:
-            - [ setContainer,[ @service_container ] ]
+            - [setCollection, [@ongr_api.route_collection]]
         tags:
             - { name: routing.loader }
 
-    ongr_api.response_builder:
-        class: ONGR\ApiBundle\Service\ResponseBuilder
+    ongr_api.rest_response_view_handler:
+        class: %ongr_api.rest_response_view_handler.class%
+        arguments:
+            - @ongr_api.rest_request
 
-#  ongr_api.api.[version].[endpoint].controller
-#  ongr_api.api.[version].[endpoint].data_request
-#  ongr_api.api.[version].[endpoint].router
+    ongr_api.rest.validator:
+        class: %ongr_api.rest.validator.class%
+        arguments:
+            - @form.factory
+
+    ongr_api.event_listener.rest_request:
+        class: %ongr_api.event_listener.rest_request.class%
+        arguments:
+            - @ongr_api.rest_request
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    ongr_api.rest_request_factory:
+        class: %ongr_api.rest_request_factory.class%
+        arguments:
+            - @service_container
+
+    ongr_api.rest_request:
+        class: %ongr_api.rest_request.class%
+        factory: ["@ongr_api.rest_request_factory", get]
+        public: false
+        calls:
+            - [setDefaultAcceptType, [%ongr_api.default_encoding%]]
+
+    ongr_api.rest_controller:
+        class: %ongr_api.rest_controller.class%
+        calls:
+            - [setContainer, [@service_container]]
+
+    ongr_api.batch_controller:
+        class: %ongr_api.batch_controller.class%
+        calls:
+            - [setContainer, [@service_container]]
+
+    ongr_api.command_controller:
+        class: %ongr_api.command_controller.class%
+        calls:
+            - [setContainer, [@service_container]]
+
+    ongr_api.batch_processor:
+        class: %ongr_api.batch_processor.class%
+        arguments:
+            - @router
+        calls:
+            - [setContainer, [@service_container]]

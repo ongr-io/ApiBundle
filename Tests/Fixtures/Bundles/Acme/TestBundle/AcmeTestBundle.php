@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle;
+namespace ONGR\ApiBundle\Tests\Fixtures\Bundles\Acme\TestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class ONGRApiBundle.
+ * AcmeTestBundle for testing.
  */
-class ONGRApiBundle extends Bundle
+class AcmeTestBundle extends Bundle
 {
 }

@@ -11,8 +11,8 @@
 
 namespace ONGR\ApiBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
@@ -25,6 +25,16 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class ONGRApiExtension extends Extension
 {
     /**
+     * @var array
+     */
+    private $configuration;
+
+    /**
+     * @var string
+     */
+    private $version = '';
+
+    /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -34,151 +44,260 @@ class ONGRApiExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('types.yml');
 
-        $container->setParameter('ongr_api.versions', array_keys($config['versions']));
-        foreach ($config['versions'] as $versionName => $version) {
-            if (isset($version['parent'])) {
-                $version = $this->appendParentConfig($version, $version['parent'], $config['versions']);
-            } elseif (empty($version['endpoints'])) {
-                throw new InvalidConfigurationException(
-                    "At least one endpoint must be configured in version '$versionName'."
-                );
-            }
-            foreach ($version['endpoints'] as $endpointName => $endpoint) {
-                if (!isset($endpoint['controller'])) {
-                    $endpoint['controller'] = ['name' => 'default'];
-                    if (!isset($endpoint['manager'])) {
-                        throw new InvalidConfigurationException(
-                            "Manager must be set, when using default controller. (Endpoint: '$endpointName')"
-                        );
-                    }
-                    if (!isset($endpoint['document'])) {
-                        throw new InvalidConfigurationException(
-                            "Document must be set, when using default controller. (Endpoint: '$endpointName')"
-                        );
-                    }
-                }
-                if (!empty($endpoint['include_fields']) && !empty($endpoint['exclude_fields'])) {
-                    throw new InvalidConfigurationException(
-                        "'include_fields' and 'exclude_fields' can not be used together in endpoint '$endpointName'."
-                    );
-                }
-
-                if (isset($endpoint['controller']['path'])
-                    && strpos($endpoint['controller']['path'], '/') !== 0
-                ) {
-                    $endpoint['controller']['path'] = '/' . $endpoint['controller']['path'];
-                }
-
-                // Data request services are generated only for endpoints with default controllers.
-                if ($endpoint['controller']['name'] === 'default') {
-                    $this->generateDataRequestService($container, $versionName, $endpointName, $endpoint);
-                }
-
-                $container->setParameter("ongr_api.$versionName.$endpointName.controller", $endpoint['controller']);
-                $container->setParameter("ongr_api.$versionName.$endpointName", $endpoint);
-            }
-            $container->setParameter("ongr_api.$versionName.endpoints", array_keys($version['endpoints']));
-        }
+        $this->collectRoutes($config['versions'], $container);
+        $this->registerAuthenticationListener($config, $container);
+        $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
     }
 
     /**
-     * Appends settings to endpoint from parent endpoint.
+     * If authorization is enabled authentication listener is registered.
      *
-     * @param array  $node
-     * @param string $parentName
-     * @param array  $nodeset
-     * @param array  $children
-     *
-     * @return array
-     * @throws InvalidConfigurationException
-     */
-    private function appendParentConfig($node, $parentName, $nodeset, $children = [])
-    {
-        if (!array_key_exists($parentName, $nodeset)) {
-            throw new InvalidConfigurationException(
-                "Invalid parent '$parentName'."
-            );
-        }
-        $parent = $nodeset[$parentName];
-        if (in_array($parentName, $children)) {
-            throw new InvalidConfigurationException(
-                "'$parentName' can not be ancestor of itself."
-            );
-        }
-
-        $children[] = $parentName;
-        if (isset($parent['parent'])) {
-            $parent = $this->appendParentConfig($parent, $parent['parent'], $nodeset, $children);
-        }
-
-        $node['endpoints'] = array_merge($parent['endpoints'], $node['endpoints']);
-
-        return $node;
-    }
-
-    /**
-     * Generate data request services.
-     *
+     * @param array            $config
      * @param ContainerBuilder $container
-     * @param string           $versionName
-     * @param string           $endpointName
-     * @param array            $endpoint
      */
-    private function generateDataRequestService($container, $versionName, $endpointName, $endpoint)
+    private function registerAuthenticationListener(array $config, ContainerBuilder $container)
     {
-        $fields = [];
-        $fields['exclude_fields'] = $endpoint['exclude_fields'];
-        $fields['include_fields'] = $endpoint['include_fields'];
+        if ($config['authorization']['enabled']) {
+            $definition = new Definition(
+                $container->getParameter('ongr_api.event_listener.authentication.class'),
+                [
+                    new Reference('service_container'),
+                    $config['authorization']['secret'],
+                ]
+            );
+            $definition->setTags(
+                [
+                    'kernel.event_listener' => [
+                        ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 10],
+                    ],
+                ]
+            );
 
-        $definition = new Definition(
-            $container->getParameter(
-                'ongr_api.data_request.class'
-            ),
+            $container->setDefinition('ongr_api.event_listener.authentication', $definition);
+        }
+    }
+
+    /**
+     * Populates endpoints into route collection.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $builder
+     */
+    private function collectRoutes(array $config, ContainerBuilder $builder)
+    {
+        $collection = new Definition('Symfony\Component\Routing\RouteCollection');
+
+        foreach ($config as $version => $endpoints) {
+            $this
+                ->setEndpointConfig($endpoints['endpoints'])
+                ->setVersion($version);
+
+            foreach ($this->generate() as $name => $routeConfig) {
+                $route = new Definition('Symfony\Component\Routing\Route', $routeConfig);
+                $collection->addMethodCall('add', [$name, $route]);
+            }
+
+            if ($endpoints['batch']['enabled']) {
+                $route = $this->getBatchRoute($endpoints['batch']);
+                $collection->addMethodCall('add', [sprintf('ongr_api_%s_batch', $this->getVersion()), $route]);
+            }
+        }
+
+        $collection->setPublic(false);
+        $builder->setDefinition('ongr_api.route_collection', $collection);
+    }
+
+    /**
+     * Generates configuration for each route.
+     *
+     * @return \Generator
+     */
+    public function generate()
+    {
+        foreach ($this->getEndpointConfig() as $name => $config) {
+            foreach ($config['documents'] as $docConfig) {
+                list(,$type) = explode(':', $docConfig['name'], 2);
+                $c = [
+                    'url' => $this->formatUrl($name, $type),
+                    'defaults' => [
+                        'id' => null,
+                        'type' => strtolower($type),
+                        'manager' => $config['manager'],
+                        'repository' => $docConfig['name'],
+                        '_version' => $this->getVersion(),
+                        '_allow_extra_fields' => $docConfig['allow_extra_fields'],
+                    ],
+                ];
+
+                foreach ($docConfig['methods'] as $method) {
+                    $c['defaults']['_controller'] = $docConfig['controller'] . ':' . strtolower($method) . 'Action';
+                    $c['requirements']['_method'] = $method;
+
+                    yield $this->formatName($name, $type, $method) => $c;
+                }
+            }
+
+            if ($config['commands']['enabled']) {
+                foreach ($config['commands']['commands'] as $cmd) {
+                    list($command, $action) = explode(':', $cmd, 2);
+                    yield $this->formatCommandName($name, $command, $action) => [
+                        'url' => $this->formatCommandUrl($name, $command, $action),
+                        'defaults' => [
+                            '_controller' => $config['commands']['controller'] . ':'
+                                . strtolower($action) . ucfirst($command) . 'Action',
+                            '_version' => $this->getVersion(),
+                            'manager' => $config['manager'],
+                        ],
+                        'requirements' => [
+                            '_method' => 'POST',
+                        ],
+                    ];
+                }
+            }
+        }
+    }
+
+    /**
+     * Formats url for endpoint.
+     *
+     * @param string $endpoint
+     * @param string $type
+     *
+     * @return string
+     */
+    private function formatUrl($endpoint, $type)
+    {
+        return strtolower(
+            sprintf(
+                '%s/%s%s/{id}',
+                $this->getVersion(),
+                $endpoint === 'default' ? '' : $endpoint . '/',
+                $type
+            )
+        );
+    }
+
+    /**
+     * Formats command route url.
+     *
+     * @param string $endpoint
+     * @param string $command
+     * @param string $action
+     *
+     * @return string
+     */
+    private function formatCommandUrl($endpoint, $command, $action)
+    {
+        return strtolower(
+            sprintf(
+                '%s/%s_command/%s/%s',
+                $this->getVersion(),
+                $endpoint === 'default' ? '' : $endpoint . '/',
+                $command,
+                $action
+            )
+        );
+    }
+
+    /**
+     * Formats route name.
+     *
+     * @param string $endpoint
+     * @param string $type
+     * @param string $method
+     *
+     * @return string
+     */
+    private function formatName($endpoint, $type, $method)
+    {
+        return strtolower(sprintf('ongr_api_%s_%s_%s_%s', $this->getVersion(), $endpoint, $type, $method));
+    }
+
+    /**
+     * Formats command route name.
+     *
+     * @param string $endpoint
+     * @param string $command
+     * @param string $action
+     *
+     * @return string
+     */
+    private function formatCommandName($endpoint, $command, $action)
+    {
+        return strtolower(
+            sprintf(
+                'ongr_api_command_%s_%s_%s_%s',
+                $this->getVersion(),
+                $endpoint,
+                $command,
+                $action
+            )
+        );
+    }
+
+    /**
+     * Builds batch route definition.
+     *
+     * @param array $config
+     *
+     * @return Definition
+     */
+    private function getBatchRoute(array $config)
+    {
+        return new Definition(
+            'Symfony\Component\Routing\Route',
             [
-                new Reference('service_container'),
-                $endpoint['manager'],
-                $endpoint['document'],
-                $fields,
-                $endpointName,
-                new Reference('event_dispatcher'),
+                'url' => $this->getVersion() . '/batch',
+                'defaults' => [
+                    '_version' => $this->getVersion(),
+                    '_controller' => $config['controller'] . ':batchAction',
+                ],
+                'requirements' => [
+                    '_method' => 'POST',
+                ],
             ]
         );
-
-        $container->setDefinition(
-            self::getServiceNameWithNamespace(
-                'data_request',
-                self::getNamespaceName($versionName, $endpointName)
-            ),
-            $definition
-        );
     }
 
     /**
-     * Gets namespace string according to configuration version and endpoint given.
+     * @param array $configuration
      *
+     * @return ONGRApiExtension
+     */
+    protected function setEndpointConfig($configuration)
+    {
+        $this->configuration = $configuration;
+
+        return $this;
+    }
+
+    /**
      * @param string $version
-     * @param string $endpoint
      *
-     * @return string
+     * @return ONGRApiExtension
      */
-    public static function getNamespaceName($version, $endpoint)
+    protected function setVersion($version)
     {
-        $namespace = 'ongr_api.service.' . $version . '.' . $endpoint . '.%s';
+        $this->version = $version;
 
-        return $namespace;
+        return $this;
     }
 
     /**
-     * Gets service full name, by it's namespace and short name.
-     *
-     * @param string $name
-     * @param string $namespace
-     *
+     * @return array
+     */
+    protected function getEndpointConfig()
+    {
+        return $this->configuration;
+    }
+
+    /**
      * @return string
      */
-    public static function getServiceNameWithNamespace($name, $namespace)
+    protected function getVersion()
     {
-        return sprintf($namespace, $name);
+        return $this->version;
     }
 }
