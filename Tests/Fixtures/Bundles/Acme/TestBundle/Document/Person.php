@@ -26,14 +26,21 @@ class Person extends AbstractDocument
      *
      * @ES\Property(name="name", type="string", index="not_analyzed")
      */
-    protected $name;
+    private $name;
 
     /**
      * @var string
      *
      * @ES\Property(name="surname", type="string", index="not_analyzed")
      */
-    protected $surname;
+    private $surname;
+
+    /**
+     * @var boolean
+     *
+     * @ES\Property(name="active", type="boolean")
+     */
+    private $active;
 
     /**
      * @return string
@@ -65,5 +72,21 @@ class Person extends AbstractDocument
     public function setSurname($surname)
     {
         $this->surname = $surname;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
     }
 }
