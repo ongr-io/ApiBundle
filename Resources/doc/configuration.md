@@ -33,6 +33,7 @@ ongr_api:
 ```
 
 - `authorization` - If set, request header must include `Authorization` with value in this case 'supersecretstring'.
+> You can also use [symfony security component][5], but be sure this is disabled.
 
 - `default_encoding` - default encoding used if unknown `Accept` value set in header.
 
@@ -57,3 +58,4 @@ Let's learn more about [endpoints][3].
 [2]: custom_controller.md
 [3]: endpoints.md
 [4]: endpoints.md#command
+[5]: http://symfony.com/doc/current/book/security.html

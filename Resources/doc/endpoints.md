@@ -16,6 +16,8 @@ If endpoint is set to *default* then pattern would look like this:
 <yourdomain.com>/api/{version}/{document_type}/{id}
 ```
 
+POST and PUT methods should contain data to insert in their request body.
+
 Default controller status codes:
 
 | Method | Success | Error | Extra                                                                  |

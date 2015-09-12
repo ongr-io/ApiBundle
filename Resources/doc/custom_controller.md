@@ -32,7 +32,7 @@ class AcmeRestController extends AbstractRestController implements RestControlle
 	/**
 	 * {@inheritdoc}
 	 */
-    public function getAction(RestRequest $restRequest)
+    public function getAction(RestRequest $restRequest, $id = null)
     {
 		$data = $restRequest->getData();
 
