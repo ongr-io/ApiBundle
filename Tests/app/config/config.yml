@@ -3,8 +3,7 @@ imports:
 
 # Framework Configuration
 framework:
-    esi:             ~
-    fragments:       { path: /_proxy }
+    fragments:       ~
     translator:      { fallback: "%locale%" }
     secret:          %secret%
     router:
@@ -15,7 +14,6 @@ framework:
     validation:      { enable_annotations: true }
     templating:
         engines: ['twig']
-        #assets_version: 201204261
     default_locale:  "%locale%"
     trusted_proxies: ~
     session:         ~

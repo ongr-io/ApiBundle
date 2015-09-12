@@ -30,7 +30,7 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function postAction(RestRequest $restRequest, $id = null)
     {
         if ($id === null) {
-            return $this->renderRest(['message' => 'Identifier not found!'], Response::HTTP_BAD_REQUEST);
+            return $this->renderRest(['message' => $this->trans('response.error.id')], Response::HTTP_BAD_REQUEST);
         }
 
         $validator = $this->get('ongr_api.rest.validator');
@@ -38,14 +38,14 @@ class RestController extends AbstractRestController implements RestControllerInt
         $data = $validator->validate($restRequest);
         if ($data === false) {
             return $this->renderRest(
-                ['message' => 'Validation error!', 'errors' => $validator->getErrors()],
+                ['message' => $this->trans('response.error.validation'), 'errors' => $validator->getErrors()],
                 Response::HTTP_NOT_ACCEPTABLE
             );
         }
 
         $repository = $restRequest->getRepository();
         if ($repository->find($id, Repository::RESULTS_RAW) !== null) {
-            return $this->renderRest(['message' => 'Resource already exists!'], Response::HTTP_CONFLICT);
+            return $this->renderRest(['message' => $this->trans('response.error.resource')], Response::HTTP_CONFLICT);
         }
 
         $types = $repository->getTypes();
@@ -86,7 +86,10 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function putAction(RestRequest $restRequest, $id = null)
     {
         if ($id === null) {
-            return $this->renderRest(['message' => 'Identifier not found!'], Response::HTTP_BAD_REQUEST);
+            return $this->renderRest(
+                ['message' => $this->trans('response.error.id')],
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         $data = $restRequest->getData();
@@ -96,7 +99,7 @@ class RestController extends AbstractRestController implements RestControllerInt
         if ($data === false) {
             return $this->renderRest(
                 [
-                    'message' => 'Validation error!',
+                    'message' => $this->trans('response.error.validation'),
                     'errors' => $validator->getErrors(),
                 ],
                 Response::HTTP_NOT_ACCEPTABLE
@@ -122,7 +125,7 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function deleteAction(RestRequest $restRequest, $id = null)
     {
         if ($id === null) {
-            return $this->renderRest(['message' => 'Identifier not found!'], Response::HTTP_BAD_REQUEST);
+            return $this->renderRest(['message' => $this->trans('response.error.id')], Response::HTTP_BAD_REQUEST);
         }
 
         $connection = $restRequest->getRepository()->getManager()->getConnection();
@@ -136,7 +139,7 @@ class RestController extends AbstractRestController implements RestControllerInt
             );
         } catch (Missing404Exception $e) {
             return $this->renderRest(
-                ['message' => sprintf('No document found with id "%s"', $id)],
+                ['message' => $this->trans('response.error.not_found', ['%id%' => $id])],
                 Response::HTTP_NOT_FOUND
             );
         }
@@ -163,5 +166,18 @@ class RestController extends AbstractRestController implements RestControllerInt
         $route = substr_replace($route, strtolower($method), strrpos($route, '_') + 1);
 
         return $this->generateUrl($route, ['id' => $id]);
+    }
+
+    /**
+     * Translates message.
+     *
+     * @param string $message
+     * @param array  $parameters
+     *
+     * @return string
+     */
+    protected function trans($message, $parameters = [])
+    {
+        return $this->get('translator')->trans($message, $parameters, 'ApiBundle');
     }
 }
