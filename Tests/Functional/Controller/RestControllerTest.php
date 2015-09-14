@@ -28,16 +28,19 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                         '_id' => 1,
                         'name' => 'TestName1',
                         'surname' => 'TestSurname1',
+                        'active' => false,
                     ],
                     [
                         '_id' => 2,
                         'name' => 'TestName2',
                         'surname' => 'TestSurname2',
+                        'active' => true,
                     ],
                     [
                         '_id' => 3,
                         'name' => 'TestName3',
                         'surname' => 'TestSurname3',
+                        'active' => true,
                     ],
                 ],
             ],
@@ -99,7 +102,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(
-            '{"name":"TestName1","surname":"TestSurname1"}',
+            '{"name":"TestName1","surname":"TestSurname1","active":false}',
             $response->getContent()
         );
     }
@@ -114,9 +117,9 @@ class RestControllerTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(
-            '[{"name":"TestName1","surname":"TestSurname1"},'
-            . '{"name":"TestName2","surname":"TestSurname2"},'
-            . '{"name":"TestName3","surname":"TestSurname3"}]',
+            '[{"name":"TestName1","surname":"TestSurname1","active":false},'
+            . '{"name":"TestName2","surname":"TestSurname2","active":true},'
+            . '{"name":"TestName3","surname":"TestSurname3","active":true}]',
             $response->getContent()
         );
     }
@@ -131,8 +134,8 @@ class RestControllerTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(
-            '[{"name":"TestName2","surname":"TestSurname2"},'
-            . '{"name":"TestName3","surname":"TestSurname3"}]',
+            '[{"name":"TestName2","surname":"TestSurname2","active":true},'
+            . '{"name":"TestName3","surname":"TestSurname3","active":true}]',
             $response->getContent()
         );
     }
@@ -267,6 +270,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                 json_encode(
                     [
                         'name' => 'foo_name',
+                        'active' => false,
                     ]
                 )
             );
@@ -277,7 +281,8 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         );
         $document = $manager->getRepository('AcmeTestBundle:Person')->find(2);
         $this->assertNotNull($document, 'Document should exist');
-        $this->assertEquals('foo_name', $document->getName(), 'Document property should have changed');
+        $this->assertEquals('foo_name', $document->getName(), 'Document \'name\' property should have changed');
+        $this->assertFalse($document->isActive(), 'Document \'active\' property should have changed');
         $this->assertTrue($response->headers->has('Location'), 'Response should contain Location header');
         $this->assertEquals(
             '/api/v1/custom/person/2',
