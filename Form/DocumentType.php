@@ -29,6 +29,7 @@ class DocumentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['metadata']->getAliases() as $name => $alias) {
+            $alias['allow_extra_fields'] = $options['allow_extra_fields'];
             $this->resolveField($builder, $name, $alias);
         }
 

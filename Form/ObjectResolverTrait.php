@@ -50,6 +50,7 @@ trait ObjectResolverTrait
             'data_class' => $alias['namespace'],
             'types' => $alias['aliases'],
             'multiple' => (bool)$alias['multiple'],
+            'allow_extra_fields' => $alias['allow_extra_fields'],
         ];
 
         if ($typeOptions['multiple']) {
