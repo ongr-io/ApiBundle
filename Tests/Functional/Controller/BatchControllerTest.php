@@ -130,7 +130,6 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
             [
                 'status_code' => Response::HTTP_OK,
                 'response' => [
-                    'id' => 2,
                     'name' => 'updated_name',
                     'surname' => 'updated_surname',
                 ],

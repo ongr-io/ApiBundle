@@ -219,22 +219,21 @@ class RestControllerTest extends AbstractElasticsearchTestCase
             );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertEquals('{"message":"No identifier found!"}', $response->getContent());
+        $this->assertEquals('{"message":"Identifier not found!"}', $response->getContent());
     }
 
     /**
      * Tests post api twice providing identifier in request body.
      */
-    public function testPostApiTwiceWithIdInBody()
+    public function testPostApiTwice()
     {
         $manager = $this->getManager('not_default');
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v1/custom/person',
+                '/api/v1/custom/person/4',
                 json_encode(
                     [
-                        'id' => 4,
                         'name' => 'foo_name',
                     ]
                 )
@@ -246,10 +245,9 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v1/custom/person',
+                '/api/v1/custom/person/4',
                 json_encode(
                     [
-                        'id' => 4,
                         'name' => 'foo_name',
                     ]
                 )
@@ -334,28 +332,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
             );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertEquals('{"message":"No identifier found!"}', $response->getContent());
-    }
-
-    /**
-     * Tests post api providing identifier in request body.
-     */
-    public function testPutApiWithIdInBody()
-    {
-        $manager = $this->getManager('not_default');
-        $response = $this
-            ->sendApiRequest(
-                'PUT',
-                '/api/v1/custom/person',
-                json_encode(
-                    [
-                        'id' => 4,
-                        'name' => 'foo_name',
-                    ]
-                )
-            );
-
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        $this->assertEquals('{"message":"Identifier not found!"}', $response->getContent());
     }
 
     /**
