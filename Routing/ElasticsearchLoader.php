@@ -20,11 +20,6 @@ use Symfony\Component\Routing\RouteCollection;
 class ElasticsearchLoader extends Loader
 {
     /**
-     * @var bool
-     */
-    private $loaded = false;
-
-    /**
      * @var RouteCollection
      */
     private $collection;
@@ -34,13 +29,7 @@ class ElasticsearchLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        if (true === $this->loaded) {
-            throw new \RuntimeException('Do not add the "ongr_api" loader twice');
-        }
-
-        $this->loaded = true;
-
-        return $this->getCollection();
+        return clone $this->getCollection();
     }
 
     /**
