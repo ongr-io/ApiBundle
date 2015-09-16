@@ -232,19 +232,6 @@ class ElasticsearchLoaderTest extends WebTestCase
     }
 
     /**
-     * Tests if exception is thown when loading more than once.
-     *
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Do not add the "ongr_api" loader twice
-     */
-    public function testLoadException()
-    {
-        $loader = $this->getLoader();
-        $loader->load('');
-        $loader->load('');
-    }
-
-    /**
      * @return ElasticsearchLoader
      */
     private function getLoader()
