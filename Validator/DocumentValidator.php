@@ -156,7 +156,7 @@ class DocumentValidator implements ValidatorInterface
     /**
      * @return Repository
      */
-    private function getRepository()
+    protected function getRepository()
     {
         return $this->repository;
     }
@@ -166,7 +166,7 @@ class DocumentValidator implements ValidatorInterface
      *
      * @return $this
      */
-    private function setRepository($repository)
+    protected function setRepository($repository)
     {
         $this->repository = $repository;
 
