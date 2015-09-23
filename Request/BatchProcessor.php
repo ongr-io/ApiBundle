@@ -165,6 +165,7 @@ class BatchProcessor implements ContainerAwareInterface
                     ->get($options['manager'])
                     ->getRepository($options['repository'])
             )
+            ->setType($options['_type'])
             ->setAllowedExtraFields($options['_allow_extra_fields']);
     }
 

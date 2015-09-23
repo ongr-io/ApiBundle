@@ -123,9 +123,9 @@ class ONGRApiExtension extends Extension
                     'url' => $this->formatUrl($name, $type),
                     'defaults' => [
                         'id' => null,
-                        'type' => strtolower($type),
                         'manager' => $config['manager'],
                         'repository' => $docConfig['name'],
+                        '_type' => strtolower($type),
                         '_version' => $this->getVersion(),
                         '_allow_extra_fields' => $docConfig['allow_extra_fields'],
                     ],

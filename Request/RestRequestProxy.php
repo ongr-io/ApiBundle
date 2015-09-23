@@ -34,6 +34,11 @@ class RestRequestProxy extends RestRequest
     private $allowedExtraFields = false;
 
     /**
+     * @var string
+     */
+    private $type;
+
+    /**
      * {@inheritdoc}
      */
     public function getData()
@@ -89,6 +94,26 @@ class RestRequestProxy extends RestRequest
     public function setAllowedExtraFields($allowedExtraFields)
     {
         $this->allowedExtraFields = $allowedExtraFields;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
 
         return $this;
     }
