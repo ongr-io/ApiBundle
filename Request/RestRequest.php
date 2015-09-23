@@ -208,4 +208,14 @@ class RestRequest
     {
         return $this->getRequest()->attributes->get('_allow_extra_fields', false);
     }
+
+    /**
+     * Returns using repository type.
+     *
+     * @return string|null
+     */
+    public function getType()
+    {
+        return $this->getRequest()->attributes->get('_type');
+    }
 }
