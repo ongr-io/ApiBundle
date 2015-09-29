@@ -65,6 +65,7 @@ class BatchProcessor implements ContainerAwareInterface
         }
 
         $out = [];
+        $indexes = [];
         $proxy = RestRequestProxy::initialize($restRequest);
         $currentMethod = $this->getRouter()->getContext()->getMethod();
 
@@ -85,8 +86,18 @@ class BatchProcessor implements ContainerAwareInterface
             $this->prepareProxy($proxy, $action['body'], $options);
 
             $out[] = call_user_func_array([$this->getController($id), $method], [$proxy, $options['id']]);
+            $indexes[$proxy->getRepository()->getManager()->getConnection()->getIndexName()] = null;
         }
 
+        if (!empty($indexes)) {
+            $proxy
+                ->getRepository()
+                ->getManager()
+                ->getConnection()
+                ->getClient()
+                ->indices()
+                ->flush(['index' => implode(',', array_keys($indexes))]);
+        }
         $this->getRouter()->getContext()->setMethod($currentMethod);
 
         return $out;

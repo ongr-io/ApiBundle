@@ -51,7 +51,7 @@ class RestController extends AbstractRestController implements RestControllerInt
         $types = $repository->getTypes();
         $data['_id'] = $id;
         $repository->getManager()->getConnection()->bulk('create', reset($types), $data);
-        $repository->getManager()->commit();
+        $repository->getManager()->getConnection()->commit(!$this->isBatch());
 
         return $this->renderRest(
             null,
@@ -110,7 +110,7 @@ class RestController extends AbstractRestController implements RestControllerInt
         $types = $repository->getTypes();
         $data['_id'] = $id;
         $repository->getManager()->getConnection()->bulk('index', reset($types), $data);
-        $repository->getManager()->commit();
+        $repository->getManager()->getConnection()->commit(!$this->isBatch());
 
         return $this->renderRest(
             null,
@@ -129,14 +129,22 @@ class RestController extends AbstractRestController implements RestControllerInt
         }
 
         $connection = $restRequest->getRepository()->getManager()->getConnection();
+        $types = $restRequest->getRepository()->getTypes();
+
         try {
-            $connection->delete(
-                [
-                    'id' => $id,
-                    'type' => $restRequest->getRepository()->getTypes(),
-                    'index' => $connection->getIndexName(),
-                ]
-            );
+            if ($this->isBatch()) {
+                $types = $restRequest->getRepository()->getTypes();
+                $connection->bulk('delete', reset($types), ['_id' => $id]);
+                $connection->commit(false);
+            } else {
+                $connection->delete(
+                    [
+                        'id' => $id,
+                        'type' => $types,
+                        'index' => $connection->getIndexName(),
+                    ]
+                );
+            }
         } catch (Missing404Exception $e) {
             return $this->renderRest(
                 ['message' => $this->trans('response.error.not_found', ['%id%' => $id])],
