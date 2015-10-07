@@ -76,6 +76,8 @@ class RestRequestFactory
      */
     private function getRequest()
     {
-        return $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request !== null ? $request : Request::createFromGlobals();
     }
 }
