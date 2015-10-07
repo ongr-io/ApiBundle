@@ -92,7 +92,6 @@ class RestController extends AbstractRestController implements RestControllerInt
             );
         }
 
-        $data = $restRequest->getData();
         $validator = $this->get('ongr_api.rest.validator');
         $data = $validator->validate($restRequest);
 
