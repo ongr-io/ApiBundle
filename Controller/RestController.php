@@ -65,8 +65,13 @@ class RestController extends AbstractRestController implements RestControllerInt
      */
     public function getAction(RestRequest $restRequest, $id = null)
     {
+        if (null !== $restRequest->get('pretty')) {
+            $resultType = Repository::RESULTS_OBJECT;
+        } else {
+            $resultType = Repository::RESULTS_ARRAY;
+        }
         if ($id !== null) {
-            $data = $restRequest->getRepository()->find($id, Repository::RESULTS_ARRAY);
+            $data = $restRequest->getRepository()->find($id, $resultType);
             if ($data === null) {
                 return $this->renderRest(null, Response::HTTP_NOT_FOUND);
             }
@@ -74,7 +79,7 @@ class RestController extends AbstractRestController implements RestControllerInt
             $search = new Search();
             !$restRequest->query->has('from') ? : $search->setFrom($restRequest->query->get('from'));
             !$restRequest->query->has('size') ? : $search->setSize($restRequest->query->get('size'));
-            $data = $restRequest->getRepository()->execute($search, Repository::RESULTS_ARRAY);
+            $data = $restRequest->getRepository()->execute($search, $resultType);
         }
 
         return $this->renderRest($data);

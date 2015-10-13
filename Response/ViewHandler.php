@@ -43,15 +43,8 @@ class ViewHandler
      */
     public function handleView($data, $statusCode = Response::HTTP_OK, $headers = [])
     {
-        $contentType = $this->getRestRequest()->checkAcceptHeader();
-        if ($contentType == 'json' && null !== $this->getRestRequest()->get('pretty')) {
-            $dataResponse = json_encode($data, JSON_PRETTY_PRINT);
-        } else {
-            $dataResponse = $this->getRestRequest()->serialize($data);
-        }
-
         return new Response(
-            $dataResponse,
+            $this->getRestRequest()->serialize($data),
             $statusCode,
             array_merge(
                 ['Content-Type' => 'application/' . $this->getRestRequest()->checkAcceptHeader()],
