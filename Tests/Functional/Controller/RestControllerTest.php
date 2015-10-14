@@ -108,6 +108,27 @@ class RestControllerTest extends AbstractElasticsearchTestCase
     }
 
     /**
+     * Tests get api with pretty format when document is found.
+     */
+    public function testGetApiWithIdAndPrettyFormat()
+    {
+        $manager = $this->getManager('not_default');
+        $response = $this->sendApiRequest('GET', '/api/v1/custom/person/1?pretty');
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals(
+            '{
+    "id": "1",
+    "name": "TestName1",
+    "surname": "TestSurname1",
+    "active": false,
+    "__is_initialized": true
+}',
+            $response->getContent()
+        );
+    }
+
+    /**
      * Tests get api when document without id.
      */
     public function testGetApiWithoutId()
