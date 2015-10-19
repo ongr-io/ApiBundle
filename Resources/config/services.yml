@@ -1,7 +1,7 @@
 parameters:
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
     ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
-
+    ongr_api.event_listener.json_pretty_format.class: ONGR\ApiBundle\EventListener\JsonPrettyFormatEventListener
     ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
     ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
@@ -71,3 +71,11 @@ services:
             - @router
         calls:
             - [setContainer, [@service_container]]
+
+    ongr_api.json_pretty_format:
+        class: %ongr_api.event_listener.json_pretty_format.class%
+        arguments:
+            - @ongr_api.rest_request
+        tags:
+            - { name: jms_serializer.event_subscriber, event: serializer.pre_serialize, method: onPreSerialize }
+
