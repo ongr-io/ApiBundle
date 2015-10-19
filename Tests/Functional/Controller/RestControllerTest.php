@@ -124,7 +124,9 @@ class RestControllerTest extends AbstractElasticsearchTestCase
                     'surname' => 'TestSurname1',
                     'active' => false,
                     '__is_initialized' => true,
-                ],128),
+                ],
+                JSON_PRETTY_PRINT
+            ),
             $response->getContent()
         );
     }
