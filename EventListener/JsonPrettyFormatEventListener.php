@@ -18,7 +18,7 @@ use ONGR\ApiBundle\Request\RestRequest;
 /**
  * Listener for injecting pretty json format options.
  */
-class JsonPrettyFormat implements EventSubscriberInterface
+class JsonPrettyFormatEventListener implements EventSubscriberInterface
 {
     /**
      * @var RestRequest
@@ -28,7 +28,7 @@ class JsonPrettyFormat implements EventSubscriberInterface
     /**
      * @param RestRequest $restRequest
      */
-    public function __construct(RestRequest $restRequest)
+    public function __construct($restRequest)
     {
         $this->restRequest = $restRequest;
     }
@@ -44,12 +44,12 @@ class JsonPrettyFormat implements EventSubscriberInterface
                 'method' => 'onPreSerialize',
                 'format' => 'json',
             ],
-
         ];
     }
 
     /**
      * Set pretty json options.
+     *
      * @param ObjectEvent $event
      */
     public function onPreSerialize(ObjectEvent $event)

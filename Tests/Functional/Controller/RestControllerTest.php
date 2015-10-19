@@ -117,13 +117,14 @@ class RestControllerTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(
-            '{
-    "id": "1",
-    "name": "TestName1",
-    "surname": "TestSurname1",
-    "active": false,
-    "__is_initialized": true
-}',
+            json_encode(
+                [
+                    'id' => '1',
+                    'name' => 'TestName1',
+                    'surname' => 'TestSurname1',
+                    'active' => false,
+                    '__is_initialized' => true,
+                ],128),
             $response->getContent()
         );
     }
