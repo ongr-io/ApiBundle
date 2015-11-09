@@ -14,6 +14,7 @@ namespace ONGR\ApiBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Validates and merges configuration from your app/config files.
@@ -50,14 +51,23 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('default_encoding')
+                ->booleanNode('version_in_url')
+                    ->defaultFalse()
+                    ->info(
+                        'By default versions is only handled via Accept headers. '.
+                        'In addition there is possible to add it in the url.'
+                    )
+                ->end()
+                ->scalarNode('output_format')
                     ->defaultValue('json')
                     ->example('json')
                     ->info('Default encoding type. Changed through headers')
-                    ->isRequired()
                     ->validate()
                         ->ifNotInArray(['json', 'xml'])
-                        ->thenInvalid('Currently valid encoders are only json and xml!')
+                        ->thenInvalid(
+                            'Currently valid encoders are only json and xml. '.
+                            'For more you can inject your own serializer.'
+                        )
                     ->end()
                 ->end()
                 ->append($this->getVersionsNode())
@@ -78,35 +88,14 @@ class Configuration implements ConfigurationInterface
 
         $node
             ->info('Defines api versions.')
-            ->isRequired()
-            ->requiresAtLeastOneElement()
             ->useAttributeAsKey('version')
             ->prototype('array')
                 ->children()
-                    ->scalarNode('version')
-                        ->info('Defines a version for current api')
-                        ->example('v2')
+                    ->scalarNode('versions')
+                        ->info('Defines a version for current api endpoints.')
+                        ->example('v1')
                     ->end()
-                    ->arrayNode('batch')
-                        ->addDefaultsIfNotSet()
-                        ->validate()
-                            ->ifTrue(
-                                function ($node) {
-                                    return $node['enabled'] && !isset($node['controller']);
-                                }
-                            )
-                            ->thenInvalid("'controller' for batch api must be set if batch is enabled.")
-                        ->end()
-                        ->children()
-                            ->booleanNode('enabled')
-                                ->defaultTrue()
-                            ->end()
-                            ->scalarNode('controller')
-                                ->defaultValue('ongr_api.batch_controller')
-                            ->end()
-                        ->end()
-                    ->end()
-                    ->append($this->getEndpointNode())
+                ->append($this->getEndpointNode())
                 ->end()
             ->end();
 
@@ -124,130 +113,61 @@ class Configuration implements ConfigurationInterface
         $node = $builder->root('endpoints');
 
         $node
-            ->requiresAtLeastOneElement()
             ->info('Defines version endpoints.')
             ->useAttributeAsKey('endpoint')
             ->prototype('array')
                 ->children()
                     ->scalarNode('endpoint')
-                        ->info('Endpoint name (will be included in url (excl. default))')
-                        ->example('custom')
+                        ->info('Endpoint name (will be included in url (e.g. products))')
+                        ->example('products')
                     ->end()
-                    ->scalarNode('manager')
+                    ->scalarNode('repository')
                         ->isRequired()
-                        ->info('Elasticsearch manager which will be used for document fetching')
-                        ->example('es.manager.custom')
-                    ->end()
-                    ->append($this->getDocumentNode())
-                    ->append($this->getCommandsNode())
-                ->end()
-            ->end();
-
-        return $node;
-    }
-
-    /**
-     * Builds configuration tree for documents.
-     *
-     * @return NodeDefinition
-     */
-    public function getDocumentNode()
-    {
-        $builder = new TreeBuilder();
-        $node = $builder->root('documents');
-
-        $node
-            ->beforeNormalization()
-                ->ifNull()
-                ->thenEmptyArray()
-            ->end()
-            ->prototype('array')
-                ->beforeNormalization()
-                    ->ifString()
-                    ->then(
-                        function ($string) {
-                            return ['name' => $string];
-                        }
-                    )
-                ->end()
-                ->children()
-                    ->scalarNode('name')
-                        ->isRequired()
-                        ->info('Document name (AKA Repository name)')
-                        ->example('ONGRDemoBundle:Product')
-                    ->end()
-                    ->scalarNode('controller')
-                        ->defaultValue('ongr_api.rest_controller')
-                        ->info('Front controller for rest actions')
-                    ->end()
-                    ->booleanNode('allow_extra_fields')
-                        ->defaultTrue()
-                        ->info('Allows to pass unknown fields to api')
+                        ->info('Document service from Elasticsearch bundle which will be used for data fetching')
+                        ->example('es.manager.default.products')
                     ->end()
                     ->arrayNode('methods')
-                        ->requiresAtLeastOneElement()
-                        ->defaultValue(['POST', 'GET', 'PUT', 'DELETE'])
+                        ->defaultValue(
+                            [
+                                Request::METHOD_POST,
+                                Request::METHOD_GET,
+                            ]
+                        )
                         ->prototype('scalar')
-                            ->validate()
-                                ->ifNotInArray(['POST', 'GET', 'PUT', 'DELETE'])
-                                ->thenInvalid(
-                                    'Invalid method used! Available methods: POST, GET, PUT, DELETE.'
-                                    . 'Please check your ongr_api configuration.'
-                                )
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end();
-
-        return $node;
-    }
-
-    /**
-     * Builds commands node.
-     *
-     * @return NodeDefinition
-     */
-    private function getCommandsNode()
-    {
-        $builder = new TreeBuilder();
-        $node = $builder->root('commands');
-
-        $node
-            ->addDefaultsIfNotSet()
-            ->beforeNormalization()
-                ->ifTrue(
-                    function ($value) {
-                        return is_bool($value);
-                    }
-                )
-                ->then(
-                    function ($value) {
-                        return ['enabled' => $value];
-                    }
-                )
-            ->end()
-            ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                    ->info('Enables commands like index create for endpoint.')
-                ->end()
-                ->scalarNode('controller')
-                    ->defaultValue('ongr_api.command_controller')
-                    ->info('Controller used for command requests')
-                ->end()
-                ->arrayNode('commands')
-                    ->requiresAtLeastOneElement()
-                    ->defaultValue(['index:create', 'index:drop', 'schema:update'])
-                    ->prototype('scalar')
                         ->validate()
-                        ->ifNotInArray(['index:create', 'index:drop', 'schema:update'])
+                        ->ifNotInArray(
+                            [
+                                Request::METHOD_HEAD,
+                                Request::METHOD_POST,
+                                Request::METHOD_PATCH,
+                                Request::METHOD_GET,
+                                Request::METHOD_PUT,
+                                Request::METHOD_DELETE,
+                            ]
+                        )
                         ->thenInvalid(
-                            'Invalid command used! Available commands: '
-                            . 'index:create, index:drop, schema:update. '
-                            . 'Please check your ongr_api configuration.'
+                            'Invalid HTTP method used! Please check your ongr_api endpoint configuration.'
                         )
                         ->end()
+                    ->end()
+                    ->end()
+                    ->booleanNode('allow_extra_fields')
+                        ->defaultFalse()
+                        ->info(
+                            'Allows to pass unknown fields to an api. '.
+                            'Make sure you have configured elasticsearch respectively.'
+                        )
+                    ->end()
+                    ->arrayNode('allow_fields')
+                        ->defaultValue([])
+                        ->info('A list off a allowed fields to operate through api for a document.')
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->booleanNode('allow_get_all')
+                    ->defaultFalse()
+                    ->info(
+                        'Allows to use `_scroll` elasticsearch api to get all documents from a type.'
+                    )
                     ->end()
                 ->end()
             ->end();
