@@ -12,7 +12,7 @@
 namespace ONGR\ApiBundle\Validator;
 
 use ONGR\ApiBundle\Request\RestRequest;
-use ONGR\ElasticsearchBundle\ORM\Repository;
+use ONGR\ElasticsearchBundle\Service\Repository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -143,14 +143,11 @@ class DocumentValidator implements ValidatorInterface
      */
     private function getMetadata()
     {
-        $types = $this->getRepository()->getManager()->getTypesMapping();
+        $manager = $this->getRepository()->getManager();
+        $types = $manager->getMetadataCollector()->getMappings($manager->getConfig()['mappings']);
         $repositoryTypes = $this->getRepository()->getTypes();
-        $meta = $this
-            ->getRepository()
-            ->getManager()
-            ->getBundlesMapping([$types[reset($repositoryTypes)]]);
 
-        return reset($meta);
+        return array_intersect_key($types, array_values($repositoryTypes));
     }
 
     /**
