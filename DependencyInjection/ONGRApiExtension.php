@@ -44,11 +44,35 @@ class ONGRApiExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
-        $loader->load('types.yml');
 
-        $this->collectRoutes($config['versions'], $container);
-        $this->registerAuthenticationListener($config, $container);
-        $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
+        $container->setParameter('ongr_api.output_format', $config['output_format']);
+        $container->setParameter('ongr_api.version_in_url', $config['version_in_url']);
+        $container->setParameter('ongr_api.versions', $config['versions']);
+
+        $collection = new Definition('Symfony\Component\Routing\RouteCollection');
+
+        foreach ($config['versions'] as $version => $endpoints) {
+            $path = '';
+            if ($config['output_format']) {
+                $path .= '/'.$version;
+            }
+
+            foreach ($endpoints as $name => $endpoint) {
+                $config = [
+                    'url' => $this->formatUrl($name, $type),
+                    'defaults' => [
+                        'id' => null,
+                        'repository' => $endpoint['repository'],
+                        '_type' => strtolower($type),
+                        '_version' => $this->getVersion(),
+                        '_allow_extra_fields' => $endpoint['allow_extra_fields'],
+                    ],
+                ];
+
+                $route = new Definition('Symfony\Component\Routing\Route', $routeConfig);
+                $collection->addMethodCall('add', [$name, $route]);
+            }
+        }
     }
 
     /**
@@ -111,8 +135,6 @@ class ONGRApiExtension extends Extension
 
     /**
      * Generates configuration for each route.
-     *
-     * @return \Generator
      */
     public function generate()
     {
@@ -175,28 +197,6 @@ class ONGRApiExtension extends Extension
                 $this->getVersion(),
                 $endpoint === 'default' ? '' : $endpoint . '/',
                 $type
-            )
-        );
-    }
-
-    /**
-     * Formats command route url.
-     *
-     * @param string $endpoint
-     * @param string $command
-     * @param string $action
-     *
-     * @return string
-     */
-    private function formatCommandUrl($endpoint, $command, $action)
-    {
-        return strtolower(
-            sprintf(
-                '%s/%s_command/%s/%s',
-                $this->getVersion(),
-                $endpoint === 'default' ? '' : $endpoint . '/',
-                $command,
-                $action
             )
         );
     }
