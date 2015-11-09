@@ -12,7 +12,7 @@
 namespace ONGR\ApiBundle\Request;
 
 use JMS\Serializer\SerializerInterface;
-use ONGR\ElasticsearchBundle\ORM\Repository;
+use ONGR\ElasticsearchBundle\Service\Repository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -72,7 +72,7 @@ class RestRequest
     }
 
     /**
-     * Proxy get metod for original properties.
+     * Proxy get method for original properties.
      *
      * @param string $name
      *
@@ -92,7 +92,7 @@ class RestRequest
     }
 
     /**
-     * Fethes deserialized request content.
+     * Fetches deserialized request content.
      *
      * @return array
      */
@@ -112,7 +112,7 @@ class RestRequest
     /**
      * @return string
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function getDefaultAcceptType()
     {
