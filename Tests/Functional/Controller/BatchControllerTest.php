@@ -49,6 +49,8 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
      */
     public function testBatchAction()
     {
+        $this->getManager();
+        $t = json_encode($this->getBatchContent());
         $response = $this->sendBatchRequest(json_encode($this->getBatchContent()));
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -142,6 +144,7 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
      */
     public function testBatchWithInvalidPath()
     {
+        $this->getManager();
         $content = [
             [
                 'method' => 'GET',
@@ -156,7 +159,7 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
             [
                 [
                     'status_code' => Response::HTTP_BAD_REQUEST,
-                    'message' => 'Could not resolve path!',
+                    'message' => 'Could not resolve path or action!',
                     'error' => '',
                 ],
             ],
@@ -169,6 +172,7 @@ class BatchControllerTest extends AbstractElasticsearchTestCase
      */
     public function testBatchWithInvalidContent()
     {
+        $this->getManager();
         $respose = $this->sendBatchRequest('thisisinvalidjson_O;.;o');
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $respose->getStatusCode());
         $this->assertEquals(

@@ -24,14 +24,14 @@ class Person extends AbstractDocument
     /**
      * @var string
      *
-     * @ES\Property(name="name", type="string", index="not_analyzed")
+     * @ES\Property(name="name", type="string", options={"index"="not_analyzed"})
      */
     private $name;
 
     /**
      * @var string
      *
-     * @ES\Property(name="surname", type="string", index="not_analyzed")
+     * @ES\Property(name="surname", type="string", options={"index"="not_analyzed"})
      */
     private $surname;
 
@@ -88,5 +88,13 @@ class Person extends AbstractDocument
     public function setActive($active)
     {
         $this->active = $active;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }
