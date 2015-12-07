@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle\Tests\Fixtures\Bundles\Acme\TestBundle\Controller;
+namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle\Controller;
 
 use ONGR\ApiBundle\Controller\ApiControllerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
