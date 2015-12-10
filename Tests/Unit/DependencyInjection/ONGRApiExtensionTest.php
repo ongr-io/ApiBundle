@@ -26,7 +26,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
         // Case 0. Tests if only repository is set.
         $versions = [
             'versions' => [
-                'v1' => [
+                'v3' => [
                     'endpoints' => [
                         'persons' => [
                             'repository' => 'es.manager.default.person',
@@ -42,8 +42,8 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $expected = $versions;
 
-        $expected['versions']['v1']['endpoints']['persons'] = array_merge(
-            $versions['versions']['v1']['endpoints']['persons'],
+        $expected['versions']['v3']['endpoints']['persons'] = array_merge(
+            $versions['versions']['v3']['endpoints']['persons'],
             [
                 'methods' => [
                     Request::METHOD_POST,

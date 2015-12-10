@@ -46,7 +46,7 @@ ongr_api:
        enabled: true
        secret: %secret%
    output_format: json
-   version_in_url: false
+   version_in_url: true
    versions:
 #       v1:
 #           batch:
@@ -61,6 +61,14 @@ ongr_api:
 #                   manager: es.manager.not_default
 #                   documents:
 #                       - { name: "AcmeTestBundle:Person", allow_extra_fields: false }
+
+# New API way
+# /api/v1/person POST -> ["name" => "John"]
+# /api/v1/person/{id} PUT -> ["name" => "John"]
+# /api/v1/person/{id} GET
+# /api/v1/person/_all GET ?filters
+# /api/v1/person/{id} DELETE
+# /api/v1/person/_batch POST -> [["name" => "John"]]
 
        v3:
            endpoints:
