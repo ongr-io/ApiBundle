@@ -1,5 +1,7 @@
-ONGR Api Bundle
-===============
+# ONGR Api Bundle
+
+
+# Currently API Bundle is under reconstruction. Use 0.1 branch as a stable version for now. 
 
 Api Bundle allows rapid setup of RESTful API to simplify Elasticsearch data access for remote clients.
 
