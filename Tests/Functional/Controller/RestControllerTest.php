@@ -52,6 +52,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
      */
     public function testAuthorization()
     {
+        $this->getManager();
         $client = static::createClient();
         $client->request('GET', '/api/v1/person');
 

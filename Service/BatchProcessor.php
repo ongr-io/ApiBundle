@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle\Request;
+namespace ONGR\ApiBundle\Service;
 
 use ONGR\ApiBundle\Controller\RestControllerInterface;
+use ONGR\ApiBundle\Request\RestRequest;
+use ONGR\ApiBundle\Request\RestRequestProxy;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -24,11 +26,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class BatchProcessor implements ContainerAwareInterface
 {
-    /**
-     * @var OptionsResolver
-     */
-    private $resolver;
-
     /**
      * @var RouterInterface
      */
@@ -40,13 +37,32 @@ class BatchProcessor implements ContainerAwareInterface
     private $container;
 
     /**
+     * @var CrudInterface
+     */
+    private $crud;
+
+    /**
      * @param RouterInterface $router
      */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
-        $this->resolver = new OptionsResolver();
-        $this->configureResolver($this->resolver);
+    }
+
+    /**
+     * @return CrudInterface
+     */
+    public function getCrud()
+    {
+        return $this->crud;
+    }
+
+    /**
+     * @param CrudInterface $crud
+     */
+    public function setCrud(CrudInterface $crud)
+    {
+        $this->crud = $crud;
     }
 
     /**
@@ -64,20 +80,26 @@ class BatchProcessor implements ContainerAwareInterface
             return false;
         }
 
-        $out = [];
+        $output = [];
         $indexes = [];
-        $proxy = RestRequestProxy::initialize($restRequest);
-        $currentMethod = $this->getRouter()->getContext()->getMethod();
 
-        foreach ($data as $action) {
-            $action = $this->getResolver()->resolve($action);
+        foreach ($data as $batch) {
+
+//            $method = $batch['method'];
+//            switch ($method) {
+//
+//                case Request::METHOD_POST:
+//                    $output[]
+//                    break;
+//            }
+
             $this->getRouter()->getContext()->setMethod($action['method']);
             try {
                 $options = $this->getRouter()->match('/api/' . $restRequest->getVersion() . '/' . $action['path']);
             } catch (ResourceNotFoundException $e) {
                 $out[] = [
                     'status_code' => Response::HTTP_BAD_REQUEST,
-                    'message' => 'Could not resolve path!',
+                    'message' => 'Could not resolve path or action!',
                     'error' => $e->getMessage(),
                 ];
                 continue;
@@ -85,15 +107,15 @@ class BatchProcessor implements ContainerAwareInterface
             list($id, $method) = explode(':', $options['_controller'], 2);
             $this->prepareProxy($proxy, $action['body'], $options);
 
+
             $out[] = call_user_func_array([$this->getController($id), $method], [$proxy, $options['id']]);
-            $indexes[$proxy->getRepository()->getManager()->getConnection()->getIndexName()] = null;
+            $indexes[$proxy->getRepository()->getManager()->getIndexName()] = null;
         }
 
         if (!empty($indexes)) {
             $proxy
                 ->getRepository()
                 ->getManager()
-                ->getConnection()
                 ->getClient()
                 ->indices()
                 ->flush(['index' => implode(',', array_keys($indexes))]);
@@ -125,38 +147,6 @@ class BatchProcessor implements ContainerAwareInterface
     protected function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * @return OptionsResolver
-     */
-    protected function getResolver()
-    {
-        return $this->resolver;
-    }
-
-    /**
-     * Options resolver setup.
-     *
-     * @param OptionsResolver $resolver
-     */
-    protected function configureResolver(OptionsResolver $resolver)
-    {
-        $resolver
-            ->setRequired(['method', 'path', 'body'])
-            ->setAllowedTypes(
-                [
-                    'method' => 'string',
-                    'path' => 'string',
-                    'body' => 'array',
-                ]
-            )
-            ->setNormalizer(
-                'method',
-                function ($options, $value) {
-                    return strtoupper($value);
-                }
-            );
     }
 
     /**

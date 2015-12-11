@@ -1,15 +1,15 @@
 parameters:
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
-    ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
 
+    ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
     ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
     ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
     ongr_api.rest_request_factory.class: ONGR\ApiBundle\Request\RestRequestFactory
     ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
-    ongr_api.batch_processor.class: ONGR\ApiBundle\Request\BatchProcessor
-
+    ongr_api.batch_processor.class: ONGR\ApiBundle\Service\BatchProcessor
+    ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
     ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
     ongr_api.batch_controller.class: ONGR\ApiBundle\Controller\BatchController
     ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CommandController
@@ -65,9 +65,13 @@ services:
         calls:
             - [setContainer, [@service_container]]
 
+    ongr_api.crud:
+        class: %ongr_api.crud.class%
+
     ongr_api.batch_processor:
         class: %ongr_api.batch_processor.class%
         arguments:
             - @router
         calls:
             - [setContainer, [@service_container]]
+            - [setCrud, [@ongr_api.crud]]

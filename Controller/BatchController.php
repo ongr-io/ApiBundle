@@ -17,19 +17,19 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Controller for handling batch requests.
  */
-class BatchController extends AbstractRestController implements BatchControllerInterface
+class BatchController extends AbstractRestController implements ApiInterface
 {
     /**
      * {@inheritdoc}
      */
     public function batchAction(RestRequest $restRequest)
     {
-        $data = $this->get('ongr_api.batch_processor')->handle($restRequest);
-
-        if ($data !== false) {
-            return $this->renderRest($data, Response::HTTP_OK);
+        try {
+            $data = $this->get('ongr_api.batch_processor')->handle($restRequest);
+        } catch (\Exception $e) {
+            return $this->renderRest(['message' => 'Deserialization error!'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest(['message' => 'Deserialization error!'], Response::HTTP_BAD_REQUEST);
+        return $this->renderRest($data, Response::HTTP_OK);
     }
 }

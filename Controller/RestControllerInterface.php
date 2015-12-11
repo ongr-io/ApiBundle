@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * CRUD interface for Rest Api Controller.
  */
-interface RestControllerInterface extends ApiInterface
+interface RestControllerInterface
 {
     /**
      * Create operation.
      *
      * @param RestRequest $restRequest
-     * @param srting      $id
+     * @param string      $id
      *
      * @return Response
      */
@@ -33,17 +33,17 @@ interface RestControllerInterface extends ApiInterface
      * Read operation.
      *
      * @param RestRequest $restRequest
-     * @param srting      $id
+     * @param string      $id
      *
      * @return Response
      */
-    public function getAction(RestRequest $restRequest, $id = null);
+    public function getAction(RestRequest $restRequest, $id);
 
     /**
      * Update operation.
      *
      * @param RestRequest $restRequest
-     * @param srting      $id
+     * @param string      $id
      *
      * @return Response
      */
@@ -53,9 +53,9 @@ interface RestControllerInterface extends ApiInterface
      * Delete operation.
      *
      * @param RestRequest $restRequest
-     * @param srting      $id
+     * @param string      $id
      *
      * @return Response
      */
-    public function deleteAction(RestRequest $restRequest, $id = null);
+    public function deleteAction(RestRequest $restRequest, $id);
 }

@@ -56,7 +56,7 @@ class ONGRApiExtensionTest extends WebTestCase
             ],
             [
                 'ongr_api.batch_processor',
-                'ONGR\ApiBundle\Request\BatchProcessor',
+                'ONGR\ApiBundle\Service\BatchProcessor',
             ],
             [
                 'ongr_api.rest_controller',

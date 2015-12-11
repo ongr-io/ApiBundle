@@ -1,0 +1,80 @@
+parameters:
+    locale: en
+    secret: 'superdupersecretkey#pleasedonttellitanyone'
+
+framework:
+    secret: "TOP-SECRET"
+    form: true
+    router:
+        resource: "%kernel.root_dir%/config/routing_test.yml"
+        strict_requirements: %kernel.debug%
+    templating:
+            engines: ['twig']
+    test: ~
+    default_locale: %locale%
+    translator: { fallback: %locale% }
+
+ongr_elasticsearch:
+    connections:
+        not_default:
+            hosts:
+                - 127.0.0.1:9200
+            index_name: ongr_api_test
+            settings:
+                number_of_shards: 1
+                number_of_replicas: 0
+                index:
+                    refresh_interval: -1
+    managers:
+        default:
+            connection: not_default
+            mappings:
+                - AcmeTestBundle
+        not_default:
+            connection: not_default
+            mappings:
+                - AcmeTestBundle
+
+monolog:
+    handlers:
+        event_all:
+            type: stream
+            level: error
+
+ongr_api:
+   authorization:
+       enabled: true
+       secret: %secret%
+   output_format: json
+   version_in_url: true
+   versions:
+#       v1:
+#           batch:
+#               enabled: false
+#           endpoints:
+#               default:
+#                   manager: es.manager.default
+#                   commands: true
+#                   documents:
+#                       - { name: "AcmeTestBundle:Person", methods: ["GET", "POST"] }
+#               custom:
+#                   manager: es.manager.not_default
+#                   documents:
+#                       - { name: "AcmeTestBundle:Person", allow_extra_fields: false }
+
+# New API way
+# /api/v1/person POST -> ["name" => "John"]
+# /api/v1/person/{id} PUT -> ["name" => "John"]
+# /api/v1/person/{id} GET
+# /api/v1/person/_all GET ?filters
+# /api/v1/person/{id} DELETE
+# /api/v1/person/_batch POST -> [["name" => "John"]]
+
+       v3:
+           endpoints:
+               person:
+                   repository: es.manager.default.person
+                   methods: ["GET", "POST"]
+                   allow_extra_fields: false
+                   allow_fields: []
+                   allow_get_all: false
