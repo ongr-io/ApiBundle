@@ -3,6 +3,8 @@
 
 # Currently API Bundle is under reconstruction. Use 0.1 branch as a stable version for now. 
 
+> `master` branch docs might not be accurate. Until 1.0 will be released take a look at the [docs here](https://github.com/ongr-io/ApiBundle/blob/0.1/Resources/doc/index.md)
+
 Api Bundle allows rapid setup of RESTful API to simplify Elasticsearch data access for remote clients.
 
 [![Build Status](https://travis-ci.org/ongr-io/ApiBundle.svg?branch=master)](https://travis-ci.org/ongr-io/ApiBundle)
