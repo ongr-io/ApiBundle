@@ -1,28 +1,16 @@
-Api Bundle
-==========
-
-Description
------------
-
-ONGR ApiBundle is meant to simplify elasticsearch data access for remote clients. With minimal time and effort you will be able to create various api interfaces and internal logics.
-
-Installation
-------------
-
- - [Setup][1]
+# Api Bundle
 
 
-Bundle documentation
---------------------
+## Description
+
+ONGR `ApiBundle` is meant to simplify `elasticsearch` data access for the remote clients.
+ With a minimal time and effort you will be able to create a various api interfaces and implement your internal domain logic.
+
+
+## Bundle documentation
 
 Main things you should know while working with this bundle.
 
- - [Configuration][2]
- - [Endpoints][3]
- - [Custom controller][4]
-
-
-[1]: setup.md
-[2]: configuration.md
-[3]: endpoints.md
-[4]: custom_controller.md
+ - [Configuration](configuration.md)
+ - [Endpoints](endpoints.md)
+ - [Custom controller](custom_controller.md)

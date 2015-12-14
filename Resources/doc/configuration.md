@@ -1,36 +1,24 @@
-Configuration
-=============
+# Configuration
 
-Full configuration example:
+## Full configuration example
 
 ```yaml
 #app/config/config.yml
 
 ongr_api:
-    authorization:
-        enabled: true #default: false
-        secret: "supersecretstring"
-    default_encoding: json
+    default_encoding: json #default: json
     version_in_url: true #default: true
     versions:
         v3:
             endpoints:
                 product: #this key represents endpoint name which will be used in URL 
-                    manager: es.manager #default es.manager
-                    repository: es.manager.default.product #default: ~
+                    repository: es.manager.default.product #required
                     methods: ["GET", "POST"] #default: GET, POST, PUT, DELETE
                     allow_extra_fields: false #default: false
                     allow_fields: ['name', 'surname', 'age'] #default: ~
                     allow_get_all: true #default: true
                     allow_batch: true #default: true
-                    route: ~ #default: ~
-                custom:
-                    manager: es.manager.mymanager #default: es.manager
-                    route: my_bundle.my_custom_rest_controller
 ```
-
-- `authorization` - If set, request header must include `Authorization` with value in this case 'supersecretstring'.
-> You can also use [symfony security component][3], but be sure this is disabled.
 
 - `default_encoding` - default encoding used if unknown `Accept` value set in header.
 
@@ -41,8 +29,6 @@ ongr_api:
 
 - `endpoints` - here you can define multiple API endpoints. Name will correspond to second url parameter, e.g. `/v3/product`. One endpoint is responsible for one elasticsearch type unless you specify custom controller see [more info here][2].
 
-- `manager` - elasticsearch manager name, e.g. `es.manager.default`, by default it set to `es.manager`. If you set `repository` from different manager you still can leave it blank, nes manager will be recognized from the repository instance. `manager` setting is mainly for custom controllers where `repository` is not necessary to set.
-
 - `repository` - elasticsearch respository service name, e.g. `es.manager.default.product`
 
 - `methods` - a list of methods that that API support, each HTTP method represent action with the resource. e.g. PUT will update and create, DELETE will remove by id and etc..
@@ -51,12 +37,13 @@ ongr_api:
 
 - `allow_fields` - if this option is set, API will allow only to operate with specified fields from the type.
 
-- `allow_get_all` - adds `_all` to the endpoint and allows to get all values. Please keep in mind that results with `_all` will be paginated, be default you will get only 10 documents. You can set `limit`, `offset`, `size` to modify output.  
+- `allow_get_all` - adds `_all` to the endpoint and allows to get all values. Please keep in mind that results with `_all` will be paginated, be default you will get only 10 documents. You can set `size` and `from` to modify output.  
 
 - `allow_batch` - adds `_batch` to the endpoint. You can sent then an array of documents to be indexed to the particular endpoint type.
 
-What's next?
--------------
+
+## What's next?
+
 Let's learn more about [endpoints][3].
 
 [1]: http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html
