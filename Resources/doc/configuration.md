@@ -44,8 +44,4 @@ ongr_api:
 
 ## What's next?
 
-Let's learn more about [endpoints][3].
-
-[1]: http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html
-[2]: custom_controller.md
-[3]: http://symfony.com/doc/current/book/security.html
+Let's learn more about [endpoints](endpoints.md).
