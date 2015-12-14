@@ -97,9 +97,9 @@ This bundle is covered by the MIT license. Please see the complete license in th
 
 
 
-[1]: https://raw.githubusercontent.com/ongr-io/ApiBundle/master/LICENSE
-[2]: https://github.com/ongr-io/ApiBundle/blob/master/Resources/doc/index.md
+[1]: LICENSE
+[2]: Resources/doc/index.md
 [3]: https://github.com/ongr-io/ElasticsearchBundle/blob/master/README.md
 [4]: https://getcomposer.org/doc/00-intro.md
-[5]: https://github.com/ongr-io/ApiBundle/blob/master/Resources/doc/configuration.md
-[6]: https://github.com/ongr-io/ApiBundle/blob/master/Resources/doc/usage.md
+[5]: Resources/doc/configuration.md
+[6]: Resources/doc/usage.md
