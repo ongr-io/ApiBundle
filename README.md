@@ -22,7 +22,7 @@ The source of the documentation is stored in the `Resources/doc/` folder in this
 > This example assumes that you already have configured Elasticsearch bundle. 
 If you haven't, here's a quick [setup guide][3] on how to do it.
 
-### Step 1: Install Api bundle
+### Step 1: Install
 
 Api bundle is installed using [Composer][4].
 
@@ -30,7 +30,7 @@ Api bundle is installed using [Composer][4].
 composer require ongr/api-bundle
 ```
 
-### Step 2: Enable Api bundle
+### Step 2: Enable bundle in the AppKernel
 
 ```php
 <?php
@@ -65,9 +65,7 @@ ongr_api:
                         repository: es.manager.default.product
 ```
 
-
-> If you have altered default Elasticsearch bundle configuration or simple configuration is not enough, you might need 
-to change settings in th endpoint or create a custom one. Head to [configuration page][5] for more information.
+> The example above is a version of a minimal configuration. There are plenty of other configuration settings where you might need to change. Take a look at the [configuration page][5] for more information.
 
 
 Add routing
@@ -79,6 +77,8 @@ ongr_api_routing:
     resource: @ONGRApiBundle/Resources/config/routing.yml
     prefix: /api
 ```
+
+> You can specify prefix like you want, `api` is only the example.
 
 ### Step 4: That's it
 
