@@ -42,6 +42,7 @@ public function registerBundles()
     $bundles = array(
         // ...
         new JMS\SerializerBundle\JMSSerializerBundle(),
+        new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
         new ONGR\ApiBundle\ONGRApiBundle(),
     );
 }
