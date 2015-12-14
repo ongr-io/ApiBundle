@@ -15,14 +15,14 @@ The source of the documentation is stored in the `Resources/doc/` folder in this
 
 [Read the API Bundle Documentation][2]
 
+
 ## Setup the bundle
 
-#### Step 1: Configure Elasticsearch bundle
 
-This example assumes that you already have configured Elasticsearch bundle.
+> This example assumes that you already have configured Elasticsearch bundle. 
 If you haven't, here's a quick [setup guide][3] on how to do it.
 
-#### Step 2: Install Api bundle
+### Step 1: Install Api bundle
 
 Api bundle is installed using [Composer][4].
 
@@ -30,8 +30,7 @@ Api bundle is installed using [Composer][4].
 composer require ongr/api-bundle
 ```
 
-
-#### Step 3: Enable Api bundle
+### Step 2: Enable Api bundle
 
 ```php
 <?php
@@ -48,13 +47,11 @@ public function registerBundles()
 }
 ```
 
-> API Bundle requires JMS Serializer to work with json and xml
+> API Bundle requires JMS Serializer to work with JSON and XML
 
+### Step 3: Add configuration
 
-#### Step 4: Add configuration
-
-
-##### Add minimal configuration for Api bundle to the `config.yml`.
+Add minimal configuration for Api bundle to the `config.yml`.
 
 ```yaml
 #app/config/config.yml
@@ -73,7 +70,7 @@ ongr_api:
 to change settings in th endpoint or create a custom one. Head to [configuration page][5] for more information.
 
 
-##### Add routing
+Add routing
 
 ```yaml
 #app/config/routing.yml
@@ -83,13 +80,14 @@ ongr_api_routing:
     prefix: /api
 ```
 
-#### Step 5: That's it
+### Step 4: That's it
 
 Its ready to use. API Bundle will generate new url endpoints by your configuration, by previous configuration you will have: `<yourdomain.com>/api/v3/product`
 
-#### What's next ?
+### What's next ?
 
 Head to [configuration page][5] to learn how to get most of your API or take a look at the [basic usage example][6]
+
 
 ## License
 
