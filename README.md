@@ -70,7 +70,7 @@ ongr_api:
 
 
 > If you have altered default Elasticsearch bundle configuration or simple configuration is not enough, you might need 
-to change ``manager`` and ``documents``. Head to [configuration page][5] for more information.
+to change settings in th endpoint or create a custom one. Head to [configuration page][5] for more information.
 
 
 ##### Add routing
