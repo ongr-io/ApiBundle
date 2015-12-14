@@ -8,47 +8,52 @@ Full configuration example:
 
 ongr_api:
     authorization:
-        enabled: true
+        enabled: true #default: false
         secret: "supersecretstring"
     default_encoding: json
+    version_in_url: true #default: true
     versions:
-        v1:
-            batch:
-                enabled: true
-                controller: "ongr_api.batch_controller"
+        v3:
             endpoints:
-                default:
-                    manager: es.manager.default
-                    commands:
-                        enabled: true
-                        controller: "ongr_api.command_controller"
-                        commands: ["index:create", "index:drop", "schema:update"]
-                    documents:
-                        - { name: "ONGRDemoBundle:Product", controller: "ongr_api.rest_controller", methods: ["GET", "POST"] }
-                        - "ONGRDemoBundle:Category"
+                product: #this key represents endpoint name which will be used in URL 
+                    manager: es.manager #default es.manager
+                    repository: es.manager.default.product #default: ~
+                    methods: ["GET", "POST"] #default: GET, POST, PUT, DELETE
+                    allow_extra_fields: false #default: false
+                    allow_fields: ['name', 'surname', 'age'] #default: ~
+                    allow_get_all: true #default: true
+                    allow_batch: true #default: true
+                    route: ~ #default: ~
                 custom:
-                    manager: es.manager.mymanager
-                    documents:
-                        - { name: "MyVendorBundle", controller: "my_vendor.rest_controller" }
+                    manager: es.manager.mymanager #default: es.manager
+                    route: my_bundle.my_custom_rest_controller
 ```
 
 - `authorization` - If set, request header must include `Authorization` with value in this case 'supersecretstring'.
-> You can also use [symfony security component][5], but be sure this is disabled.
+> You can also use [symfony security component][3], but be sure this is disabled.
 
 - `default_encoding` - default encoding used if unknown `Accept` value set in header.
 
+- `version_in_url` - use API version in the URL e.g. `/api/v3/product`. If set to false then version must be specified as `Accept` value set in header.
+
 - `versions` - define multiple API versions. Version name will correspond to first url parameter e.g. `/v1`
-> You should be consistent with version naming. Think of version naming conventions and stick to them e.g. ``v1``, ``v2``, ...
+> You should be consistent with version naming. Think of version naming conventions and stick to them e.g. `v1`, `v2`, `v2.2` ...
 
-- `endpoints` - here you can define multiple API endpoints. Name will correspond to second url parameter, e.g. `/v1/users`. One endpoint is responsible for one elasticsearch manager.
+- `endpoints` - here you can define multiple API endpoints. Name will correspond to second url parameter, e.g. `/v3/product`. One endpoint is responsible for one elasticsearch type unless you specify custom controller see [more info here][2].
 
-- `manager` - elasticsearch manager name, e.g. `es.manager.default`
+- `manager` - elasticsearch manager name, e.g. `es.manager.default`, by default it set to `es.manager`. If you set `repository` from different manager you still can leave it blank, nes manager will be recognized from the repository instance. `manager` setting is mainly for custom controllers where `repository` is not necessary to set.
 
-- `commands` - Exposes index create, drop, schema update commands through an api. More about how to access them look in [endpoint commands][4] part.
-> **Commands are disabled by default**. In this example they are enabled for `v1` default endpoint, but they wont be accessible through custom endpoint. When they are enabled all commands are added, but that can be changed with inner commands array.
+- `repository` - elasticsearch respository service name, e.g. `es.manager.default.product`
 
-- `documents` - exposed documents to API. Read more about defining elasticsearch documents [here][1]. For each document you can also define a custom controller with custom logic for your API and methods which will be available.
-> About custom controllers read more [here][2].
+- `methods` - a list of methods that that API support, each HTTP method represent action with the resource. e.g. PUT will update and create, DELETE will remove by id and etc..
+ 
+- `allow_extra_fields` - when it's true, basically it turns of document structure validation. To use it, it's necessary to create dynamic mapping for your `elasticsearch` type and configure `elasticsearch` to accept fields that are not from the mapping.
+
+- `allow_fields` - if this option is set, API will allow only to operate with specified fields from the type.
+
+- `allow_get_all` - adds `_all` to the endpoint and allows to get all values. Please keep in mind that results with `_all` will be paginated, be default you will get only 10 documents. You can set `limit`, `offset`, `size` to modify output.  
+
+- `allow_batch` - adds `_batch` to the endpoint. You can sent then an array of documents to be indexed to the particular endpoint type.
 
 What's next?
 -------------
@@ -56,6 +61,4 @@ Let's learn more about [endpoints][3].
 
 [1]: http://ongr.readthedocs.org/en/latest/components/ElasticsearchBundle/mapping.html
 [2]: custom_controller.md
-[3]: endpoints.md
-[4]: endpoints.md#command
-[5]: http://symfony.com/doc/current/book/security.html
+[3]: http://symfony.com/doc/current/book/security.html
