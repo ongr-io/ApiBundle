@@ -1,6 +1,6 @@
 # Endpoints
 
-## Rest
+## Crud actions
 
 Rest API endpoints rely on the configuration you have set. How to setup bundles configuration [can be found here][1]. The uri pattern is made of *version* and *endpoint name* you wish to access and also an optional *id* for requesting specific documents. Pattern:
 
@@ -21,9 +21,9 @@ Default controller status codes:
 
 
 
-## Batch
+## Multiple insert
 
-Batch is useful if you need to pass many documents to an api with a single request.
+Batch is useful if you need to pass many documents to an api via a single request.
 
 ```yaml
 #app/config/config.yml
@@ -101,6 +101,18 @@ This API endpoint only takes **GET** requests. Without any options you will get 
 |--------|---------|----------------------------------------------------------------------|
 | size   | 10      | Parameter defines the amount of documents to fetch.                  |
 | from   | 0       | Parameter defines the offset from the first result you want to fetch.|
+
+Say we want to get 50 documents then request will look like:
+
+```
+<yourdomain.com>/api/v3/product/_all?size=50
+```
+
+and another 50:
+
+```
+<yourdomain.com>/api/v3/product/_all?size=50&from=50
+```
 
 
 Customization
