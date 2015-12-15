@@ -31,26 +31,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('authorization')
-                    ->addDefaultsIfNotSet()
-                    ->validate()
-                        ->ifTrue(
-                            function ($node) {
-                                return $node['enabled'] && !isset($node['secret']);
-                            }
-                        )
-                        ->thenInvalid("'secret' for api must be set if authorization is enabled.")
-                    ->end()
-                    ->children()
-                        ->booleanNode('enabled')
-                            ->defaultFalse()
-                            ->info('Set to true if authorization needs to be enabled.')
-                        ->end()
-                        ->scalarNode('secret')
-                            ->info('Secret used for authentication')
-                        ->end()
-                    ->end()
-                ->end()
                 ->booleanNode('version_in_url')
                     ->defaultFalse()
                     ->info(

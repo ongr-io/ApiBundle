@@ -24,47 +24,37 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     public function getData()
     {
         // Case 0. Tests if only repository is set.
-        $versions = [
-            'versions' => [
-                'v3' => [
-                    'endpoints' => [
-                        'persons' => [
-                            'repository' => 'es.manager.default.person',
+        $config = [
+            'ongr_api' => [
+                'versions' => [
+                    'v3' => [
+                        'endpoints' => [
+                            'persons' => [
+                                'repository' => 'es.manager.default.person',
+                                'methods' => [
+                                    Request::METHOD_POST,
+                                    Request::METHOD_GET,
+                                ],
+                                'allow_extra_fields' => false,
+                                'allow_fields' => [],
+                                'allow_get_all' => false,
+                            ],
                         ],
                     ],
                 ],
             ],
         ];
 
-        $parameters = [
-            'ongr_api' => $versions,
-        ];
-
-        $expected = $versions;
-
-        $expected['versions']['v3']['endpoints']['persons'] = array_merge(
-            $versions['versions']['v3']['endpoints']['persons'],
-            [
-                'methods' => [
-                    Request::METHOD_POST,
-                    Request::METHOD_GET,
-                ],
-                'allow_extra_fields' => false,
-                'allow_fields' => [],
-                'allow_get_all' => false,
-            ]
-        );
-
         $out[] = [
-            $parameters,
-            $expected['versions'],
+            $config,
+            $config['ongr_api']['versions'],
         ];
 
         // Case #1. Tests when there is no configuration.
-        $parameters = [];
+        $config = [];
         $expected = [];
         $out[] = [
-            $parameters,
+            $config,
             $expected,
         ];
 
@@ -90,6 +80,9 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Tests output format without a version in URL.
+     */
     public function testOutputFormatValueWithoutVersions()
     {
         $parameters = [
