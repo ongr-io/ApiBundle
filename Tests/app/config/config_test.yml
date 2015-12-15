@@ -41,17 +41,14 @@ monolog:
             type: stream
             level: error
 
-# New API way
+# Generated routes for API from config below
 # /api/v1/person POST -> ["name" => "John"]
-# /api/v1/person/{id} PUT -> ["name" => "John"]
+# /api/v1/person/{id} PUT -> ["name" => "Steve"]
 # /api/v1/person/{id} GET
-# /api/v1/person/_all GET ?filters
+# /api/v1/person/_all GET ?size=10&from=0
 # /api/v1/person/{id} DELETE
-# /api/v1/person/_batch POST -> [["name" => "John"]]
+# /api/v1/person/_batch POST -> [["name" => "John"],["name" => "Doe"]]
 ongr_api:
-   authorization:
-       enabled: true
-       secret: %secret%
    output_format: json
    version_in_url: true
    versions:
@@ -59,7 +56,5 @@ ongr_api:
            endpoints:
                person:
                    repository: es.manager.default.person
-                   methods: ["GET", "POST"]
                    allow_extra_fields: false
-                   allow_fields: []
-                   allow_get_all: false
+                   allow_get_all: true
