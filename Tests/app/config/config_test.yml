@@ -41,27 +41,6 @@ monolog:
             type: stream
             level: error
 
-ongr_api:
-   authorization:
-       enabled: true
-       secret: %secret%
-   output_format: json
-   version_in_url: true
-   versions:
-#       v1:
-#           batch:
-#               enabled: false
-#           endpoints:
-#               default:
-#                   manager: es.manager.default
-#                   commands: true
-#                   documents:
-#                       - { name: "AcmeTestBundle:Person", methods: ["GET", "POST"] }
-#               custom:
-#                   manager: es.manager.not_default
-#                   documents:
-#                       - { name: "AcmeTestBundle:Person", allow_extra_fields: false }
-
 # New API way
 # /api/v1/person POST -> ["name" => "John"]
 # /api/v1/person/{id} PUT -> ["name" => "John"]
@@ -69,7 +48,13 @@ ongr_api:
 # /api/v1/person/_all GET ?filters
 # /api/v1/person/{id} DELETE
 # /api/v1/person/_batch POST -> [["name" => "John"]]
-
+ongr_api:
+   authorization:
+       enabled: true
+       secret: %secret%
+   output_format: json
+   version_in_url: true
+   versions:
        v3:
            endpoints:
                person:

@@ -1,19 +1,11 @@
-Endpoints
-=========
+# Endpoints
 
-Rest
-----
+## Crud actions
 
-Rest endpoints rely on configuration you have set. How to setup can be found [here][1]. The uri pattern is made of *version*, *endpoint name*, *document type* you whish to access and also an optional *id* for requesting specific documents. Pattern:
+Rest API endpoints rely on the configuration you have set. How to setup bundles configuration [can be found here][1]. The uri pattern is made of *version* and *endpoint name* you wish to access and also an optional *id* for requesting specific documents. Pattern:
 
 ```
-<yourdomain.com>/api/{version}/{endpoint}/{document_type}/{id}
-```
-
-If endpoint is set to *default* then pattern would look like this:
-
-```
-<yourdomain.com>/api/{version}/{document_type}/{id}
+<yourdomain.com>/api/{version}/{endpoint}/{id}
 ```
 
 POST and PUT methods should contain data to insert in their request body.
@@ -22,144 +14,110 @@ Default controller status codes:
 
 | Method | Success | Error | Extra                                                                  |
 |--------|---------|-------|------------------------------------------------------------------------|
-| GET    | 200     | 404   |                                                                        |
-| POST   | 201     | 400   | includes `Location` header. 406 validation error, 409 resource exists. |
-| PUT    | 204     | 400   | includes `Location` header. 406 validation error.                      |
+| GET    | 200     | 404   | 404 if not found.                                                      |
+| POST   | 201     | 400   | 406 validation error, 409 resource exists.                             |
+| PUT    | 204     | 400   | 406 validation error.                                                  |
 | DELETE | 204     | 400   | 404 if not found.                                                      |
 
-Batch
------
 
-Batch is useful if you need to pass many requests to an api on one connection. Every api version has their batch api enabled by default, but it can be disabled like so:
 
-```yaml
-#app/config/config.yml
+## Multiple insert
 
-ongr_api:
-    default_encoding: json
-        versions:
-            v1:
-				batch:
-					enabled: false
-                endpoints:
-                    ...
-```
-
-This Api only takes ***post*** requests and in specific structure. f.e.
-
-```json
-[
-    {
-        "method": "POST",
-        "path": "product/1",
-        "body": {
-            "title": "Tuna",
-            "sku": "FT10012",
-            "description": "Refero Eluo fornax vos illa ora Nutus casus moderor hoc Fides, revolvo vox corium ne eo Decoro.",
-            "price": 9.99,
-            "category": ["5"],
-            "image": "/media/image/tuna.jpg",
-            "urls": [
-                {
-                    "url": "fish/tuna.html",
-                    "key": ""
-                }
-            ]
-        }
-    },
-    {
-        "method": "GET",
-        "path": "product/1",
-        "body": []
-    },
-	{
-        "method": "GET",
-        "path": "product/2",
-        "body": []
-    }
-]
-```
-
-This batch will create a new product with id of `1` and fetch two products with id of `1` and `2`. As you can tell second batch request should return the same data that we put in first request.
-> Logic is used from Rest controller which is resolved by provided path in each request.
-
-Response should be similar to this:
-
-```json
-[
-	{
-		"status_code": 201
-	},
-	{
-		"status_code": 200,
-		"response": {
-			"title": "Tuna",
-            "sku": "FT10012",
-            "description": "Refero Eluo fornax vos illa ora Nutus casus moderor hoc Fides, revolvo vox corium ne eo Decoro.",
-            "price": 9.99,
-            "category": ["5"],
-            "image": "/media/image/tuna.jpg",
-            "urls": [
-                {
-                    "url": "fish/tuna.html",
-                    "key": ""
-                }
-            ]
-		}
-	},
-	{
-		"status_code": 404
-	}
-]
-```
-
-Last request got 404 response because document did not exist.
-> Batch Api returns **200** status code on success.
-
-Command
--------
-
-Command endpoint is disabled by default, but it can be enabled in configuration like so:
+Batch is useful if you need to pass many documents to an api via a single request.
 
 ```yaml
 #app/config/config.yml
 
 ongr_api:
     versions:
-        v1:
+        v3:
             endpoints:
-                default:
-                    commands:
-                        enabled: true
-                    ...
+                product:
+                    repository: es.manager.default.product
+                    allow_batch: true #default: true
 ```
+> By default batch is enabled but if you don't want to allow multiple documents insert, you can disable it.
 
-Similar to [Rest](#rest), except it includes fields like `command` and `action`. For example `command` could be an `index` and `action` is `create`, so in result index is created. Simple right? Heres how the uri pattern looks like: 
-
-```
-<yourdomain.com>/api/{version}/{endpoint}/_command/{command}/{action}
-```
-
-If endpoint is set to *default* then pattern would look like this:
+To index multiple documents sent POST request to the new `_batch` endpoint. By provided example above it should look like this:
 
 ```
-<yourdomain.com>/api/{version}/_command/{command}/{action}
+<yourdomain.com>/api/v3/product/_batch 
 ```
 
-For example to create an index your url will look like this: `<yourdomain.com>/api/v1/_command/index/create`.
+This API endpoint only takes **POST** requests and in specific structure. f.e.
 
-Default controller status codes:
+```json
+[
+    {
+        "title": "Tuna",
+        "sku": "FT10012",
+        "price": 19.99
+    },
+    {
+        "_id": "SS10043",
+        "title": "Salmon",
+        "sku": "SS10043",
+        "price": 9.99
+    }
+]
+```
 
-| Command       | Success | Error | Extra                                |
-|---------------|---------|-------|--------------------------------------|
-| index/create  | 204     | 400   |                                      |
-| index/drop    | 204     | 400   |                                      |
-| schema/update | 200     | 400   | Body contains `status` and `message` |
+API will return a response with created products ID's if no error occurs. e.g. response:
+
+```json
+[
+    "8b32718e91f9b62a788594525d446642",
+    "SS10043"
+]
+```
+
+
+## Get all documents
+
+There is an option to retrieve all documents from a specific `repository`. 
+
+```yaml
+#app/config/config.yml
+
+ongr_api:
+    versions:
+        v3:
+            endpoints:
+                product:
+                    repository: es.manager.default.product
+                    allow_get_all: true #default: true
+```
+
+When the `allow_get_all` is set to `true` there will be generated new route, e.g. :
+ 
+```
+<yourdomain.com>/api/v3/product/_all
+```
+
+This API endpoint only takes **GET** requests. Without any options you will get first 10 documents. In addition there are some options which can be accepted:
+
+
+| Option | Default | Description                                                          |
+|--------|---------|----------------------------------------------------------------------|
+| size   | 10      | Parameter defines the amount of documents to fetch.                  |
+| from   | 0       | Parameter defines the offset from the first result you want to fetch.|
+
+Say we want to get 50 documents then request will look like:
+
+```
+<yourdomain.com>/api/v3/product/_all?size=50
+```
+
+and another 50:
+
+```
+<yourdomain.com>/api/v3/product/_all?size=50&from=50
+```
 
 
 Customization
 -------------
 How to customize request body and response can be found [here][2].
 
-[1]: setup.md
+[1]: configuration.md
 [2]: custom_controller.md

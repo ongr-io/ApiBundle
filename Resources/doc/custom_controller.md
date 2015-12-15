@@ -1,78 +1,49 @@
-Custom controller
-=================
+# Custom controller
 
-There are three types of controllers:
- - `RestController` extends `AbstractRestController` implements `RestControllerInterface`. Handles batch requests.
+Sometimes might be that default functionality is not enough. So for this reason you can create/extend current controller or create your own one.
 
- - `BatchController` extends `AbstractRestController` implements `BatchControllerInterface`. Handlles *post*, *get*, *put*, *delete* requests.
- 
- - `CommandController` extends `AbstractRestController` implements `CommandControllerInterface`. Handles command requests if they are enbaled in [configuration][1].
+There are two types of controllers:
+ - `RestController` extends `AbstractRestController` implements `RestControllerInterface`. Handles normal endpoint requests.
+ - `BatchController` extends `AbstractRestController` implements `BatchControllerInterface`. Handles only **POST** requests.
 
-ONGRApiBundle comes with default controllers which allows you to use API functionality right after bundle install. It also allows you to define custom controllers if default functionality is not enough.
+ONGRApiBundle comes with default controllers which allows you to use API functionality right after bundle install.
 
-How to
-------
+
+## How to
 
 Your new custom controller must implement same interfaces and extend same parents like default ones.
 
-Let's create new custom rest controller and call it `AcmeRestController` :
+Let's create a new custom REST controller and call it `AppRestController` :
 
 ```php
 <?php
-// Controller/AcmeRestController.php
+// src/YourBundle/Controller/AcmeRestController.php
 
-namespace Acme\DemoBundle\Controller;
+namespace AppBundle\Controller;
 
 use ONGR\ApiBundle\Controller\AbstractRestController;
 use ONGR\ApiBundle\Controller\RestControllerInterface;
 use ONGR\ApiBundle\Request\RestRequest;
 
-class AcmeRestController extends AbstractRestController implements RestControllerInterface
+class AppRestController extends AbstractRestController implements RestControllerInterface
 {
-	/**
-	 * {@inheritdoc}
-	 */
-    public function getAction(RestRequest $restRequest, $id = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function getAction(RestRequest $restRequest)
     {
-		$data = $restRequest->getData();
+        $data = $restRequest->getData();
 
         // Custom logic ...
 
         return $this->renderRest($data);
     }
 
-    ...
+    //...
 }
 ```
 
-Then we must register it in our service container:
+Add a route to the `routing.yml`.
 
-```yaml
-#src/Acme/DemoBundle/Resouces/config.yml
+It's a simple route like all other in your app. How to add routing read [the official Symfony docs](http://symfony.com/doc/current/book/routing.html). 
 
-services:
-	acme_demo.rest_controller:
-		class: Acme\DemoBundle\Controller\AcmeRestController
-		calls:
-			- ['setContainer', [@service_container]]
-```
-
-And lastly tell ONGR API bundle to use it:
-
-```yaml
-#app/config/config.yml
-
-ongr_api:
-    default_encoding: json
-        versions:
-            v1:
-                endpoints:
-                    default:
-                        manager: es.manager.default
-                        documents:
-                            - { name: "ONGRDemoBundle:Product", controller: "acme_demo.rest_controller" }
-```
-
-That's it. Now every request for `/v1/product` will be handled by our new controller.
-
-[1]: configuration.md
