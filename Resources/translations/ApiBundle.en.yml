@@ -1,6 +1,0 @@
-response:
-    error:
-        id: Identifier not found!
-        validation: Validation error!
-        resource: Resource already exists!
-        not_found: No document found with id %id%

@@ -17,13 +17,14 @@ use ONGR\ApiBundle\Service\Crud;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
  */
-class RestController extends AbstractRestController implements RestControllerInterface, ApiInterface
+class RestController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -31,18 +32,14 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function postAction(RestRequest $restRequest, $id = null)
     {
         try {
-            $crudService = $this->getCrudService();
-            $crudService->create($restRequest->getRepository(), $restRequest->getData());
-            $response = $crudService->commit($restRequest->getRepository());
+//            $crudService = $this->get('ongr_api.crud');
+//            $crudService->create($restRequest->getRepository(), $restRequest->getData());
+//            $response = $crudService->commit($restRequest->getRepository());
         } catch (\Exception $e) {
-            return $this->renderRest(['message' => $this->trans('response.error.resource')], Response::HTTP_CONFLICT);
+            #TODO return error message with error header
         }
 
-        return $this->renderRest(
-            $response,
-            Response::HTTP_CREATED,
-            ['Location' => $this->generateRestUrl($restRequest->getRequest(), $id)]
-        );
+        #TODO return array with inserted documents id's
     }
 
     /**
@@ -50,16 +47,17 @@ class RestController extends AbstractRestController implements RestControllerInt
      */
     public function getAction(RestRequest $restRequest, $id)
     {
-        $repository = $restRequest->getRepository();
-        $crudService = $this->getCrudService();
-
+//        $repository = $restRequest->getRepository();
+//        $crudService = $this->get('ongr_api.crud');
         try {
-            $data = $crudService->read($repository, $id);
+//            $data = $crudService->read($repository, $id);
         } catch (\Exception $e) {
-            return $this->renderRest(null, Response::HTTP_NOT_FOUND);
-        }
+//            return $this->renderRest(null, Response::HTTP_NOT_FOUND);
+            #TODO return error message with not found header
 
-        return $this->renderRest($data);
+        }
+//        return $data;
+        #TODO return document
     }
 
     /**
@@ -68,18 +66,14 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function putAction(RestRequest $restRequest, $id = null)
     {
         try {
-            $crudService = $this->getCrudService();
-            $crudService->update($restRequest->getRepository(), $restRequest->getData());
-            $response = $crudService->commit($restRequest->getRepository());
+//            $crudService = $this->get('ongr_api.crud');
+//            $crudService->update($restRequest->getRepository(), $restRequest->getData());
+//            $response = $crudService->commit($restRequest->getRepository());
         } catch (\Exception $e) {
-            return $this->renderRest(['message' => $this->trans('response.error.resource')], Response::HTTP_CONFLICT);
+            #TODO return error message and header
         }
 
-        return $this->renderRest(
-            $response,
-            Response::HTTP_NO_CONTENT,
-            ['Location' => $this->generateRestUrl($restRequest->getRequest(), $id)]
-        );
+        #TODO return success
     }
 
     /**
@@ -88,58 +82,13 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function deleteAction(RestRequest $restRequest, $id)
     {
         try {
-            $crudService = $this->getCrudService();
-            $crudService->delete($restRequest->getRepository(), $id);
-            $response = $crudService->commit($restRequest->getRepository());
+//            $crudService = $this->get('ongr_api.crud');
+//            $crudService->delete($restRequest->getRepository(), $id);
+//            $response = $crudService->commit($restRequest->getRepository());
         } catch (Missing404Exception $e) {
-            return $this->renderRest(
-                ['message' => $this->trans('response.error.not_found', ['%id%' => $id])],
-                Response::HTTP_NOT_FOUND
-            );
+            #TODO return error message and header
         }
 
-        return $this->renderRest($response, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * Generates rest uri from request.
-     *
-     * @param Request $request
-     * @param string  $id
-     * @param string  $method
-     *
-     * @return string
-     */
-    protected function generateRestUrl(Request $request, $id = null, $method = 'GET')
-    {
-        if ($this->isBatch()) {
-            return null;
-        }
-
-        $route = $request->attributes->get('_route');
-        $route = substr_replace($route, strtolower($method), strrpos($route, '_') + 1);
-
-        return $this->generateUrl($route, ['id' => $id]);
-    }
-
-    /**
-     * Translates message.
-     *
-     * @param string $message
-     * @param array  $parameters
-     *
-     * @return string
-     */
-    protected function trans($message, $parameters = [])
-    {
-        return $this->get('translator')->trans($message, $parameters, 'ApiBundle');
-    }
-
-    /**
-     * @return Crud
-     */
-    protected function getCrudService()
-    {
-        return $this->get('ongr_api.crud');
+        #TODO return delete success
     }
 }
