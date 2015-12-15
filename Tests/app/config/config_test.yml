@@ -1,45 +1,20 @@
-parameters:
-    locale: en
-    secret: 'superdupersecretkey#pleasedonttellitanyone'
-
 framework:
     secret: "TOP-SECRET"
-    form: true
     router:
         resource: "%kernel.root_dir%/config/routing_test.yml"
         strict_requirements: %kernel.debug%
-    templating:
-            engines: ['twig']
-    test: ~
-    default_locale: %locale%
-    translator: { fallback: %locale% }
 
 ongr_elasticsearch:
     connections:
-        not_default:
+        default:
             hosts:
                 - 127.0.0.1:9200
             index_name: ongr_api_test
-            settings:
-                number_of_shards: 1
-                number_of_replicas: 0
-                index:
-                    refresh_interval: -1
     managers:
         default:
-            connection: not_default
+            connection: default
             mappings:
                 - AcmeTestBundle
-        not_default:
-            connection: not_default
-            mappings:
-                - AcmeTestBundle
-
-monolog:
-    handlers:
-        event_all:
-            type: stream
-            level: error
 
 # Generated routes for API from config below
 # /api/v1/person POST -> ["name" => "John"]
