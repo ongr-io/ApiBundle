@@ -1,35 +1,26 @@
 sudo: false
 language: php
-
 php:
   - 5.5
   - 5.6
   - 7.0
   - hhvm
-
-matrix:
-  allow_failures:
-    - php: 7.0
-    - php: hhvm
-
-env:
-  - SYMFONY="2.7.*"
-
 services:
   - elasticsearch
-
-install:
-  - wget -q -O conf.py https://raw.githubusercontent.com/ongr-io/docs-aggregator/master/source/conf-travis.py
-  - mkdir _static
-  - composer require --no-update symfony/symfony:${SYMFONY}
-
+matrix:
+  allow_failures:
+    - php: hhvm
 before_script:
-  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
-  - composer install
-
+  - composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH
+  - composer install --no-interaction
 script:
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-  - vendor/bin/phpcs -p --standard=./vendor/ongr/ongr-strict-standard/Ongr --ignore=vendor/,Tests/app/,Resources/public/,DependencyInjection/ONGRApiExtension.php ./
-
+  - vendor/bin/phpunit --coverage-clover=coveralls.clover
+  - vendor/bin/phpcs -p --standard=vPSR2 --ignore=vendor/,Tests/app/ ./
+after_script:
+  - vendor/bin/coveralls
 notifications:
-  slack: ongr:oyJ6inOcsttTBsnkuHV6dWbT
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/81e47479feba5ba8dc47
+    on_success: change
+    on_start: never
