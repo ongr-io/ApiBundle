@@ -2,9 +2,7 @@ parameters:
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
 
     ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
-    ongr_api.rest.validator.class: ONGR\ApiBundle\Validator\DocumentValidator
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
-    ongr_api.event_listener.authentication.class: ONGR\ApiBundle\EventListener\AuthorizationEventListener
     ongr_api.rest_request_factory.class: ONGR\ApiBundle\Request\RestRequestFactory
     ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
@@ -25,11 +23,6 @@ services:
         class: %ongr_api.rest_response_view_handler.class%
         arguments:
             - @ongr_api.rest_request
-
-    ongr_api.rest.validator:
-        class: %ongr_api.rest.validator.class%
-        arguments:
-            - @form.factory
 
     ongr_api.event_listener.rest_request:
         class: %ongr_api.event_listener.rest_request.class%
@@ -52,16 +45,6 @@ services:
 
     ongr_api.rest_controller:
         class: %ongr_api.rest_controller.class%
-        calls:
-            - [setContainer, [@service_container]]
-
-    ongr_api.batch_controller:
-        class: %ongr_api.batch_controller.class%
-        calls:
-            - [setContainer, [@service_container]]
-
-    ongr_api.command_controller:
-        class: %ongr_api.command_controller.class%
         calls:
             - [setContainer, [@service_container]]
 
