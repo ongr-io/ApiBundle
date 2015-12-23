@@ -161,6 +161,8 @@ class RestRequest
         } catch (\Exception $e) {
             // Do nothing, returns null.
         }
+
+        return null;
     }
 
     /**

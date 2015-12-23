@@ -19,6 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class ElasticsearchLoader extends Loader
 {
+
     /**
      * @var RouteCollection
      */

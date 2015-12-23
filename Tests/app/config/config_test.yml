@@ -24,7 +24,7 @@ ongr_elasticsearch:
 # /api/v1/person/{id} DELETE
 # /api/v1/person/_batch POST -> [["name" => "John"],["name" => "Doe"]]
 ongr_api:
-   output_format: json
+   default_encoding: json
    version_in_url: true
    versions:
        v3:
