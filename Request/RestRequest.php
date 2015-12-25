@@ -13,6 +13,7 @@ namespace ONGR\ApiBundle\Request;
 
 use JMS\Serializer\SerializerInterface;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestRequest
 {
+
     /**
      * @var SerializerInterface
      */
@@ -41,22 +43,38 @@ class RestRequest
     private $defaultAcceptType;
 
     /**
-     * @param Request             $request
-     * @param SerializerInterface $serializer
-     * @param Repository          $repository
+     * @param ContainerInterface $container
      */
-    public function __construct(Request $request, SerializerInterface $serializer, Repository $repository = null)
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->serializer = $serializer;
-        $this->repository = $repository;
+        $this->container = $container;
+
+        /** @var SerializerInterface $serializer */
+        $serializer = $this->container->get('serializer');
+        $this->setSerializer($serializer);
+
+        /** @var Request $request */
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $this->setRequest($request !== null ? $request : Request::createFromGlobals());
+
+
+        if ($this->getRequest()->attributes->has('manager') && $this->getRequest()->attributes->has('repository')) {
+            $attributes = $this->getRequest()->attributes;
+            $manager = $this->container->get($attributes->get('manager'));
+
+            /** @var Repository $repository */
+            $repository = $manager->getRepository($attributes->get('repository'));
+            $this->setRepository($repository);
+        }
+
+        $this->setDefaultAcceptType($this->container->getParameter('ongr_api.default_encoding'));
     }
 
     /**
      * Proxy call method to original request.
      *
      * @param string $name
-     * @param array  $arguments
+     * @param array $arguments
      *
      * @return mixed
      *
@@ -92,6 +110,14 @@ class RestRequest
     }
 
     /**
+     * @param Repository $repository
+     */
+    public function setRepository(Repository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
      * Fetches deserialized request content.
      *
      * @return array
@@ -107,6 +133,14 @@ class RestRequest
     public function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -140,8 +174,7 @@ class RestRequest
      */
     public function serialize($data)
     {
-        return $this
-            ->getSerializer()
+        return $this->getSerializer()
             ->serialize($data, $this->checkAcceptHeader());
     }
 
@@ -155,8 +188,7 @@ class RestRequest
     public function deserialize($data)
     {
         try {
-            return $this
-                ->getSerializer()
+            return $this->getSerializer()
                 ->deserialize($data, 'array', $this->checkAcceptHeader());
         } catch (\Exception $e) {
             // Do nothing, returns null.
@@ -171,6 +203,14 @@ class RestRequest
     public function getSerializer()
     {
         return $this->serializer;
+    }
+
+    /**
+     * @param SerializerInterface $serializer
+     */
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
     }
 
     /**

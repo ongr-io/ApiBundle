@@ -3,13 +3,15 @@ parameters:
 
     ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
     ongr_api.route_collection.class: ONGR\ApiBundle\Routing\ApiRouteCollection
-    ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
-    ongr_api.rest_request_factory.class: ONGR\ApiBundle\Request\RestRequestFactory
+
     ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
     ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
     ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
     ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CommandController
+
+    ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
+    ongr_api.event_listener.rest_exception.class: ONGR\ApiBundle\EventListener\RestExceptionListener
 
 services:
     ongr_api.route_collection:
@@ -39,17 +41,17 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
-    ongr_api.rest_request_factory:
-        class: %ongr_api.rest_request_factory.class%
+    ongr_api.event_listener.rest_exception:
+        class: %ongr_api.event_listener.rest_exception.class%
         arguments:
-            - @service_container
+            - @ongr_api.rest_request
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     ongr_api.rest_request:
         class: %ongr_api.rest_request.class%
-        factory: ["@ongr_api.rest_request_factory", get]
-        public: false
-        calls:
-            - [setDefaultAcceptType, [%ongr_api.default_encoding%]]
+        arguments:
+            - @service_container
 
     ongr_api.rest_controller:
         class: %ongr_api.rest_controller.class%
@@ -59,3 +61,4 @@ services:
 
     ongr_api.crud:
         class: %ongr_api.crud.class%
+
