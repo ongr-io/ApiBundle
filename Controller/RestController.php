@@ -11,7 +11,6 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,19 +26,15 @@ class RestController extends AbstractRestController implements
      */
     public function postAction(RestRequest $restRequest, $id = null)
     {
-
         try {
-            // $crudService = $this->get('ongr_api.crud');
-            // $crudService->create($restRequest->getRepository(), $restRequest->getData());
-            // $response = $crudService->commit($restRequest->getRepository());
-
-            // TODO: POST operation
-
+            $this->getCrud()->create($restRequest->getRepository(), $restRequest->getData());
+            $response = $this->getCrud()->commit($restRequest->getRepository());
         } catch (\Exception $e) {
-            // TODO return error message with error header
+            // TODO: 406 validation error, 409 resource exists.
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest(["Message" => "This is POST"], Response::HTTP_NOT_FOUND);
+        return $this->renderRest($response, Response::HTTP_OK);
     }
 
     /**
@@ -47,21 +42,13 @@ class RestController extends AbstractRestController implements
      */
     public function getAction(RestRequest $restRequest, $id)
     {
-
-        // $repository = $restRequest->getRepository();
-        // $crudService = $this->get('ongr_api.crud');
         try {
-            // $data = $crudService->read($repository, $id);
-
-            // TODO: POST operation
-
+            $data = $this->getCrud()->read($restRequest->getRepository(), $id);
         } catch (\Exception $e) {
-            return $this->renderRest(null, Response::HTTP_NOT_FOUND);
-            #TODO return error message with not found header
-
+            return $this->renderError($e->getMessage(), Response::HTTP_NOT_FOUND);
         }
 
-        return $this->renderRest(["Message" => "This is GET"], Response::HTTP_NOT_FOUND);
+        return $this->renderRest($data, Response::HTTP_OK);
     }
 
     /**
@@ -70,17 +57,18 @@ class RestController extends AbstractRestController implements
     public function putAction(RestRequest $restRequest, $id = null)
     {
         try {
-            // $crudService = $this->get('ongr_api.crud');
-            // $crudService->update($restRequest->getRepository(), $restRequest->getData());
-            // $response = $crudService->commit($restRequest->getRepository());
+            if ($id !== null) {
+                $data['_id'] = $id;
+            }
 
-            // TODO: PUT operation
-
+            $this->getCrud()->update($restRequest->getRepository(), $data);
+            $response = $this->getCrud()->commit($restRequest->getRepository());
         } catch (\Exception $e) {
-            // TODO: return error message and header
+            // TODO: 406 validation error
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest(["Message" => "This is PUT"], Response::HTTP_NOT_FOUND);
+        return $this->renderRest($response, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -89,14 +77,13 @@ class RestController extends AbstractRestController implements
     public function deleteAction(RestRequest $restRequest, $id)
     {
         try {
-            // $crudService = $this->get('ongr_api.crud');
-            // $crudService->delete($restRequest->getRepository(), $id);
-            // $response = $crudService->commit($restRequest->getRepository());
-
-        } catch (Missing404Exception $e) {
-            // TODO: return error message and header
+            $this->getCrud()->delete($restRequest->getRepository(), $id);
+            $response = $this->getCrud()->commit($restRequest->getRepository());
+        } catch (\Exception $e) {
+            // TODO: 404 if not found.
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest(["Message" => "This is DELETE"], Response::HTTP_NOT_FOUND);
+        return $this->renderRest($response, Response::HTTP_NO_CONTENT);
     }
 }

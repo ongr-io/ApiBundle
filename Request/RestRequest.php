@@ -38,11 +38,6 @@ class RestRequest
     private $repository;
 
     /**
-     * @var string
-     */
-    private $defaultAcceptType;
-
-    /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -55,19 +50,11 @@ class RestRequest
 
         /** @var Request $request */
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $this->setRequest($request !== null ? $request : Request::createFromGlobals());
+        $this->setRequest(($request !== null ? $request : Request::createFromGlobals()));
 
-
-        if ($this->getRequest()->attributes->has('manager') && $this->getRequest()->attributes->has('repository')) {
-            $attributes = $this->getRequest()->attributes;
-            $manager = $this->container->get($attributes->get('manager'));
-
-            /** @var Repository $repository */
-            $repository = $manager->getRepository($attributes->get('repository'));
-            $this->setRepository($repository);
-        }
-
-        $this->setDefaultAcceptType($this->container->getParameter('ongr_api.default_encoding'));
+        /** @var Repository $repository */
+        $repository = $this->container->get($this->getRequest()->attributes->get('_endpoint')['repository']);
+        $this->setRepository($repository);
     }
 
     /**
@@ -102,6 +89,42 @@ class RestRequest
     }
 
     /**
+     * Fetches de-serialized request content.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->deserialize($this->getRequest()->getContent());
+    }
+
+    /**
+     * Returns api version.
+     *
+     * @return string|null
+     */
+    public function getVersion()
+    {
+        return $this->getRequest()->attributes->get('_version', 'v1');
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getDefaultAcceptType()
+    {
+        $defaultAcceptType = $this->container->getParameter('ongr_api.default_encoding');
+
+        if (!$defaultAcceptType) {
+            throw new \RuntimeException('Please set acceptable content type to request or set default accept type.');
+        }
+
+        return $defaultAcceptType;
+    }
+
+    /**
      * @return Repository|null
      */
     public function getRepository()
@@ -117,15 +140,6 @@ class RestRequest
         $this->repository = $repository;
     }
 
-    /**
-     * Fetches deserialized request content.
-     *
-     * @return array
-     */
-    public function getData()
-    {
-        return $this->deserialize($this->getRequest()->getContent());
-    }
 
     /**
      * @return Request
@@ -143,27 +157,6 @@ class RestRequest
         $this->request = $request;
     }
 
-    /**
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    public function getDefaultAcceptType()
-    {
-        if (!$this->defaultAcceptType) {
-            throw new \RuntimeException('Please set acceptable content type to request or set default accept type.');
-        }
-
-        return $this->defaultAcceptType;
-    }
-
-    /**
-     * @param string $defaultAcceptType
-     */
-    public function setDefaultAcceptType($defaultAcceptType)
-    {
-        $this->defaultAcceptType = $defaultAcceptType;
-    }
 
     /**
      * Encodes data for response.
@@ -179,22 +172,29 @@ class RestRequest
     }
 
     /**
-     * Deserializes content.
+     * Deserialize content.
      *
      * @param mixed $data
-     *
      * @return array|null
+     * @throws \RuntimeException
      */
     public function deserialize($data)
     {
+        $type = 'array';
+        $format = $this->checkAcceptHeader();
+
         try {
             return $this->getSerializer()
-                ->deserialize($data, 'array', $this->checkAcceptHeader());
+                ->deserialize($data, $type, $format);
         } catch (\Exception $e) {
-            // Do nothing, returns null.
+            throw new \RuntimeException(
+                sprintf(
+                    'Could not deserialize request content to object of \'%s\' type and \'%s\' format',
+                    $type,
+                    $format
+                )
+            );
         }
-
-        return null;
     }
 
     /**
@@ -214,7 +214,7 @@ class RestRequest
     }
 
     /**
-     * Returns accpetance type based on given request.
+     * Returns acceptance type based on given request.
      *
      * @return string
      */
@@ -232,32 +232,62 @@ class RestRequest
     }
 
     /**
-     * Returns api version.
-     *
-     * @return string|null
-     */
-    public function getVersion()
-    {
-        return $this->getRequest()->attributes->get('_version');
-    }
-
-    /**
      * Used for validator to check if it can ignore unknown fields.
      *
      * @return bool
      */
     public function isAllowedExtraFields()
     {
-        return $this->getRequest()->attributes->get('_allow_extra_fields', false);
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_extra_fields' => true
+            ]
+        )['allow_extra_fields'];
     }
 
     /**
-     * Returns using repository type.
+     * if this option is set, API will allow only to operate with specified fields from the type.
      *
-     * @return string|null
+     * @return String|Array
      */
-    public function getType()
+    public function getAllowedFields()
     {
-        return $this->getRequest()->attributes->get('_type');
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_fields' => "~"
+            ]
+        )['allow_fields'];
+    }
+
+    /**
+     * allows to get all values.
+     *
+     * @return boolean
+     */
+    public function isAllowedGetAll()
+    {
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_get_all' => true
+            ]
+        )['allow_get_all'];
+    }
+
+    /**
+     * You can sent then an array of documents to be indexed to the particular endpoint type.
+     *
+     * @return boolean
+     */
+    public function isAllowedBatch()
+    {
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_batch' => true
+            ]
+        )['allow_batch'];
     }
 }

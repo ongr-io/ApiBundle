@@ -26,15 +26,15 @@ class AbstractCommandController extends AbstractRestController
      * @var array
      */
     private $mapping = [
-        '_all'   => [
+        '_all' => [
             '_controller' => 'ONGRApiBundle:Command:all',
-            'methods'     => ['GET'],
-            'enable'      => 'allow_get_all'
+            'methods' => ['GET'],
+            'enable' => 'allow_get_all'
         ],
         '_batch' => [
             '_controller' => 'ONGRApiBundle:Command:batch',
-            'methods'     => ['POST'],
-            'enable'      => 'allow_batch'
+            'methods' => ['POST'],
+            'enable' => 'allow_batch'
         ]
     ];
 

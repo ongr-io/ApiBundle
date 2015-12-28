@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+use ONGR\ApiBundle\Service\Crud;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,11 +21,42 @@ use Symfony\Component\HttpFoundation\Response;
 class AbstractRestController extends Controller
 {
 
+    /** @var  Crud $crud */
+    private $crud;
+
+    /**
+     * Get CRUD Service
+     *
+     * @return Crud
+     */
+    public function getCrud()
+    {
+
+        if (!$this->crud) {
+            if (!$this->container->has('ongr_api.crud')) {
+                throw new \RuntimeException('Please set RESTful CRUD Service.');
+            }
+            $this->crud = $this->container->get('ongr_api.crud');
+        }
+
+        return $this->crud;
+    }
+
+    /**
+     * Set CRUD Service
+     *
+     * @param Crud $crud
+     */
+    public function setCrud(Crud $crud)
+    {
+        $this->crud = $crud;
+    }
+
     /**
      * Renders rest response.
      *
      * @param mixed $data
-     * @param int   $statusCode
+     * @param int $statusCode
      * @param array $headers
      *
      * @return Response|array
@@ -36,5 +68,28 @@ class AbstractRestController extends Controller
     ) {
         return $this->get('ongr_api.rest_response_view_handler')
             ->handleView($data, $statusCode, $headers);
+    }
+
+    /**
+     * Error Response
+     *
+     * @param string $message
+     * @param int $statusCode
+     * @return array|Response
+     */
+    public function renderError(
+        $message,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+
+        // TODO: Add more information about this Error
+
+        $response = [
+            'error' => [],
+            'message' => $message,
+            'code' => $statusCode
+        ];
+
+        return $this->renderRest($response, $statusCode);
     }
 }

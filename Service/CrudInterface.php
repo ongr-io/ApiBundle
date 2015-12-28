@@ -19,15 +19,15 @@ interface CrudInterface
      * Document create action.
      *
      * @param Repository $repository
-     * @param array      $data
+     * @param array $data
      */
     public function create(Repository $repository, array $data);
 
     /**
-     * Document fetch by id action. Uses Elastcisearch get API.
+     * Document fetch by id action. Uses Elasticsearch get API.
      *
      * @param Repository $repository
-     * @param string     $id
+     * @param string $id
      *
      * @return array
      */
@@ -37,19 +37,19 @@ interface CrudInterface
      * Update document action.
      *
      * @param Repository $repository
-     * @param array      $data
+     * @param array $data
      *
      * @throws \RuntimeException
      */
     public function update(Repository $repository, array $data);
 
     /**
-     * Delete action.
+     * Delete a document by Id.
      *
      * @param Repository $repository
-     * @param array      $data
+     * @param string $is
      */
-    public function delete(Repository $repository, array $data);
+    public function delete(Repository $repository, $id);
 
     /**
      * Commit changes to the elasticsearch.

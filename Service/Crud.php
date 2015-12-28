@@ -18,6 +18,7 @@ use ONGR\ElasticsearchBundle\Service\Repository;
  */
 class Crud implements CrudInterface
 {
+
     /**
      * {@inheritdoc}
      */
@@ -49,13 +50,9 @@ class Crud implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Repository $repository, array $data)
+    public function delete(Repository $repository, $id)
     {
-        if (!isset($data['_id'])) {
-            throw new \RuntimeException('Missing _id field for delete operations.');
-        }
-
-        $repository->getManager()->bulk('delete', $repository->getTypes(), $data);
+        $repository->getManager()->bulk('delete', $repository->getTypes(), ['_id' => $id]);
     }
 
     /**

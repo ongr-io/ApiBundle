@@ -36,7 +36,7 @@ class ApiRouteCollection extends RouteCollection
      */
     public function collectRoutes()
     {
-        $versions        = $this->container->getParameter('ongr_api.versions');
+        $versions = $this->container->getParameter('ongr_api.versions');
         $mappingCommands = $this->container->get('ongr_api.command_controller')
             ->getMapping();
 
@@ -48,8 +48,8 @@ class ApiRouteCollection extends RouteCollection
             }
 
             foreach ($config['endpoints'] as $document => $endpoint) {
-                $this->processRestRequest($document, $endpoint, $path);
-                $this->processCommandRequest($document, $endpoint, $path, $mappingCommands);
+                $this->processRestRequest($document, $endpoint, $path, $version);
+                $this->processCommandRequest($document, $endpoint, $path, $mappingCommands, $version);
             }
         }
     }
@@ -58,22 +58,22 @@ class ApiRouteCollection extends RouteCollection
      * Add Route Configuration of RESTful request
      *
      * @param string $document
-     * @param array  $endpoint
+     * @param array $endpoint
      * @param string $path
+     * @param string $version
      */
-    private function processRestRequest($document, $endpoint, $path)
+    private function processRestRequest($document, $endpoint, $path, $version)
     {
-        $pattern      = strtolower(sprintf('%s/%s/{id}', $path, $document));
-        $defaults     = [
-            'id'        => null,
-            '_endpoint' => $endpoint
+        $pattern = strtolower(sprintf('%s/%s/{id}', $path, $document));
+        $defaults = [
+            'id' => null,
+            '_endpoint' => $endpoint,
+            '_version' => $version
         ];
-        $requirements = [
-            'id' => '\d+'
-        ];
+        $requirements = [];
 
         foreach ($endpoint['methods'] as $method) {
-            $name                    = strtolower(sprintf('ongr_api.%s.%s', $document, $method));
+            $name = strtolower(sprintf('ongr_api.%s.%s', $document, $method));
             $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
 
             $this->add($name, new Route($pattern, $defaults, $requirements, [], "", [], [$method]));
@@ -84,27 +84,30 @@ class ApiRouteCollection extends RouteCollection
      * Add Route Configuration of RESTful command request
      *
      * @param string $document
-     * @param array  $endpoint
+     * @param array $endpoint
      * @param string $path
-     * @param array  $mapping
+     * @param array $mapping
+     * @param string $version
      */
     private function processCommandRequest(
         $document,
         $endpoint,
         $path,
-        $mapping
+        $mapping,
+        $version
     ) {
 
         foreach ($mapping as $command => $config) {
             if (isset($endpoint[$config['enable']]) && $endpoint[$config['enable']]) {
 
-                $pattern  = strtolower(sprintf('%s/%s/%s', $path, $document, $command));
-                $name     = strtolower(sprintf('ongr_api.%s.%s', $document, $command));
+                $pattern = strtolower(sprintf('%s/%s/%s', $path, $document, $command));
+                $name = strtolower(sprintf('ongr_api.%s.%s', $document, $command));
                 $defaults = [
                     '_controller' => $config['_controller'],
-                    '_endpoint'   => $endpoint
+                    '_endpoint' => $endpoint,
+                    '_version' => $version
                 ];
-                $methods  = $config['methods'];
+                $methods = $config['methods'];
 
                 $this->add($name, new Route($pattern, $defaults, [], [], "", [], $methods));
             }
