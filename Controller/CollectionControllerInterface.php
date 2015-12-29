@@ -14,7 +14,7 @@ namespace ONGR\ApiBundle\Controller;
 /**
  * Command interface for Rest Api Controller.
  */
-interface CommandControllerInterface
+interface CollectionControllerInterface
 {
 
 }

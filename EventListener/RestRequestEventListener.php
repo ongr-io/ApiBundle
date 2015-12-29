@@ -11,7 +11,7 @@
 
 namespace ONGR\ApiBundle\EventListener;
 
-use ONGR\ApiBundle\Controller\CommandController;
+use ONGR\ApiBundle\Controller\CollectionController;
 use ONGR\ApiBundle\Controller\RestController;
 use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -55,7 +55,7 @@ class RestRequestEventListener
      */
     public function support($controller)
     {
-        return ($controller instanceof RestController || $controller instanceof CommandController);
+        return ($controller instanceof RestController || $controller instanceof CollectionController);
     }
 
     /**

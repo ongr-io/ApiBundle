@@ -85,7 +85,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                 [
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Command:all'
+                    '_controller' => 'ONGRApiBundle:Collection:all'
                 ],
             ],
             [
@@ -95,7 +95,7 @@ class ElasticsearchLoaderTest extends WebTestCase
                 [
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Command:batch'
+                    '_controller' => 'ONGRApiBundle:Collection:batch'
                 ],
             ],
         ];

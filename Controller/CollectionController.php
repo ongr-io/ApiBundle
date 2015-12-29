@@ -14,8 +14,8 @@ namespace ONGR\ApiBundle\Controller;
 /**
  * CRUD implementation for Api Controller.
  */
-class CommandController extends AbstractCommandController implements
-    CommandControllerInterface
+class CollectionController extends AbstractCollectionController implements
+    CollectionControllerInterface
 {
 
 }

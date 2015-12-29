@@ -8,7 +8,7 @@ parameters:
     ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
     ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
     ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
-    ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CommandController
+    ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CollectionController
 
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
     ongr_api.event_listener.rest_exception.class: ONGR\ApiBundle\EventListener\RestExceptionListener

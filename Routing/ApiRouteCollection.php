@@ -37,7 +37,7 @@ class ApiRouteCollection extends RouteCollection
     public function collectRoutes()
     {
         $versions = $this->container->getParameter('ongr_api.versions');
-        $mappingCommands = $this->container->get('ongr_api.command_controller')
+        $mappingCollections = $this->container->get('ongr_api.command_controller')
             ->getMapping();
 
         foreach ($versions as $version => $config) {
@@ -49,7 +49,7 @@ class ApiRouteCollection extends RouteCollection
 
             foreach ($config['endpoints'] as $document => $endpoint) {
                 $this->processRestRequest($document, $endpoint, $path, $version);
-                $this->processCommandRequest($document, $endpoint, $mappingCommands, $path, $version);
+                $this->processCommandRequest($document, $endpoint, $mappingCollections, $path, $version);
             }
         }
     }
@@ -102,7 +102,7 @@ class ApiRouteCollection extends RouteCollection
     ) {
 
         foreach ($mapping as $command => $config) {
-            if (isset($endpoint[$config['enable']]) && $endpoint[$config['enable']]) {
+            if (isset($endpoint[$config['validator']]) && $endpoint[$config['validator']]) {
 
                 $pattern = strtolower(sprintf('%s/%s/%s', $path, $document, $command));
                 $name = strtolower(

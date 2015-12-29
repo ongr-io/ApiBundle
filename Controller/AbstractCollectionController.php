@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Abstraction for rest api controller.
  */
-class AbstractCommandController extends AbstractRestController
+class AbstractCollectionController extends AbstractRestController
 {
 
     /**
@@ -27,14 +27,14 @@ class AbstractCommandController extends AbstractRestController
      */
     private $mapping = [
         '_all' => [
-            '_controller' => 'ONGRApiBundle:Command:all',
+            '_controller' => 'ONGRApiBundle:Collection:all',
             'methods' => ['GET'],
-            'enable' => 'allow_get_all'
+            'validator' => 'allow_get_all'
         ],
         '_batch' => [
-            '_controller' => 'ONGRApiBundle:Command:batch',
+            '_controller' => 'ONGRApiBundle:Collection:batch',
             'methods' => ['POST'],
-            'enable' => 'allow_batch'
+            'validator' => 'allow_batch'
         ]
     ];
 
