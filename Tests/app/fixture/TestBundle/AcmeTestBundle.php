@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle\Tests\Fixtures\Bundles\Acme\TestBundle;
+namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

@@ -12,7 +12,6 @@
 namespace ONGR\ApiBundle\Tests\Unit\DependencyInjection;
 
 use ONGR\ApiBundle\DependencyInjection\ONGRApiExtension;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -38,6 +37,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                                 'allow_extra_fields' => false,
                                 'allow_fields' => [],
                                 'allow_get_all' => false,
+                                'allow_batch' => true
                             ],
                         ],
                     ],
@@ -87,15 +87,15 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $parameters = [
             'ongr_api' => [
-                'output_format' => 'xml',
+                'default_encoding' => 'xml',
             ],
         ];
 
         $container = $this->getLoadedExtension($parameters);
         $this->assertEquals(
             'xml',
-            $container->getParameter('ongr_api.output_format'),
-            'Incorrect output_format parameter.'
+            $container->getParameter('ongr_api.default_encoding'),
+            'Incorrect default_encoding parameter.'
         );
     }
 
@@ -109,7 +109,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $parameters = [
             'ongr_api' => [
-                'output_format' => 'nothing_knows',
+                'default_encoding' => 'nothing_knows',
             ],
         ];
 
@@ -146,7 +146,7 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     private function getLoadedExtension(array $parameters)
     {
         $container = new ContainerBuilder();
-        class_exists('mockClass') ? : eval('class mockClass {}');
+        class_exists('mockClass') ?: eval('class mockClass {}');
         $container->setParameter('kernel.bundles', ['mockBundle' => 'mockClass']);
         $container->setParameter('kernel.cache_dir', '');
         $container->setParameter('kernel.debug', true);

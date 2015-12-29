@@ -49,7 +49,7 @@ class ApiRouteCollection extends RouteCollection
 
             foreach ($config['endpoints'] as $document => $endpoint) {
                 $this->processRestRequest($document, $endpoint, $path, $version);
-                $this->processCommandRequest($document, $endpoint, $path, $mappingCommands, $version);
+                $this->processCommandRequest($document, $endpoint, $mappingCommands, $path, $version);
             }
         }
     }
@@ -62,8 +62,12 @@ class ApiRouteCollection extends RouteCollection
      * @param string $path
      * @param string $version
      */
-    private function processRestRequest($document, $endpoint, $path, $version)
-    {
+    private function processRestRequest(
+        $document,
+        $endpoint,
+        $path = '',
+        $version = 'v1'
+    ) {
         $pattern = strtolower(sprintf('%s/%s/{id}', $path, $document));
         $defaults = [
             'id' => null,
@@ -73,7 +77,7 @@ class ApiRouteCollection extends RouteCollection
         $requirements = [];
 
         foreach ($endpoint['methods'] as $method) {
-            $name = strtolower(sprintf('ongr_api.%s.%s', $document, $method));
+            $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, $method));
             $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
 
             $this->add($name, new Route($pattern, $defaults, $requirements, [], "", [], [$method]));
@@ -85,27 +89,29 @@ class ApiRouteCollection extends RouteCollection
      *
      * @param string $document
      * @param array $endpoint
-     * @param string $path
      * @param array $mapping
+     * @param string $path
      * @param string $version
      */
     private function processCommandRequest(
         $document,
         $endpoint,
-        $path,
         $mapping,
-        $version
+        $path = '',
+        $version = 'v1'
     ) {
 
         foreach ($mapping as $command => $config) {
             if (isset($endpoint[$config['enable']]) && $endpoint[$config['enable']]) {
 
                 $pattern = strtolower(sprintf('%s/%s/%s', $path, $document, $command));
-                $name = strtolower(sprintf('ongr_api.%s.%s', $document, $command));
+                $name = strtolower(
+                    sprintf('ongr_api_%s_%s_%s', $version, $document, $command)
+                );
                 $defaults = [
-                    '_controller' => $config['_controller'],
                     '_endpoint' => $endpoint,
-                    '_version' => $version
+                    '_version' => $version,
+                    '_controller' => $config['_controller']
                 ];
                 $methods = $config['methods'];
 
