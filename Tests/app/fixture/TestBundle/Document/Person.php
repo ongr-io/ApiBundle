@@ -48,4 +48,20 @@ class Person extends AbstractDocument
      * @ES\Property(name="active", type="boolean")
      */
     public $active;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
 }

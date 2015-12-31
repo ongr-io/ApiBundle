@@ -95,7 +95,13 @@ class RestRequest
      */
     public function getData()
     {
-        return $this->deserialize($this->getRequest()->getContent());
+        try {
+            $response = $this->deserialize($this->getRequest()->getContent());
+        } catch (\Exception $e) {
+            $response = [];
+        }
+
+        return $response;
     }
 
     /**

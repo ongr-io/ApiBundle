@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Service;
 
+use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ElasticsearchBundle\Service\Repository;
 
 /**
@@ -24,6 +25,11 @@ class Crud implements CrudInterface
      */
     public function create(Repository $repository, array $data)
     {
+
+        if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
+            throw new \RuntimeException('The resource existed.');
+        }
+
         $repository->getManager()->bulk('create', $repository->getTypes(), $data);
     }
 
@@ -44,7 +50,11 @@ class Crud implements CrudInterface
             throw new \RuntimeException('Missing _id field for update operations.');
         }
 
-        $repository->getManager()->bulk('update', $repository->getTypes(), $data);
+        if (!$this->read($repository, $data['_id'])) {
+            throw new NoDocumentsToGetException("Identifier not found!");
+        }
+
+        $repository->getManager()->bulk('update', $repository->getTypes(), ['_id' => $data['_id'], 'doc' => $data]);
     }
 
     /**
@@ -52,6 +62,14 @@ class Crud implements CrudInterface
      */
     public function delete(Repository $repository, $id)
     {
+        if (!$id) {
+            throw new \RuntimeException('Missing _id field for update operations.');
+        }
+
+        if (!$this->read($repository, $id)) {
+            throw new NoDocumentsToGetException("Identifier not found!");
+        }
+
         $repository->getManager()->bulk('delete', $repository->getTypes(), ['_id' => $id]);
     }
 

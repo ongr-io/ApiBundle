@@ -66,6 +66,11 @@ class AbstractRestController extends Controller
         $statusCode = Response::HTTP_OK,
         $headers = []
     ) {
+
+        if ($data == null) {
+            return $this->renderError("NOT FOUND", Response::HTTP_NOT_FOUND);
+        }
+
         return $this->get('ongr_api.rest_response_view_handler')
             ->handleView($data, $statusCode, $headers);
     }
@@ -85,7 +90,7 @@ class AbstractRestController extends Controller
         // TODO: Add more information about this Error
 
         $response = [
-            'error' => [],
+            'errors' => [],
             'message' => $message,
             'code' => $statusCode
         ];
