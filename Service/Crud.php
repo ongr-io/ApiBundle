@@ -30,7 +30,7 @@ class Crud implements CrudInterface
             throw new \RuntimeException('The resource existed.');
         }
 
-        $repository->getManager()->bulk('create', $repository->getTypes(), $data);
+        $repository->getManager()->bulk('create', $repository->getType(), $data);
     }
 
     /**
@@ -38,7 +38,7 @@ class Crud implements CrudInterface
      */
     public function read(Repository $repository, $id)
     {
-        return $repository->find($id, Repository::RESULTS_ARRAY);
+        return $repository->find($id);
     }
 
     /**
@@ -54,7 +54,7 @@ class Crud implements CrudInterface
             throw new NoDocumentsToGetException("Identifier not found!");
         }
 
-        $repository->getManager()->bulk('update', $repository->getTypes(), ['_id' => $data['_id'], 'doc' => $data]);
+        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $data['_id'], 'doc' => $data]);
     }
 
     /**
@@ -70,7 +70,7 @@ class Crud implements CrudInterface
             throw new NoDocumentsToGetException("Identifier not found!");
         }
 
-        $repository->getManager()->bulk('delete', $repository->getTypes(), ['_id' => $id]);
+        $repository->getManager()->bulk('delete', $repository->getType(), ['_id' => $id]);
     }
 
     /**
