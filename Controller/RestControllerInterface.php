@@ -47,7 +47,7 @@ interface RestControllerInterface
      *
      * @return Response
      */
-    public function putAction(RestRequest $restRequest, $id = null);
+    public function putAction(RestRequest $restRequest, $id);
 
     /**
      * Delete operation.

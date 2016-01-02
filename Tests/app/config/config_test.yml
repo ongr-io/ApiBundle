@@ -3,6 +3,7 @@ framework:
     router:
         resource: "%kernel.root_dir%/config/routing_test.yml"
         strict_requirements: %kernel.debug%
+    test: ~
 
 ongr_elasticsearch:
     connections:
@@ -24,7 +25,7 @@ ongr_elasticsearch:
 # /api/v1/person/{id} DELETE
 # /api/v1/person/_batch POST -> [["name" => "John"],["name" => "Doe"]]
 ongr_api:
-   output_format: json
+   default_encoding: json
    version_in_url: true
    versions:
        v3:
@@ -32,4 +33,7 @@ ongr_api:
                person:
                    repository: es.manager.default.person
                    allow_extra_fields: false
+                   methods: ["GET", "POST", "PUT", "DELETE"]
                    allow_get_all: true
+                   allow_batch: true
+

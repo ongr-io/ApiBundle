@@ -11,6 +11,7 @@
 
 namespace ONGR\ApiBundle\Service;
 
+use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ElasticsearchBundle\Service\Repository;
 
 /**
@@ -18,12 +19,18 @@ use ONGR\ElasticsearchBundle\Service\Repository;
  */
 class Crud implements CrudInterface
 {
+
     /**
      * {@inheritdoc}
      */
     public function create(Repository $repository, array $data)
     {
-        $repository->getManager()->bulk('create', $repository->getTypes(), $data);
+
+        if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
+            throw new \RuntimeException('The resource existed.');
+        }
+
+        $repository->getManager()->bulk('create', $repository->getType(), $data);
     }
 
     /**
@@ -31,7 +38,7 @@ class Crud implements CrudInterface
      */
     public function read(Repository $repository, $id)
     {
-        return $repository->find($id, Repository::RESULTS_ARRAY);
+        return $repository->find($id);
     }
 
     /**
@@ -43,19 +50,27 @@ class Crud implements CrudInterface
             throw new \RuntimeException('Missing _id field for update operations.');
         }
 
-        $repository->getManager()->bulk('update', $repository->getTypes(), $data);
+        if (!$this->read($repository, $data['_id'])) {
+            throw new NoDocumentsToGetException("Identifier not found!");
+        }
+
+        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $data['_id'], 'doc' => $data]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(Repository $repository, array $data)
+    public function delete(Repository $repository, $id)
     {
-        if (!isset($data['_id'])) {
-            throw new \RuntimeException('Missing _id field for delete operations.');
+        if (!$id) {
+            throw new \RuntimeException('Missing _id field for update operations.');
         }
 
-        $repository->getManager()->bulk('delete', $repository->getTypes(), $data);
+        if (!$this->read($repository, $id)) {
+            throw new NoDocumentsToGetException("Identifier not found!");
+        }
+
+        $repository->getManager()->bulk('delete', $repository->getType(), ['_id' => $id]);
     }
 
     /**

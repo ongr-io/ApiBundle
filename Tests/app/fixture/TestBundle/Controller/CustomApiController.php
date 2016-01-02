@@ -11,7 +11,8 @@
 
 namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle\Controller;
 
-use ONGR\ApiBundle\Controller\ApiControllerInterface;
+use ONGR\ApiBundle\Controller\RestControllerInterface;
+use ONGR\ApiBundle\Request\RestRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,17 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * CRUD implementation for Custom Api Controller.
  */
-class CustomApiController extends Controller implements ApiControllerInterface
+class CustomApiController extends Controller implements RestControllerInterface
 {
     /**
      * Create operation.
      *
-     * @param Request $request
-     * @param string  $endpoint
+     * @param RestRequest $request
+     * @param string $endpoint
      *
      * @return Response
      */
-    public function postAction(Request $request, $endpoint = null)
+    public function postAction(RestRequest $request, $endpoint = null)
     {
         return new JsonResponse('Custom controller POST', Response::HTTP_OK);
     }
@@ -38,12 +39,12 @@ class CustomApiController extends Controller implements ApiControllerInterface
     /**
      * Read operation.
      *
-     * @param Request $request
-     * @param string  $endpoint
+     * @param RestRequest $request
+     * @param string $endpoint
      *
      * @return Response
      */
-    public function getAction(Request $request, $endpoint = null)
+    public function getAction(RestRequest $request, $endpoint = null)
     {
         return new JsonResponse('Custom controller GET', Response::HTTP_OK);
     }
@@ -51,12 +52,12 @@ class CustomApiController extends Controller implements ApiControllerInterface
     /**
      * Update operation.
      *
-     * @param Request $request
-     * @param string  $endpoint
+     * @param RestRequest $request
+     * @param string $endpoint
      *
      * @return Response
      */
-    public function putAction(Request $request, $endpoint = null)
+    public function putAction(RestRequest $request, $endpoint = null)
     {
         return new JsonResponse('Custom controller PUT', Response::HTTP_OK);
     }
@@ -65,11 +66,11 @@ class CustomApiController extends Controller implements ApiControllerInterface
      * Delete operation.
      *
      * @param Request $request
-     * @param string  $endpoint
+     * @param string $endpoint
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $endpoint = null)
+    public function deleteAction(RestRequest $request, $endpoint = null)
     {
         return new JsonResponse('Custom controller DELETE', Response::HTTP_OK);
     }

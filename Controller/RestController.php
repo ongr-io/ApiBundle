@@ -11,69 +11,92 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ApiBundle\Request\RestRequest;
-use ONGR\ApiBundle\Service\Crud;
-use ONGR\ElasticsearchDSL\Search;
-use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchBundle\Service\Repository;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
  */
-class RestController extends Controller
+class RestController extends AbstractRestController implements
+    RestControllerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function postAction(RestRequest $restRequest, $id = null)
-    {
-        try {
-//            $crudService = $this->get('ongr_api.crud');
-//            $crudService->create($restRequest->getRepository(), $restRequest->getData());
-//            $response = $crudService->commit($restRequest->getRepository());
-        } catch (\Exception $e) {
-            #TODO return error message with error header
-        }
-
-        #TODO return array with inserted documents id's
-    }
 
     /**
      * {@inheritdoc}
      */
     public function getAction(RestRequest $restRequest, $id)
     {
-//        $repository = $restRequest->getRepository();
-//        $crudService = $this->get('ongr_api.crud');
         try {
-//            $data = $crudService->read($repository, $id);
+            $row = $this->getCrud()->read($restRequest->getRepository(), $id);
         } catch (\Exception $e) {
-//            return $this->renderRest(null, Response::HTTP_NOT_FOUND);
-            #TODO return error message with not found header
-
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
-//        return $data;
-        #TODO return document
+
+        return $this->renderRest($row, Response::HTTP_OK);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function putAction(RestRequest $restRequest, $id = null)
+    public function postAction(RestRequest $restRequest, $id = null)
     {
-        try {
-//            $crudService = $this->get('ongr_api.crud');
-//            $crudService->update($restRequest->getRepository(), $restRequest->getData());
-//            $response = $crudService->commit($restRequest->getRepository());
-        } catch (\Exception $e) {
-            #TODO return error message and header
+        $data = $restRequest->getData();
+        if (!empty($id)) {
+            $data['_id'] = $id;
         }
 
-        #TODO return success
+        // TODO: check validation
+
+        try {
+            $this->getCrud()->create($restRequest->getRepository(), $data);
+            $response = $this->getCrud()->commit($restRequest->getRepository());
+        } catch (\RuntimeException $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_CONFLICT);
+        } catch (\Exception $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($response['errors']) {
+            // TODO: 406 validation error
+        }
+
+        $id = $response['items'][0]['create']['_id'];
+        $row = $this->getCrud()->read($restRequest->getRepository(), $id);
+        return $this->renderRest($row, Response::HTTP_CREATED);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function putAction(RestRequest $restRequest, $id)
+    {
+
+        $data = $restRequest->getData();
+        if (!empty($id)) {
+            $data['_id'] = $id;
+        }
+
+        // TODO: check validation
+
+        try {
+            $this->getCrud()->update($restRequest->getRepository(), $data);
+            $response = $this->getCrud()->commit($restRequest->getRepository());
+        } catch (\RuntimeException $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
+        } catch (NoDocumentsToGetException $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($response['errors']) {
+            // TODO: 406 validation error
+        }
+
+        $id = $response['items'][0]['update']['_id'];
+        $row = $this->getCrud()->read($restRequest->getRepository(), $id);
+        return $this->renderRest($row, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -81,14 +104,23 @@ class RestController extends Controller
      */
     public function deleteAction(RestRequest $restRequest, $id)
     {
-        try {
-//            $crudService = $this->get('ongr_api.crud');
-//            $crudService->delete($restRequest->getRepository(), $id);
-//            $response = $crudService->commit($restRequest->getRepository());
-        } catch (Missing404Exception $e) {
-            #TODO return error message and header
+
+        $data = $restRequest->getData();
+        if (!empty($id)) {
+            $data['_id'] = $id;
         }
 
-        #TODO return delete success
+        try {
+            $this->getCrud()->delete($restRequest->getRepository(), $id);
+            $response = $this->getCrud()->commit($restRequest->getRepository());
+        } catch (\RuntimeException $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
+        } catch (NoDocumentsToGetException $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->renderRest($response, Response::HTTP_NO_CONTENT);
     }
 }

@@ -13,6 +13,7 @@ namespace ONGR\ApiBundle\Request;
 
 use JMS\Serializer\SerializerInterface;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestRequest
 {
+
     /**
      * @var SerializerInterface
      */
@@ -36,27 +38,30 @@ class RestRequest
     private $repository;
 
     /**
-     * @var string
+     * @param ContainerInterface $container
      */
-    private $defaultAcceptType;
-
-    /**
-     * @param Request             $request
-     * @param SerializerInterface $serializer
-     * @param Repository          $repository
-     */
-    public function __construct(Request $request, SerializerInterface $serializer, Repository $repository = null)
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->serializer = $serializer;
-        $this->repository = $repository;
+        $this->container = $container;
+
+        /** @var SerializerInterface $serializer */
+        $serializer = $this->container->get('serializer');
+        $this->setSerializer($serializer);
+
+        /** @var Request $request */
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $this->setRequest(($request !== null ? $request : Request::createFromGlobals()));
+
+        /** @var Repository $repository */
+        $repository = $this->container->get($this->getRequest()->attributes->get('_endpoint')['repository']);
+        $this->setRepository($repository);
     }
 
     /**
      * Proxy call method to original request.
      *
      * @param string $name
-     * @param array  $arguments
+     * @param array $arguments
      *
      * @return mixed
      *
@@ -84,6 +89,48 @@ class RestRequest
     }
 
     /**
+     * Fetches de-serialized request content.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        try {
+            $response = $this->deserialize($this->getRequest()->getContent());
+        } catch (\Exception $e) {
+            $response = [];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Returns api version.
+     *
+     * @return string|null
+     */
+    public function getVersion()
+    {
+        return $this->getRequest()->attributes->get('_version', 'v1');
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getDefaultAcceptType()
+    {
+        $defaultAcceptType = $this->container->getParameter('ongr_api.default_encoding');
+
+        if (!$defaultAcceptType) {
+            throw new \RuntimeException('Please set acceptable content type to request or set default accept type.');
+        }
+
+        return $defaultAcceptType;
+    }
+
+    /**
      * @return Repository|null
      */
     public function getRepository()
@@ -92,14 +139,13 @@ class RestRequest
     }
 
     /**
-     * Fetches deserialized request content.
-     *
-     * @return array
+     * @param Repository $repository
      */
-    public function getData()
+    public function setRepository(Repository $repository)
     {
-        return $this->deserialize($this->getRequest()->getContent());
+        $this->repository = $repository;
     }
+
 
     /**
      * @return Request
@@ -110,26 +156,13 @@ class RestRequest
     }
 
     /**
-     * @return string
-     *
-     * @throws \RuntimeException
+     * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function getDefaultAcceptType()
+    public function setRequest(Request $request)
     {
-        if (!$this->defaultAcceptType) {
-            throw new \RuntimeException('Please set acceptable content type to request or set default accept type.');
-        }
-
-        return $this->defaultAcceptType;
+        $this->request = $request;
     }
 
-    /**
-     * @param string $defaultAcceptType
-     */
-    public function setDefaultAcceptType($defaultAcceptType)
-    {
-        $this->defaultAcceptType = $defaultAcceptType;
-    }
 
     /**
      * Encodes data for response.
@@ -140,26 +173,33 @@ class RestRequest
      */
     public function serialize($data)
     {
-        return $this
-            ->getSerializer()
+        return $this->getSerializer()
             ->serialize($data, $this->checkAcceptHeader());
     }
 
     /**
-     * Deserializes content.
+     * Deserialize content.
      *
      * @param mixed $data
-     *
      * @return array|null
+     * @throws \RuntimeException
      */
     public function deserialize($data)
     {
+        $type = 'array';
+        $format = $this->checkAcceptHeader();
+
         try {
-            return $this
-                ->getSerializer()
-                ->deserialize($data, 'array', $this->checkAcceptHeader());
+            return $this->getSerializer()
+                ->deserialize($data, $type, $format);
         } catch (\Exception $e) {
-            // Do nothing, returns null.
+            throw new \RuntimeException(
+                sprintf(
+                    'Could not deserialize request content to object of \'%s\' type and \'%s\' format',
+                    $type,
+                    $format
+                )
+            );
         }
     }
 
@@ -172,7 +212,15 @@ class RestRequest
     }
 
     /**
-     * Returns accpetance type based on given request.
+     * @param SerializerInterface $serializer
+     */
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * Returns acceptance type based on given request.
      *
      * @return string
      */
@@ -190,32 +238,62 @@ class RestRequest
     }
 
     /**
-     * Returns api version.
-     *
-     * @return string|null
-     */
-    public function getVersion()
-    {
-        return $this->getRequest()->attributes->get('_version');
-    }
-
-    /**
      * Used for validator to check if it can ignore unknown fields.
      *
      * @return bool
      */
     public function isAllowedExtraFields()
     {
-        return $this->getRequest()->attributes->get('_allow_extra_fields', false);
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_extra_fields' => true
+            ]
+        )['allow_extra_fields'];
     }
 
     /**
-     * Returns using repository type.
+     * if this option is set, API will allow only to operate with specified fields from the type.
      *
-     * @return string|null
+     * @return String|Array
      */
-    public function getType()
+    public function getAllowedFields()
     {
-        return $this->getRequest()->attributes->get('_type');
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_fields' => "~"
+            ]
+        )['allow_fields'];
+    }
+
+    /**
+     * allows to get all values.
+     *
+     * @return boolean
+     */
+    public function isAllowedGetAll()
+    {
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_get_all' => true
+            ]
+        )['allow_get_all'];
+    }
+
+    /**
+     * You can sent then an array of documents to be indexed to the particular endpoint type.
+     *
+     * @return boolean
+     */
+    public function isAllowedBatch()
+    {
+        return $this->getRequest()->attributes->get(
+            '_endpoint',
+            [
+                'allow_batch' => true
+            ]
+        )['allow_batch'];
     }
 }

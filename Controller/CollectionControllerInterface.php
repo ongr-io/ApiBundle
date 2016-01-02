@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+namespace ONGR\ApiBundle\Controller;
 
 /**
- * AcmeTestBundle for testing.
+ * Command interface for Rest Api Controller.
  */
-class AcmeTestBundle extends Bundle
+interface CollectionControllerInterface
 {
+
 }

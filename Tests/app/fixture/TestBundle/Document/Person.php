@@ -12,14 +12,13 @@
 namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document;
 
 use ONGR\ElasticsearchBundle\Annotation as ES;
-use ONGR\ElasticsearchBundle\Document\AbstractDocument;
 
 /**
  * Class Person Document.
  *
  * @ES\Document(type="person")
  */
-class Person extends AbstractDocument
+class Person
 {
     /**
      * @var string
@@ -48,4 +47,20 @@ class Person extends AbstractDocument
      * @ES\Property(name="active", type="boolean")
      */
     public $active;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
 }

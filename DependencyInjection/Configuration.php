@@ -32,13 +32,14 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->booleanNode('version_in_url')
-                    ->defaultFalse()
+                    ->defaultTrue()
                     ->info(
-                        'By default versions is only handled via Accept headers. '.
-                        'In addition there is possible to add it in the url.'
+                        'Use API version in the URL'.
+                        'If set to false then version must be specified as Accept value set in header.'
                     )
                 ->end()
-                ->scalarNode('output_format')
+
+                ->scalarNode('default_encoding')
                     ->defaultValue('json')
                     ->example('json')
                     ->info('Default encoding type. Changed through headers')
@@ -50,7 +51,9 @@ class Configuration implements ConfigurationInterface
                         )
                     ->end()
                 ->end()
+
                 ->append($this->getVersionsNode())
+
             ->end();
 
         return $treeBuilder;
@@ -71,11 +74,13 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('version')
             ->prototype('array')
                 ->children()
+
                     ->scalarNode('versions')
                         ->info('Defines a version for current api endpoints.')
                         ->example('v1')
                     ->end()
-                ->append($this->getEndpointNode())
+
+                    ->append($this->getEndpointNode())
                 ->end()
             ->end();
 
@@ -97,40 +102,46 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('endpoint')
             ->prototype('array')
                 ->children()
+
                     ->scalarNode('endpoint')
                         ->info('Endpoint name (will be included in url (e.g. products))')
                         ->example('products')
                     ->end()
+
                     ->scalarNode('repository')
                         ->isRequired()
                         ->info('Document service from Elasticsearch bundle which will be used for data fetching')
                         ->example('es.manager.default.products')
                     ->end()
+
                     ->arrayNode('methods')
                         ->defaultValue(
                             [
                                 Request::METHOD_POST,
                                 Request::METHOD_GET,
+                                Request::METHOD_PUT,
+                                Request::METHOD_DELETE
                             ]
                         )
                         ->prototype('scalar')
                         ->validate()
-                        ->ifNotInArray(
-                            [
-                                Request::METHOD_HEAD,
-                                Request::METHOD_POST,
-                                Request::METHOD_PATCH,
-                                Request::METHOD_GET,
-                                Request::METHOD_PUT,
-                                Request::METHOD_DELETE,
-                            ]
-                        )
-                        ->thenInvalid(
-                            'Invalid HTTP method used! Please check your ongr_api endpoint configuration.'
-                        )
+                            ->ifNotInArray(
+                                [
+                                    Request::METHOD_HEAD,
+                                    Request::METHOD_POST,
+                                    Request::METHOD_PATCH,
+                                    Request::METHOD_GET,
+                                    Request::METHOD_PUT,
+                                    Request::METHOD_DELETE
+                                ]
+                            )
+                            ->thenInvalid(
+                                'Invalid HTTP method used! Please check your ongr_api endpoint configuration.'
+                            )
+                            ->end()
                         ->end()
                     ->end()
-                    ->end()
+
                     ->booleanNode('allow_extra_fields')
                         ->defaultFalse()
                         ->info(
@@ -138,17 +149,27 @@ class Configuration implements ConfigurationInterface
                             'Make sure you have configured elasticsearch respectively.'
                         )
                     ->end()
+
                     ->arrayNode('allow_fields')
                         ->defaultValue([])
                         ->info('A list off a allowed fields to operate through api for a document.')
                         ->prototype('scalar')->end()
                     ->end()
+
                     ->booleanNode('allow_get_all')
-                    ->defaultFalse()
+                    ->defaultTrue()
                     ->info(
-                        'Allows to use `_scroll` elasticsearch api to get all documents from a type.'
+                        'Allows to use `_all` elasticsearch api to get all documents from a type.'
                     )
                     ->end()
+
+                    ->booleanNode('allow_batch')
+                    ->defaultTrue()
+                    ->info(
+                        'Allows to use `_batch` elasticsearch api to pass multiple documents in single API request.'
+                    )
+                    ->end()
+
                 ->end()
             ->end();
 
