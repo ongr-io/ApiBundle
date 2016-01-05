@@ -47,7 +47,7 @@ interface CrudInterface
      * Delete a document by Id.
      *
      * @param Repository $repository
-     * @param string $is
+     * @param string $id
      */
     public function delete(Repository $repository, $id);
 
