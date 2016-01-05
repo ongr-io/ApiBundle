@@ -5,7 +5,6 @@ parameters:
     ongr_api.route_collection.class: ONGR\ApiBundle\Routing\ApiRouteCollection
 
     ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
-    ongr_api.rest_response_view_handler.class: ONGR\ApiBundle\Response\ViewHandler
     ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
     ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
     ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CollectionController
@@ -29,15 +28,10 @@ services:
         tags:
             - { name: routing.loader }
 
-    ongr_api.rest_response_view_handler:
-        class: %ongr_api.rest_response_view_handler.class%
-        arguments:
-            - @ongr_api.rest_request
-
     ongr_api.event_listener.rest_request:
         class: %ongr_api.event_listener.rest_request.class%
         arguments:
-            - @ongr_api.rest_request
+            - "@service_container"
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
@@ -61,3 +55,9 @@ services:
 
     ongr_api.command_controller:
         class: %ongr_api.command_controller.class%
+
+    ongr_api.request_serializer:
+        class: ONGR\ApiBundle\Service\RequestSerializer
+        arguments:
+            - "@serializer"
+            - "%ongr_api.default_encoding%"

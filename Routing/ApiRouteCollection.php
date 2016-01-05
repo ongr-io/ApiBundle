@@ -72,7 +72,8 @@ class ApiRouteCollection extends RouteCollection
         $defaults = [
             'id' => null,
             '_endpoint' => $endpoint,
-            '_version' => $version
+            '_version' => $version,
+            'repository' => $endpoint['repository'],
         ];
         $requirements = [];
 
@@ -111,7 +112,8 @@ class ApiRouteCollection extends RouteCollection
                 $defaults = [
                     '_endpoint' => $endpoint,
                     '_version' => $version,
-                    '_controller' => $config['_controller']
+                    '_controller' => $config['_controller'],
+                    'repository' => $endpoint['repository'],
                 ];
                 $methods = $config['methods'];
 

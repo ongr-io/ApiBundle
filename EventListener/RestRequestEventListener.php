@@ -13,36 +13,41 @@ namespace ONGR\ApiBundle\EventListener;
 
 use ONGR\ApiBundle\Controller\CollectionController;
 use ONGR\ApiBundle\Controller\RestController;
-use ONGR\ApiBundle\Request\RestRequest;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Listener for injecting rest request into controller.
+ * Replaces repository identifier by actual repository service.
  */
 class RestRequestEventListener
 {
     /**
-     * @var RestRequest
+     * @var ContainerInterface
      */
-    private $restRequest;
+    private $container;
 
     /**
-     * @param RestRequest $restRequest
+     * @param ContainerInterface $container
      */
-    public function __construct(RestRequest $restRequest)
+    public function __construct(ContainerInterface $container)
     {
-        $this->restRequest = $restRequest;
+        $this->container = $container;
     }
 
     /**
-     * Injects rest request proxy into request attributes.
+     * Replaces repository identifier by actual repository service.
      *
      * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($this->support($event->getController()[0])) {
-            $event->getRequest()->attributes->set('restRequest', $this->getRestRequest());
+        if ($event->getRequest()->attributes->has('repository')) {
+            $event->getRequest()->attributes->set(
+                'repository',
+                $this->container->get(
+                    $event->getRequest()->attributes->get('repository')
+                )
+            );
         }
     }
 
@@ -56,13 +61,5 @@ class RestRequestEventListener
     public function support($controller)
     {
         return ($controller instanceof RestController || $controller instanceof CollectionController);
-    }
-
-    /**
-     * @return RestRequest
-     */
-    public function getRestRequest()
-    {
-        return $this->restRequest;
     }
 }
