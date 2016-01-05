@@ -12,6 +12,8 @@
 namespace ONGR\ApiBundle\Controller;
 
 use ONGR\ApiBundle\Request\RestRequest;
+use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -77,27 +79,29 @@ class AbstractCollectionController extends AbstractRestController
      * Get all documents from a specific repository
      *
      * @param RestRequest $restRequest
+     * @param Repository  $repository
      *
      * @return Response
      */
-    public function allAction(RestRequest $restRequest)
+    public function allAction(Request $request, Repository $repository)
     {
         // TODO: Get all documents from a specific repository
 
-        return $this->renderRest(["Message" => "This is getAll"], Response::HTTP_ACCEPTED);
+        return $this->renderRest($request, ["Message" => "This is getAll"], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Index multiple documents via single API request
      *
      * @param RestRequest $restRequest
+     * @param Repository  $repository
      *
      * @return Response
      */
-    public function batchAction(RestRequest $restRequest)
+    public function batchAction(Request $request, Repository $repository)
     {
         // TODO: Index multiple documents via single API request
 
-        return $this->renderRest(["Message" => "This is postBatch"], Response::HTTP_ACCEPTED);
+        return $this->renderRest($request, ["Message" => "This is postBatch"], Response::HTTP_ACCEPTED);
     }
 }

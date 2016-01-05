@@ -48,8 +48,8 @@ class ApiRouteCollection extends RouteCollection
             }
 
             foreach ($config['endpoints'] as $document => $endpoint) {
-                $this->processRestRequest($document, $endpoint, $path, $version);
                 $this->processCommandRequest($document, $endpoint, $mappingCollections, $path, $version);
+                $this->processRestRequest($document, $endpoint, $path, $version);
             }
         }
     }
