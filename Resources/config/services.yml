@@ -4,13 +4,11 @@ parameters:
     ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
     ongr_api.route_collection.class: ONGR\ApiBundle\Routing\ApiRouteCollection
 
-    ongr_api.rest_request.class: ONGR\ApiBundle\Request\RestRequest
     ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
     ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
     ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CollectionController
 
     ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
-    ongr_api.event_listener.rest_exception.class: ONGR\ApiBundle\EventListener\RestExceptionListener
 
 services:
     ongr_api.route_collection:
@@ -34,18 +32,6 @@ services:
             - "@service_container"
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
-    ongr_api.event_listener.rest_exception:
-        class: %ongr_api.event_listener.rest_exception.class%
-        arguments:
-            - @ongr_api.rest_request
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
-
-    ongr_api.rest_request:
-        class: %ongr_api.rest_request.class%
-        arguments:
-            - @service_container
 
     ongr_api.crud:
         class: %ongr_api.crud.class%

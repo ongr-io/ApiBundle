@@ -78,8 +78,8 @@ class AbstractCollectionController extends AbstractRestController
     /**
      * Get all documents from a specific repository
      *
-     * @param RestRequest $restRequest
-     * @param Repository  $repository
+     * @param Request    $request
+     * @param Repository $repository
      *
      * @return Response
      */
@@ -93,8 +93,8 @@ class AbstractCollectionController extends AbstractRestController
     /**
      * Index multiple documents via single API request
      *
-     * @param RestRequest $restRequest
-     * @param Repository  $repository
+     * @param Request    $request
+     * @param Repository $repository
      *
      * @return Response
      */
