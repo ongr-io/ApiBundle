@@ -34,7 +34,11 @@ class RestController extends AbstractRestController implements
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest($request, $row, Response::HTTP_OK);
+        if ($row) {
+            return $this->renderRest($request, $row, Response::HTTP_OK);
+        } else {
+            return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
