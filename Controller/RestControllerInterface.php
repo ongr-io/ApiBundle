@@ -11,7 +11,8 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use ONGR\ApiBundle\Request\RestRequest;
+use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -22,40 +23,40 @@ interface RestControllerInterface
     /**
      * Create operation.
      *
-     * @param RestRequest $restRequest
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function postAction(RestRequest $restRequest, $id = null);
+    public function postAction(Request $request, $id = null);
 
     /**
      * Read operation.
      *
-     * @param RestRequest $restRequest
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function getAction(RestRequest $restRequest, $id);
+    public function getAction(Request $request, $id);
 
     /**
      * Update operation.
      *
-     * @param RestRequest $restRequest
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function putAction(RestRequest $restRequest, $id);
+    public function putAction(Request $request, $id);
 
     /**
      * Delete operation.
      *
-     * @param RestRequest $restRequest
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function deleteAction(RestRequest $restRequest, $id);
+    public function deleteAction(Request $request, $id);
 }

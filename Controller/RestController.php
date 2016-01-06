@@ -12,7 +12,8 @@
 namespace ONGR\ApiBundle\Controller;
 
 use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
-use ONGR\ApiBundle\Request\RestRequest;
+use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -25,23 +26,32 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function getAction(RestRequest $restRequest, $id)
+    public function getAction(Request $request, $id)
     {
+        $repository = $this->getRequestRepository($request);
+
         try {
-            $row = $this->getCrud()->read($restRequest->getRepository(), $id);
+            $row = $this->getCrud()->read($repository, $id);
         } catch (\Exception $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest($row, Response::HTTP_OK);
+        if ($row) {
+            return $this->renderRest($request, $row, Response::HTTP_OK);
+        } else {
+            return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function postAction(RestRequest $restRequest, $id = null)
+    public function postAction(Request $request, $id = null)
     {
-        $data = $restRequest->getData();
+        $repository = $this->getRequestRepository($request);
+
+        $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
         if (!empty($id)) {
             $data['_id'] = $id;
         }
@@ -49,12 +59,12 @@ class RestController extends AbstractRestController implements
         // TODO: check validation
 
         try {
-            $this->getCrud()->create($restRequest->getRepository(), $data);
-            $response = $this->getCrud()->commit($restRequest->getRepository());
+            $this->getCrud()->create($repository, $data);
+            $response = $this->getCrud()->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_CONFLICT);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         if ($response['errors']) {
@@ -62,17 +72,19 @@ class RestController extends AbstractRestController implements
         }
 
         $id = $response['items'][0]['create']['_id'];
-        $row = $this->getCrud()->read($restRequest->getRepository(), $id);
-        return $this->renderRest($row, Response::HTTP_CREATED);
+        $row = $this->getCrud()->read($repository, $id);
+        return $this->renderRest($request, $row, Response::HTTP_CREATED);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function putAction(RestRequest $restRequest, $id)
+    public function putAction(Request $request, $id)
     {
+        $repository = $this->getRequestRepository($request);
 
-        $data = $restRequest->getData();
+        $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
         if (!empty($id)) {
             $data['_id'] = $id;
         }
@@ -80,14 +92,14 @@ class RestController extends AbstractRestController implements
         // TODO: check validation
 
         try {
-            $this->getCrud()->update($restRequest->getRepository(), $data);
-            $response = $this->getCrud()->commit($restRequest->getRepository());
+            $this->getCrud()->update($repository, $data);
+            $response = $this->getCrud()->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (NoDocumentsToGetException $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         if ($response['errors']) {
@@ -95,32 +107,29 @@ class RestController extends AbstractRestController implements
         }
 
         $id = $response['items'][0]['update']['_id'];
-        $row = $this->getCrud()->read($restRequest->getRepository(), $id);
-        return $this->renderRest($row, Response::HTTP_NO_CONTENT);
+        $row = $this->getCrud()->read($repository, $id);
+
+        return $this->renderRest($request, $row, Response::HTTP_NO_CONTENT);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteAction(RestRequest $restRequest, $id)
+    public function deleteAction(Request $request, $id)
     {
-
-        $data = $restRequest->getData();
-        if (!empty($id)) {
-            $data['_id'] = $id;
-        }
+        $repository = $this->getRequestRepository($request);
 
         try {
-            $this->getCrud()->delete($restRequest->getRepository(), $id);
-            $response = $this->getCrud()->commit($restRequest->getRepository());
+            $this->getCrud()->delete($repository, $id);
+            $response = $this->getCrud()->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
         } catch (NoDocumentsToGetException $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
-            return $this->renderError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest($response, Response::HTTP_NO_CONTENT);
+        return $this->renderRest($request, $response, Response::HTTP_NO_CONTENT);
     }
 }
