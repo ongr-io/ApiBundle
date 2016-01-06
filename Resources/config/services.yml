@@ -26,13 +26,6 @@ services:
         tags:
             - { name: routing.loader }
 
-    ongr_api.event_listener.rest_request:
-        class: %ongr_api.event_listener.rest_request.class%
-        arguments:
-            - "@service_container"
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
     ongr_api.crud:
         class: %ongr_api.crud.class%
 

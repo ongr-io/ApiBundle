@@ -23,44 +23,40 @@ interface RestControllerInterface
     /**
      * Create operation.
      *
-     * @param Request     $request
-     * @param Repository  $repository
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function postAction(Request $request, Repository $repository, $id = null);
+    public function postAction(Request $request, $id = null);
 
     /**
      * Read operation.
      *
-     * @param Request     $request
-     * @param Repository  $repository
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function getAction(Request $request, Repository $repository, $id);
+    public function getAction(Request $request, $id);
 
     /**
      * Update operation.
      *
-     * @param Request     $request
-     * @param Repository  $repository
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function putAction(Request $request, Repository $repository, $id);
+    public function putAction(Request $request, $id);
 
     /**
      * Delete operation.
      *
-     * @param Request     $request
-     * @param Repository  $repository
-     * @param string      $id
+     * @param Request $request
+     * @param string  $id
      *
      * @return Response
      */
-    public function deleteAction(Request $request, Repository $repository, $id);
+    public function deleteAction(Request $request, $id);
 }

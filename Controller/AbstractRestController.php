@@ -12,6 +12,7 @@
 namespace ONGR\ApiBundle\Controller;
 
 use ONGR\ApiBundle\Service\Crud;
+use ONGR\ElasticsearchBundle\Service\Repository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,5 +105,17 @@ class AbstractRestController extends Controller
         ];
 
         return $this->renderRest($request, $response, $statusCode);
+    }
+
+    /**
+     * Returns repository object from it's identifier in request.
+     *
+     * @param Request $request
+     *
+     * @return Repository
+     */
+    protected function getRequestRepository(Request $request)
+    {
+        return $this->get($request->attributes->get('repository'));
     }
 }

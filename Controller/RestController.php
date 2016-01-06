@@ -26,8 +26,10 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function getAction(Request $request, Repository $repository, $id)
+    public function getAction(Request $request, $id)
     {
+        $repository = $this->getRequestRepository($request);
+
         try {
             $row = $this->getCrud()->read($repository, $id);
         } catch (\Exception $e) {
@@ -44,8 +46,10 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function postAction(Request $request, Repository $repository, $id = null)
+    public function postAction(Request $request, $id = null)
     {
+        $repository = $this->getRequestRepository($request);
+
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
         if (!empty($id)) {
@@ -75,8 +79,10 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function putAction(Request $request, Repository $repository, $id)
+    public function putAction(Request $request, $id)
     {
+        $repository = $this->getRequestRepository($request);
+
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
         if (!empty($id)) {
@@ -109,8 +115,10 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function deleteAction(Request $request, Repository $repository, $id)
+    public function deleteAction(Request $request, $id)
     {
+        $repository = $this->getRequestRepository($request);
+
         try {
             $this->getCrud()->delete($repository, $id);
             $response = $this->getCrud()->commit($repository);
