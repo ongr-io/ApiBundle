@@ -12,7 +12,10 @@
 namespace ONGR\ApiBundle\Service;
 
 use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
+use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Search;
 
 /**
  * Simple CRUD operations service.
@@ -38,7 +41,10 @@ class Crud implements CrudInterface
      */
     public function read(Repository $repository, $id)
     {
-        return $repository->find($id);
+        $search = new Search();
+        $search->addQuery(new TermQuery('_id', $id));
+
+        return $repository->execute($search, Result::RESULTS_ARRAY);
     }
 
     /**
