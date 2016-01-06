@@ -42,7 +42,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'id' => null,
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Rest:get'
+                    '_controller' => 'ONGRApiBundle:Rest:get',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
             [
@@ -53,7 +54,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'id' => null,
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Rest:post'
+                    '_controller' => 'ONGRApiBundle:Rest:post',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
             [
@@ -64,7 +66,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'id' => null,
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Rest:put'
+                    '_controller' => 'ONGRApiBundle:Rest:put',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
             [
@@ -75,7 +78,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'id' => null,
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Rest:delete'
+                    '_controller' => 'ONGRApiBundle:Rest:delete',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
             [
@@ -85,7 +89,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                 [
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Collection:all'
+                    '_controller' => 'ONGRApiBundle:Collection:all',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
             [
@@ -95,7 +100,8 @@ class ElasticsearchLoaderTest extends WebTestCase
                 [
                     '_endpoint' => $endpoint,
                     '_version' => 'v3',
-                    '_controller' => 'ONGRApiBundle:Collection:batch'
+                    '_controller' => 'ONGRApiBundle:Collection:batch',
+                    'repository' => 'es.manager.default.person',
                 ],
             ],
         ];
