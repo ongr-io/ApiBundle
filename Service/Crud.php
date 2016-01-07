@@ -21,20 +21,13 @@ use ONGR\ElasticsearchDSL\Query\IdsQuery;
  */
 class Crud implements CrudInterface
 {
-
     /**
      * {@inheritdoc}
      */
     public function create(Repository $repository, array $data)
     {
-        if (!empty($data['_id'])) {
-            try {
-                $this->read($repository, $data['_id']);
-
-                throw new \LogicException('The resource existed.');
-            } catch (\RuntimeException $e) {
-                // all good, because resource did not exist.
-            }
+        if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
+            throw new \RuntimeException('The resource existed.');
         }
 
         $repository->getManager()->bulk('create', $repository->getType(), $data);
@@ -52,8 +45,9 @@ class Crud implements CrudInterface
         $results = $repository->execute($search, Result::RESULTS_ARRAY);
 
         if (!isset($results[0])) {
-            throw new \RuntimeException('Document with "' . $id . '" id not found.');
+            return null;
         }
+
         return $results[0];
     }
 
@@ -87,14 +81,6 @@ class Crud implements CrudInterface
         }
 
         $repository->getManager()->bulk('delete', $repository->getType(), ['_id' => $id]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function exists(Repository $repository, $id)
-    {
-        return $repository->find($id) !== null;
     }
 
     /**

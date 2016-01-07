@@ -52,16 +52,6 @@ interface CrudInterface
     public function delete(Repository $repository, $id);
 
     /**
-     * Returns true if resource with given id exists, false otherwise.
-     *
-     * @param Repository $repository
-     * @param string     $id
-     *
-     * @return boolean
-     */
-    public function exists(Repository $repository, $id);
-
-    /**
      * Commit changes to the elasticsearch.
      *
      * @param Repository $repository
