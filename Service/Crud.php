@@ -15,8 +15,6 @@ use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
-use ONGR\ElasticsearchDSL\Search;
 
 /**
  * Simple CRUD operations service.
@@ -29,7 +27,6 @@ class Crud implements CrudInterface
      */
     public function create(Repository $repository, array $data)
     {
-
         if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
             throw new \RuntimeException('The resource existed.');
         }
