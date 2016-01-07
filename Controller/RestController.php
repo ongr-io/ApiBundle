@@ -37,7 +37,7 @@ class RestController extends AbstractRestController implements
         }
 
         if ($row) {
-            return $this->renderRest($request, $row, Response::HTTP_OK);
+            return $this->renderRest($request, $row[0], Response::HTTP_OK);
         } else {
             return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
         }
@@ -73,7 +73,7 @@ class RestController extends AbstractRestController implements
 
         $id = $response['items'][0]['create']['_id'];
         $row = $this->getCrud()->read($repository, $id);
-        return $this->renderRest($request, $row, Response::HTTP_CREATED);
+        return $this->renderRest($request, $row[0], Response::HTTP_CREATED);
     }
 
     /**

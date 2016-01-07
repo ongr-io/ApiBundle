@@ -12,7 +12,9 @@
 namespace ONGR\ApiBundle\Service;
 
 use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
+use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use ONGR\ElasticsearchDSL\Query\IdsQuery;
 
 /**
  * Simple CRUD operations service.
@@ -25,7 +27,6 @@ class Crud implements CrudInterface
      */
     public function create(Repository $repository, array $data)
     {
-
         if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
             throw new \RuntimeException('The resource existed.');
         }
@@ -38,7 +39,11 @@ class Crud implements CrudInterface
      */
     public function read(Repository $repository, $id)
     {
-        return $repository->find($id);
+        $search = $repository->createSearch();
+        $search->addQuery(new IdsQuery([$id]));
+        $search->setSize(1);
+
+        return $repository->execute($search, Result::RESULTS_ARRAY);
     }
 
     /**
