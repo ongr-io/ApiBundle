@@ -37,7 +37,8 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
                                 'allow_extra_fields' => false,
                                 'allow_fields' => [],
                                 'allow_get_all' => false,
-                                'allow_batch' => true
+                                'allow_batch' => true,
+                                'variations' => false,
                             ],
                         ],
                     ],

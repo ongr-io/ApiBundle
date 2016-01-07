@@ -30,7 +30,8 @@ class ElasticsearchLoaderTest extends WebTestCase
             'methods' => ["GET", "POST", "PUT", "DELETE"],
             'allow_get_all' => true,
             'allow_batch' => true,
-            'allow_fields' => []
+            'allow_fields' => [],
+            'variations' => false,
         ];
 
         return [
