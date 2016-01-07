@@ -43,7 +43,9 @@ class Crud implements CrudInterface
         $search->addQuery(new IdsQuery([$id]));
         $search->setSize(1);
 
-        return $repository->execute($search, Result::RESULTS_ARRAY);
+        $results = $repository->execute($search, Result::RESULTS_ARRAY);
+
+        return $results[0];
     }
 
     /**
