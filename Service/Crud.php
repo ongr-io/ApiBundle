@@ -90,6 +90,14 @@ class Crud implements CrudInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function exists(Repository $repository, $id)
+    {
+        return $repository->find($id) !== null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function commit(Repository $repository)
