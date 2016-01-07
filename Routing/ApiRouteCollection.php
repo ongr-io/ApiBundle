@@ -83,13 +83,19 @@ class ApiRouteCollection extends RouteCollection
 
             $this->add($name, new Route($pattern, $defaults, $requirements, [], "", [], [$method]));
 
-            if ($endpoint['variations']) {
-                $variationPattern = $pattern . '/_variation/{variationId}';
-                $variationDefaults = array_merge($defaults, ['variationId' => null]);
+            if ($endpoint['variants']) {
+                $variantPattern = $pattern . '/_variant/{variantId}';
+                $variantDefaults = array_merge(
+                    $defaults,
+                    [
+                        'variantId' => null,
+                        '_controller' => sprintf('ONGRApiBundle:Variant:%s', strtolower($method))
+                    ]
+                );
 
                 $this->add(
-                    $name . '_variation',
-                    new Route($variationPattern, $variationDefaults, $requirements, [], "", [], [$method])
+                    $name . '_variant',
+                    new Route($variantPattern, $variantDefaults, $requirements, [], "", [], [$method])
                 );
             }
         }

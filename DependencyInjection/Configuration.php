@@ -170,10 +170,10 @@ class Configuration implements ConfigurationInterface
                     )
                     ->end()
 
-                    ->booleanNode('variations')
+                    ->booleanNode('variants')
                     ->defaultFalse()
                     ->info(
-                        'If set to true user can manipulate document variations over API.'
+                        'If set to true user can manipulate document variants over API.'
                     )
                     ->end()
 
