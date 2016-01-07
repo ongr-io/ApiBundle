@@ -45,6 +45,9 @@ class Crud implements CrudInterface
 
         $results = $repository->execute($search, Result::RESULTS_ARRAY);
 
+        if (!isset($results[0])) {
+            throw new \RuntimeException('Document with "' . $id . '" id not found.');
+        }
         return $results[0];
     }
 
