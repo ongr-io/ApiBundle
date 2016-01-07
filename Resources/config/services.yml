@@ -15,14 +15,14 @@ services:
         class: %ongr_api.route_collection.class%
         public: false
         arguments:
-            - @service_container
+            - "@service_container"
         calls:
             - [collectRoutes]
 
     ongr_api.elasticsearch_loader:
         class: %ongr_api.elasticsearch_loader.class%
         calls:
-            - [setCollection, [@ongr_api.route_collection]]
+            - [setCollection, ["@ongr_api.route_collection"]]
         tags:
             - { name: routing.loader }
 
