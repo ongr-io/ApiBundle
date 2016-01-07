@@ -73,7 +73,7 @@ class RestController extends AbstractRestController implements
 
         $id = $response['items'][0]['create']['_id'];
         $row = $this->getCrud()->read($repository, $id);
-        return $this->renderRest($request, $row, Response::HTTP_CREATED);
+        return $this->renderRest($request, $row[0], Response::HTTP_CREATED);
     }
 
     /**
