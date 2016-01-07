@@ -27,8 +27,14 @@ class Crud implements CrudInterface
      */
     public function create(Repository $repository, array $data)
     {
-        if (!empty($data['_id']) && $this->read($repository, $data['_id'])) {
-            throw new \RuntimeException('The resource existed.');
+        if (!empty($data['_id'])) {
+            try {
+                $this->read($repository, $data['_id']);
+
+                throw new \LogicException('The resource existed.');
+            } catch (\RuntimeException $e) {
+                // all good, because resource did not exist.
+            }
         }
 
         $repository->getManager()->bulk('create', $repository->getType(), $data);
