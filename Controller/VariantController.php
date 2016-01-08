@@ -17,16 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * This controller works with document variants.
  */
-class VariantController extends AbstractRestController implements RestControllerInterface
+class VariantController extends AbstractRestController
 {
-    /**
-     * @inheritDoc
-     */
-    public function postAction(Request $request, $id = null)
-    {
-
-    }
-
     /**
      * @inheritDoc
      */
@@ -59,6 +51,35 @@ class VariantController extends AbstractRestController implements RestController
                 Response::HTTP_NOT_FOUND
             );
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function postAction(Request $request, $documentId)
+    {
+        $repository = $this->getRequestRepository($request);
+
+        $document = $this->getCrud()->read($this->getRequestRepository($request), $documentId);
+
+        if (!$document) {
+            return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $document['_id'] = $documentId;
+        $document['variants'] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
+        try {
+            $this->getCrud()->update($repository, $document);
+            $this->getCrud()->commit($repository);
+        } catch (\RuntimeException $e) {
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
+        } catch (\Exception $e) {
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $row = $this->getCrud()->read($repository, $documentId);
+        return $this->renderRest($request, $row, Response::HTTP_CREATED);
     }
 
     /**
