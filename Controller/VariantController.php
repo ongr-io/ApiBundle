@@ -60,7 +60,7 @@ class VariantController extends AbstractRestController
     {
         $repository = $this->getRequestRepository($request);
 
-        $document = $this->getCrud()->read($this->getRequestRepository($request), $documentId);
+        $document = $this->getCrud()->read($repository, $documentId);
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
@@ -85,9 +85,39 @@ class VariantController extends AbstractRestController
     /**
      * @inheritDoc
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request, $documentId, $id)
     {
-        // TODO: Implement putAction() method.
+        if ($id === null) {
+            return $this->renderError(
+                $request,
+                'You must provide variant id in your request.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $crud = $this->getCrud();
+        $repository = $this->getRequestRepository($request);
+
+        $document = $crud->read($repository, $documentId);
+
+        if (!$document) {
+            return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
+        }
+
+        if (!isset($document['variants'][$id])) {
+            return $this->renderError(
+                $request,
+                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $document['variants'][$id] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
+        $crud->update($repository, $document);
+        $crud->commit($repository);
+
+        return $this->renderRest($request, $document, Response::HTTP_OK);
     }
 
     /**
@@ -98,7 +128,7 @@ class VariantController extends AbstractRestController
         $crud = $this->getCrud();
         $repository = $this->getRequestRepository($request);
 
-        $document = $crud->read($this->getRequestRepository($request), $documentId);
+        $document = $crud->read($repository, $documentId);
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
@@ -122,7 +152,7 @@ class VariantController extends AbstractRestController
             );
         }
 
-        $this->getCrud()->commit($repository);
+        $crud->commit($repository);
 
         return $this->renderRest($request, $document, Response::HTTP_OK);
     }
