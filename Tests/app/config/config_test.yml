@@ -36,7 +36,6 @@ ongr_api:
                    methods: ["GET", "POST", "PUT", "DELETE"]
                    allow_get_all: true
                    allow_batch: true
-                   variants: true
                tshirt:
                    repository: es.manager.default.tshirt
                    methods: ["GET", "POST", "PUT", "DELETE"]
