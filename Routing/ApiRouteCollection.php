@@ -69,6 +69,7 @@ class ApiRouteCollection extends RouteCollection
         $version = 'v1'
     ) {
         $pattern = strtolower(sprintf('%s/%s/{id}', $path, $document));
+        $variantPattern = strtolower("$path/$document") . '/{documentId}/_variant/{id}';
         $defaults = [
             'id' => null,
             '_endpoint' => $endpoint,
@@ -84,13 +85,9 @@ class ApiRouteCollection extends RouteCollection
             $this->add($name, new Route($pattern, $defaults, $requirements, [], "", [], [$method]));
 
             if ($endpoint['variants']) {
-                $variantPattern = $pattern . '/_variant/{variantId}';
                 $variantDefaults = array_merge(
                     $defaults,
-                    [
-                        'variantId' => null,
-                        '_controller' => sprintf('ONGRApiBundle:Variant:%s', strtolower($method))
-                    ]
+                    ['_controller' => sprintf('ONGRApiBundle:Variant:%s', strtolower($method))]
                 );
 
                 $this->add(
