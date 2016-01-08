@@ -22,12 +22,12 @@ class VariantController extends AbstractRestController
     /**
      * @inheritDoc
      */
-    public function getAction(Request $request, $id, $variantId = null)
+    public function getAction(Request $request, $documentId, $id = null)
     {
         $crud = $this->getCrud();
 
         try {
-            $document = $crud->read($this->getRequestRepository($request), $id);
+            $document = $crud->read($this->getRequestRepository($request), $documentId);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -40,14 +40,14 @@ class VariantController extends AbstractRestController
             );
         }
 
-        if ($variantId === null) {
+        if ($id === null) {
             return $this->renderRest($request, $document['variants']);
-        } else if (isset($document['variants'][$variantId])) {
-            return $this->renderRest($request, $document['variants'][$variantId]);
+        } else if (isset($document['variants'][$id])) {
+            return $this->renderRest($request, $document['variants'][$id]);
         } else {
             return $this->renderError(
                 $request,
-                'Variant "' . $variantId . '" for object "' . $id . '" does not exist.',
+                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
                 Response::HTTP_NOT_FOUND
             );
         }
@@ -93,8 +93,37 @@ class VariantController extends AbstractRestController
     /**
      * @inheritDoc
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $documentId, $id = null)
     {
-        // TODO: Implement deleteAction() method.
+        $crud = $this->getCrud();
+        $repository = $this->getRequestRepository($request);
+
+        $document = $crud->read($this->getRequestRepository($request), $documentId);
+
+        if (!$document) {
+            return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $document['_id'] = $documentId;
+
+        if ($id === null) {
+            $document['variants'] = [];
+            $crud->update($repository, $document);
+        } else if (isset($document['variants'][$id])) {
+            unset($document['variants'][$id]);
+            $document['variants'] = array_values($document['variants']);
+
+            $crud->update($repository, $document);
+        } else {
+            return $this->renderError(
+                $request,
+                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $this->getCrud()->commit($repository);
+
+        return $this->renderRest($request, $document, Response::HTTP_OK);
     }
 }
