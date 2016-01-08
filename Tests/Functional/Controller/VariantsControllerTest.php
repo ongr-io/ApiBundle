@@ -11,6 +11,8 @@
 
 namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
 class VariantsControllerTest extends BasicControllerTestCase
 {
     /**
@@ -64,6 +66,11 @@ class VariantsControllerTest extends BasicControllerTestCase
                                 'size' => 'XL',
                             ],
                         ],
+                    ],
+                    [
+                        '_id' => 3,
+                        'manufacturer' => 'Cloth',
+                        'variants' => [],
                     ],
                 ],
             ],
@@ -135,7 +142,37 @@ class VariantsControllerTest extends BasicControllerTestCase
     {
         $this->assertEquals(
             $expectedVariants,
-            $this->sendApiRequest('GET', $uri)->getContent()
+            $this->sendApiRequest(Request::METHOD_GET, $uri)->getContent()
+        );
+    }
+
+    /**
+     * Test for post request.
+     */
+    public function testSendPostVariants()
+    {
+        $variants = json_encode(
+            [
+                [
+                    'color' => 'black',
+                    'size' => 'L',
+                ],
+                [
+                    'color' => 'black',
+                    'size' => 'XL',
+                ],
+            ]
+        );
+
+        $this->sendApiRequest(
+            Request::METHOD_POST,
+            '/api/v3/tshirt/2/_variant',
+            $variants
+        );
+
+        $this->assertEquals(
+            $variants,
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant')->getContent()
         );
     }
 }
