@@ -31,7 +31,7 @@ class ElasticsearchLoaderTest extends WebTestCase
             'allow_get_all' => true,
             'allow_batch' => true,
             'allow_fields' => [],
-            'variants' => false,
+            'variants' => true,
         ];
 
         return [
@@ -105,6 +105,54 @@ class ElasticsearchLoaderTest extends WebTestCase
                     'repository' => 'es.manager.default.person',
                 ],
             ],
+            [
+                'ongr_api_v3_person_get_variant',
+                '/v3/person/{documentId}/_variant/{id}',
+                'GET',
+                [
+                    'id' => null,
+                    '_endpoint' => $endpoint,
+                    '_version' => 'v3',
+                    '_controller' => 'ONGRApiBundle:Variant:get',
+                    'repository' => 'es.manager.default.person',
+                ],
+            ],
+            [
+                'ongr_api_v3_person_put_variant',
+                '/v3/person/{documentId}/_variant/{id}',
+                'PUT',
+                [
+                    'id' => null,
+                    '_endpoint' => $endpoint,
+                    '_version' => 'v3',
+                    '_controller' => 'ONGRApiBundle:Variant:put',
+                    'repository' => 'es.manager.default.person',
+                ],
+            ],
+            [
+                'ongr_api_v3_person_delete_variant',
+                '/v3/person/{documentId}/_variant/{id}',
+                'DELETE',
+                [
+                    'id' => null,
+                    '_endpoint' => $endpoint,
+                    '_version' => 'v3',
+                    '_controller' => 'ONGRApiBundle:Variant:delete',
+                    'repository' => 'es.manager.default.person',
+                ],
+            ],
+            [
+                'ongr_api_v3_person_post_variant',
+                '/v3/person/{documentId}/_variant/{id}',
+                'POST',
+                [
+                    'id' => null,
+                    '_endpoint' => $endpoint,
+                    '_version' => 'v3',
+                    '_controller' => 'ONGRApiBundle:Variant:post',
+                    'repository' => 'es.manager.default.person',
+                ],
+            ],
         ];
     }
 
@@ -123,7 +171,7 @@ class ElasticsearchLoaderTest extends WebTestCase
         /** @var RouteCollection $collection */
         $collection = $this->getLoader()->load('');
 
-        $this->assertEquals(6, $collection->count(), 'Loaded route number has changed!');
+        $this->assertEquals(10, $collection->count(), 'Loaded route number has changed!');
         $route = $collection->get($name);
 
         $this->assertNotNull($route, 'Route cannot be null');
