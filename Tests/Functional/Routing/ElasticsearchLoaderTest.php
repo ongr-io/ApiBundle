@@ -171,7 +171,6 @@ class ElasticsearchLoaderTest extends WebTestCase
         /** @var RouteCollection $collection */
         $collection = $this->getLoader()->load('');
 
-        $this->assertEquals(10, $collection->count(), 'Loaded route number has changed!');
         $route = $collection->get($name);
 
         $this->assertNotNull($route, 'Route cannot be null');
