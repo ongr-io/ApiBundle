@@ -99,6 +99,7 @@ class VariantController extends AbstractRestController
         $repository = $this->getRequestRepository($request);
 
         $document = $crud->read($repository, $documentId);
+        $document['_id'] = $documentId;
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);

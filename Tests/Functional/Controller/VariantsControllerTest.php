@@ -206,4 +206,24 @@ class VariantsControllerTest extends BasicControllerTestCase
             $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant')->getContent()
         );
     }
+
+    /**
+     * Test for put request.
+     */
+    public function testSendPutVariants()
+    {
+        $variant = json_encode(['color' => 'transparent', 'size' => 'M']);
+
+        $this->sendApiRequest(
+            Request::METHOD_PUT,
+            '/api/v3/tshirt/2/_variant/0',
+            $variant
+        );
+
+
+        $this->assertEquals(
+            $variant,
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant/0')->getContent()
+        );
+    }
 }
