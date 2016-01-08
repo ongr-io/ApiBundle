@@ -166,12 +166,43 @@ class VariantsControllerTest extends BasicControllerTestCase
 
         $this->sendApiRequest(
             Request::METHOD_POST,
-            '/api/v3/tshirt/2/_variant',
+            '/api/v3/tshirt/3/_variant',
             $variants
         );
 
         $this->assertEquals(
             $variants,
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/3/_variant')->getContent()
+        );
+    }
+
+    /**
+     * Test for delete request.
+     */
+    public function testSendDeleteVariants()
+    {
+        $this->sendApiRequest(
+            Request::METHOD_DELETE,
+            '/api/v3/tshirt/2/_variant/0'
+        );
+
+        $this->assertEquals(
+            json_encode(
+                [
+                    [
+                        'color' => 'red',
+                        'size' => 'M',
+                    ],
+                    [
+                        'color' => 'white',
+                        'size' => 'L',
+                    ],
+                    [
+                        'color' => 'blue',
+                        'size' => 'XL',
+                    ]
+                ]
+            ),
             $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant')->getContent()
         );
     }
