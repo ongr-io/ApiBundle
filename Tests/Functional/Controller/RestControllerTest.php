@@ -15,7 +15,7 @@ use ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document\Person;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class RestControllerTest extends AbstractElasticsearchTestCase
+class RestControllerTest extends BasicControllerTestCase
 {
     /**
      * {@inheritdoc}
@@ -299,31 +299,5 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         $response = $this->sendApiRequest('DELETE', '/api/v3/person');
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-    }
-
-    /**
-     * Sends api request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param string $content
-     *
-     * @return null|Response
-     */
-    private function sendApiRequest($method, $uri, $content = null)
-    {
-        $client = static::createClient();
-        $client->request(
-            $method,
-            $uri,
-            [],
-            [],
-            [
-                'HTTP_Accept' => 'application/json',
-            ],
-            $content
-        );
-
-        return $client->getResponse();
     }
 }
