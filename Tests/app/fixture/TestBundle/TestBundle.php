@@ -14,8 +14,8 @@ namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * AcmeTestBundle for testing.
+ * TestBundle for testing.
  */
-class AcmeTestBundle extends Bundle
+class TestBundle extends Bundle
 {
 }

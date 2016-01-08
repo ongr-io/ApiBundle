@@ -15,7 +15,7 @@ ongr_elasticsearch:
         default:
             connection: default
             mappings:
-                - AcmeTestBundle
+                - TestBundle
 
 # Generated routes for API from config below
 # /api/v1/person POST -> ["name" => "John"]

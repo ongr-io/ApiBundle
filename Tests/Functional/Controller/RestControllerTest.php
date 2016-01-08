@@ -129,7 +129,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
             );
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertNotNull($manager->find('AcmeTestBundle:Person', 4));
+        $this->assertNotNull($manager->find('TestBundle:Person', 4));
     }
 
     /**
@@ -155,7 +155,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
 //            '{"message":"Validation error!","errors":["This form should not contain extra fields."]}',
 //            $response->getContent()
 //        );
-//        $this->assertNull($manager->getRepository('AcmeTestBundle:Person')->find(4));
+//        $this->assertNull($manager->getRepository('TestBundle:Person')->find(4));
 //    }
 
 
@@ -177,7 +177,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
             );
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode(), 'Resource should be created!');
-        $this->assertNotNull($manager->find('AcmeTestBundle:Person', 4), 'Document should exist!');
+        $this->assertNotNull($manager->find('TestBundle:Person', 4), 'Document should exist!');
 
         $response = $this
             ->sendApiRequest(
@@ -234,7 +234,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
 
         /** @var Person $document */
-        $document = $manager->find('AcmeTestBundle:Person', 2);
+        $document = $manager->find('TestBundle:Person', 2);
 
         $this->assertNotNull($document, 'Document should exist');
         $this->assertEquals('foo_name', $document->getName(), 'Document \'name\' property should have changed');
@@ -276,7 +276,7 @@ class RestControllerTest extends AbstractElasticsearchTestCase
         $response = $this->sendApiRequest('DELETE', '/api/v3/person/1');
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
-        $this->assertNull($manager->find('AcmeTestBundle:Person', 1));
+        $this->assertNull($manager->find('TestBundle:Person', 1));
     }
 
     /**
