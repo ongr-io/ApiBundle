@@ -29,7 +29,7 @@ class AppKernel extends Kernel
             new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
             new ONGR\ApiBundle\ONGRApiBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
-            new ONGR\ApiBundle\Tests\app\fixture\TestBundle\AcmeTestBundle()
+            new ONGR\ApiBundle\Tests\app\fixture\TestBundle\TestBundle()
         ];
     }
 

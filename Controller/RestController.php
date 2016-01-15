@@ -32,15 +32,15 @@ class RestController extends AbstractRestController implements
 
         try {
             $row = $this->getCrud()->read($repository, $id);
-        } catch (\Exception $e) {
+
+            if ($row === null) {
+                return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
+            }
+        } catch(\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        if ($row) {
-            return $this->renderRest($request, $row, Response::HTTP_OK);
-        } else {
-            return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
-        }
+        return $this->renderRest($request, $row, Response::HTTP_OK);
     }
 
     /**

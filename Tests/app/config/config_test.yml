@@ -15,7 +15,7 @@ ongr_elasticsearch:
         default:
             connection: default
             mappings:
-                - AcmeTestBundle
+                - TestBundle
 
 # Generated routes for API from config below
 # /api/v1/person POST -> ["name" => "John"]
@@ -36,4 +36,7 @@ ongr_api:
                    methods: ["GET", "POST", "PUT", "DELETE"]
                    allow_get_all: true
                    allow_batch: true
-
+               tshirt:
+                   repository: es.manager.default.tshirt
+                   methods: ["GET", "POST", "PUT", "DELETE"]
+                   variants: true
