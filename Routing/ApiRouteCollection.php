@@ -37,8 +37,6 @@ class ApiRouteCollection extends RouteCollection
     public function collectRoutes()
     {
         $versions = $this->container->getParameter('ongr_api.versions');
-        $mappingCollections = $this->container->get('ongr_api.command_controller')
-            ->getMapping();
 
         foreach ($versions as $version => $config) {
 
@@ -48,7 +46,6 @@ class ApiRouteCollection extends RouteCollection
             }
 
             foreach ($config['endpoints'] as $document => $endpoint) {
-                $this->processCommandRequest($document, $endpoint, $mappingCollections, $path, $version);
                 $this->processRestRequest($document, $endpoint, $path, $version);
             }
         }
@@ -94,43 +91,6 @@ class ApiRouteCollection extends RouteCollection
                     $name . '_variant',
                     new Route($variantPattern, $variantDefaults, $requirements, [], "", [], [$method])
                 );
-            }
-        }
-    }
-
-    /**
-     * Add Route Configuration of RESTful command request
-     *
-     * @param string $document
-     * @param array $endpoint
-     * @param array $mapping
-     * @param string $path
-     * @param string $version
-     */
-    private function processCommandRequest(
-        $document,
-        $endpoint,
-        $mapping,
-        $path = '',
-        $version = 'v1'
-    ) {
-
-        foreach ($mapping as $command => $config) {
-            if (isset($endpoint[$config['validator']]) && $endpoint[$config['validator']]) {
-
-                $pattern = strtolower(sprintf('%s/%s/%s', $path, $document, $command));
-                $name = strtolower(
-                    sprintf('ongr_api_%s_%s_%s', $version, $document, $command)
-                );
-                $defaults = [
-                    '_endpoint' => $endpoint,
-                    '_version' => $version,
-                    '_controller' => $config['_controller'],
-                    'repository' => $endpoint['repository'],
-                ];
-                $methods = $config['methods'];
-
-                $this->add($name, new Route($pattern, $defaults, [], [], "", [], $methods));
             }
         }
     }

@@ -34,7 +34,6 @@ class ONGRApiExtension extends Extension
         $loader->load('services.yml');
 
         $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
-        $container->setParameter('ongr_api.version_in_url', $config['version_in_url']);
         $container->setParameter('ongr_api.versions', $config['versions']);
     }
 }

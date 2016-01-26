@@ -31,14 +31,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->booleanNode('version_in_url')
-                    ->defaultTrue()
-                    ->info(
-                        'Use API version in the URL'.
-                        'If set to false then version must be specified as Accept value set in header.'
-                    )
-                ->end()
-
                 ->scalarNode('default_encoding')
                     ->defaultValue('json')
                     ->example('json')
