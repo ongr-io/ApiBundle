@@ -11,11 +11,12 @@
 
 namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
+use ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document\Jeans;
 use ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document\Person;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class RestControllerTest extends BasicControllerTestCase
+class RestControllerTest extends AbstractControllerTestCase
 {
     /**
      * {@inheritdoc}
@@ -24,24 +25,18 @@ class RestControllerTest extends BasicControllerTestCase
     {
         return [
             'default' => [
-                'person' => [
+                'jeans' => [
                     [
                         '_id' => 1,
-                        'name' => 'TestName1',
-                        'surname' => 'TestSurname1',
-                        'active' => false,
+                        'manufacturer' => 'armani',
                     ],
                     [
                         '_id' => 2,
-                        'name' => 'TestName2',
-                        'surname' => 'TestSurname2',
-                        'active' => true,
+                        'manufacturer' => 'levis',
                     ],
                     [
                         '_id' => 3,
-                        'name' => 'TestName3',
-                        'surname' => 'TestSurname3',
-                        'active' => true,
+                        'manufacturer' => 'denim',
                     ],
                 ],
             ],
@@ -51,29 +46,14 @@ class RestControllerTest extends BasicControllerTestCase
     /**
      * Tests get api when document is found.
      */
-    public function testGetApiWithId()
+    public function testGetApi()
     {
-        $this->getManager();
-        $response = $this->sendApiRequest('GET', '/api/v3/person/1');
-
+        $response = $this->sendApiRequest('GET', '/api/v3/jeans/1');
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(
-            '{"name":"TestName1","surname":"TestSurname1","active":false}',
+            '{"manufacturer":"armani"}',
             $response->getContent()
         );
-    }
-
-    /**
-     * Tests get api when document without id.
-     *
-     */
-    public function testGetApiWithoutId()
-    {
-        $this->getManager();
-        $response = $this->sendApiRequest('GET', '/api/v3/person');
-
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertArrayHasKey('errors', json_decode($response->getContent(), true));
     }
 
     /**
@@ -81,9 +61,7 @@ class RestControllerTest extends BasicControllerTestCase
      */
     public function testGetApiNotFound()
     {
-        $this->getManager();
-        $response = $this->sendApiRequest('GET', '/api/v3/person/4');
-
+        $response = $this->sendApiRequest('GET', '/api/v3/jeans/4');
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
         $this->assertArrayHasKey('errors', json_decode($response->getContent(), true));
     }
@@ -93,20 +71,19 @@ class RestControllerTest extends BasicControllerTestCase
      */
     public function testPostApiWithoutId()
     {
-        $this->getManager();
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v3/person',
+                '/api/v3/jeans',
                 json_encode(
                     [
-                        'name' => 'foo_name',
+                        'manufacturer' => 'armani',
                     ]
                 )
             );
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertEquals('{"name":"foo_name"}', $response->getContent());
+        $this->assertEquals('{"manufacturer":"armani"}', $response->getContent());
     }
 
     /**
@@ -115,49 +92,22 @@ class RestControllerTest extends BasicControllerTestCase
     public function testPostApiWithId()
     {
         $manager = $this->getManager();
-
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v3/person/4',
+                '/api/v3/jeans/41',
                 json_encode(
                     [
-                        'name' => 'foo_name',
-                        'surname' => 'foo_surname',
+                        'manufacturer' => 'armani',
                     ]
                 )
             );
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertNotNull($manager->find('TestBundle:Person', 4));
+        $document = $manager->find('TestBundle:Jeans', 41);
+        $this->assertNotNull($document);
+        $this->assertEquals('armani', $document->manufacturer);
     }
-
-    /**
-     * Tests post api including unknown field.
-     */
-//    public function testPostApiWithUnknownField()
-//    {
-//        $manager = $this->getManager();
-//        $response = $this
-//            ->sendApiRequest(
-//                'POST',
-//                '/api/v3/person/4',
-//                json_encode(
-//                    [
-//                        'name' => 'foo_name',
-//                        'unknown' => 'Don\'t know this',
-//                    ]
-//                )
-//            );
-//
-//        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
-//        $this->assertEquals(
-//            '{"message":"Validation error!","errors":["This form should not contain extra fields."]}',
-//            $response->getContent()
-//        );
-//        $this->assertNull($manager->getRepository('TestBundle:Person')->find(4));
-//    }
-
 
     /**
      * Tests post api twice providing identifier in request body.
@@ -168,24 +118,24 @@ class RestControllerTest extends BasicControllerTestCase
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v3/person/4',
+                '/api/v3/jeans/4',
                 json_encode(
                     [
-                        'name' => 'foo_name',
+                        'manufacturer' => 'armani',
                     ]
                 )
             );
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode(), 'Resource should be created!');
-        $this->assertNotNull($manager->find('TestBundle:Person', 4), 'Document should exist!');
+        $this->assertNotNull($manager->find('TestBundle:Jeans', 4), 'Document should exist!');
 
         $response = $this
             ->sendApiRequest(
                 'POST',
-                '/api/v3/person/4',
+                '/api/v3/jeans/4',
                 json_encode(
                     [
-                        'name' => 'foo_name',
+                        'manufacturer' => 'armani',
                     ]
                 )
             );
@@ -193,79 +143,34 @@ class RestControllerTest extends BasicControllerTestCase
     }
 
     /**
-     * Tests put api without providing any identifier.
+     * Tests put api.
      */
-    public function testPutApiWithoutId()
-    {
-        $this->getManager();
-        $response = $this
-            ->sendApiRequest(
-                'PUT',
-                '/api/v3/person',
-                json_encode(
-                    [
-                        'name' => 'foo_name',
-                    ]
-                )
-            );
-
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertArrayHasKey('errors', json_decode($response->getContent(), true));
-    }
-
-    /**
-     * Tests put api with document id passed.
-     */
-    public function testPutApiWithId()
+    public function testPutApi()
     {
         $manager = $this->getManager();
+        /** @var Jeans $document */
+        $document = $manager->find('TestBundle:Jeans', 1);
+        $this->assertNotNull($document, 'Document should exist');
+        $this->assertEquals('armani', $document->manufacturer);
+
         $response = $this
             ->sendApiRequest(
                 'PUT',
-                '/api/v3/person/2',
+                '/api/v3/jeans/1',
                 json_encode(
                     [
-                        'name' => 'foo_name',
-                        'active' => false
+                        'manufacturer' => 'levis',
                     ]
                 )
             );
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
 
-        /** @var Person $document */
-        $document = $manager->find('TestBundle:Person', 2);
-
+        /** @var Jeans $document */
+        $document = $manager->find('TestBundle:Jeans', 1);
         $this->assertNotNull($document, 'Document should exist');
-        $this->assertEquals('foo_name', $document->getName(), 'Document \'name\' property should have changed');
-        $this->assertFalse($document->isActive(), 'Document \'active\' property should have changed');
+        $this->assertEquals('levis', $document->manufacturer);
     }
-
-    /**
-     * Tests put api including unknown field.
-     */
-//    public function testPutApiWithUnknownField()
-//    {
-//        $this->getManager();
-//        $response = $this
-//            ->sendApiRequest(
-//                'PUT',
-//                '/api/v1/custom/person/2',
-//                json_encode(
-//                    [
-//                        'name' => 'foo_name',
-//                        'unknown' => 'Don\'t know this',
-//                    ]
-//                )
-//            );
-//
-//        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
-//        $this->assertEquals(
-//            '{"message":"Validation error!","errors":["This form should not contain extra fields."]}',
-//            $response->getContent()
-//        );
-//    }
-
 
     /**
      * Tests delete api when document is found.
@@ -273,10 +178,9 @@ class RestControllerTest extends BasicControllerTestCase
     public function testDeleteApiSuccess()
     {
         $manager = $this->getManager();
-        $response = $this->sendApiRequest('DELETE', '/api/v3/person/1');
-
+        $response = $this->sendApiRequest('DELETE', '/api/v3/jeans/1');
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
-        $this->assertNull($manager->find('TestBundle:Person', 1));
+        $this->assertNull($manager->find('TestBundle:Jeans', 1));
     }
 
     /**
@@ -284,20 +188,7 @@ class RestControllerTest extends BasicControllerTestCase
      */
     public function testDeleteApiNotFound()
     {
-        $this->getManager();
-        $response = $this->sendApiRequest('DELETE', '/api/v3/person/4');
-
+        $response = $this->sendApiRequest('DELETE', '/api/v3/jeans/4');
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
-    }
-
-    /**
-     * Tests delete api when no document id is given.
-     */
-    public function testDeleteApiWithoutId()
-    {
-        $this->getManager();
-        $response = $this->sendApiRequest('DELETE', '/api/v3/person');
-
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
 }

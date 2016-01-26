@@ -1,3 +1,4 @@
-ongr_api_routing:
-   resource: @ONGRApiBundle/Resources/config/routing.yml
-   prefix: /api
+ongr_api_main_route:
+    resource: .
+    type: ongr_api
+    prefix: api/

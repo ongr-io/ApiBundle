@@ -22,9 +22,9 @@ class VariantController extends AbstractRestController
     /**
      * @inheritDoc
      */
-    public function getAction(Request $request, $documentId, $id = null)
+    public function getAction(Request $request, $documentId, $variantId = null)
     {
-        $crud = $this->getCrud();
+        $crud = $this->getCrudService();
 
         try {
             $document = $crud->read($this->getRequestRepository($request), $documentId);
@@ -40,14 +40,14 @@ class VariantController extends AbstractRestController
             );
         }
 
-        if ($id === null) {
+        if ($variantId === null) {
             return $this->renderRest($request, $document['variants']);
-        } else if (isset($document['variants'][$id])) {
-            return $this->renderRest($request, $document['variants'][$id]);
+        } else if (isset($document['variants'][$variantId])) {
+            return $this->renderRest($request, $document['variants'][$variantId]);
         } else {
             return $this->renderError(
                 $request,
-                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
+                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
                 Response::HTTP_NOT_FOUND
             );
         }
@@ -60,34 +60,33 @@ class VariantController extends AbstractRestController
     {
         $repository = $this->getRequestRepository($request);
 
-        $document = $this->getCrud()->read($repository, $documentId);
+        $document = $this->getCrudService()->read($repository, $documentId);
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
         }
 
-        $document['_id'] = $documentId;
         $document['variants'] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
         try {
-            $this->getCrud()->update($repository, $document);
-            $this->getCrud()->commit($repository);
+            $this->getCrudService()->update($repository, $documentId, $document);
+            $this->getCrudService()->commit($repository);
         } catch (\RuntimeException $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        $row = $this->getCrud()->read($repository, $documentId);
+        $row = $this->getCrudService()->read($repository, $documentId);
         return $this->renderRest($request, $row, Response::HTTP_CREATED);
     }
 
     /**
      * @inheritDoc
      */
-    public function putAction(Request $request, $documentId, $id)
+    public function putAction(Request $request, $documentId, $variantId)
     {
-        if ($id === null) {
+        if ($variantId === null) {
             return $this->renderError(
                 $request,
                 'You must provide variant id in your request.',
@@ -95,27 +94,26 @@ class VariantController extends AbstractRestController
             );
         }
 
-        $crud = $this->getCrud();
+        $crud = $this->getCrudService();
         $repository = $this->getRequestRepository($request);
 
         $document = $crud->read($repository, $documentId);
-        $document['_id'] = $documentId;
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
         }
 
-        if (!isset($document['variants'][$id])) {
+        if (!isset($document['variants'][$variantId])) {
             return $this->renderError(
                 $request,
-                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
+                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
                 Response::HTTP_NOT_FOUND
             );
         }
 
-        $document['variants'][$id] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+        $document['variants'][$variantId] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
-        $crud->update($repository, $document);
+        $crud->update($repository, $documentId, $document);
         $crud->commit($repository);
 
         return $this->renderRest($request, $document, Response::HTTP_OK);
@@ -124,9 +122,9 @@ class VariantController extends AbstractRestController
     /**
      * @inheritDoc
      */
-    public function deleteAction(Request $request, $documentId, $id = null)
+    public function deleteAction(Request $request, $documentId, $variantId = null)
     {
-        $crud = $this->getCrud();
+        $crud = $this->getCrudService();
         $repository = $this->getRequestRepository($request);
 
         $document = $crud->read($repository, $documentId);
@@ -135,20 +133,18 @@ class VariantController extends AbstractRestController
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
         }
 
-        $document['_id'] = $documentId;
-
-        if ($id === null) {
+        if ($variantId === null) {
             $document['variants'] = [];
-            $crud->update($repository, $document);
-        } else if (isset($document['variants'][$id])) {
-            unset($document['variants'][$id]);
+            $crud->update($repository, $documentId, $document);
+        } else if (isset($document['variants'][$variantId])) {
+            unset($document['variants'][$variantId]);
             $document['variants'] = array_values($document['variants']);
 
-            $crud->update($repository, $document);
+            $crud->update($repository, $documentId, $document);
         } else {
             return $this->renderError(
                 $request,
-                'Variant "' . $id . '" for object "' . $documentId . '" does not exist.',
+                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
                 Response::HTTP_NOT_FOUND
             );
         }

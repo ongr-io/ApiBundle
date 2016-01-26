@@ -22,35 +22,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AbstractRestController extends Controller
 {
-
-    /** @var  Crud $crud */
-    private $crud;
-
     /**
      * Get CRUD Service
      *
      * @return Crud
      */
-    public function getCrud()
+    public function getCrudService()
     {
-        if (!$this->crud) {
-            if (!$this->container->has('ongr_api.crud')) {
-                throw new \RuntimeException('Please set RESTful CRUD Service.');
-            }
-            $this->crud = $this->container->get('ongr_api.crud');
-        }
-
-        return $this->crud;
-    }
-
-    /**
-     * Set CRUD Service
-     *
-     * @param Crud $crud
-     */
-    public function setCrud(Crud $crud)
-    {
-        $this->crud = $crud;
+        return $this->get('ongr_api.crud');
     }
 
     /**

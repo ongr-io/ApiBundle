@@ -3,18 +3,9 @@ services:
         class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
         public: false
 
-    ongr_api.route_collection:
-        class: ONGR\ApiBundle\Routing\ApiRouteCollection
-        public: false
-        arguments:
-            - "@service_container"
-        calls:
-            - [collectRoutes]
-
     ongr_api.elasticsearch_loader:
         class: ONGR\ApiBundle\Routing\ElasticsearchLoader
-        calls:
-            - [setCollection, ["@ongr_api.route_collection"]]
+        arguments: [%ongr_api.versions%]
         tags:
             - { name: routing.loader }
 

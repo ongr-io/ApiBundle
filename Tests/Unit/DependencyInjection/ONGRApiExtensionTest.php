@@ -82,42 +82,6 @@ class ONGRApiExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests output format without a version in URL.
-     */
-    public function testOutputFormatValueWithoutVersions()
-    {
-        $parameters = [
-            'ongr_api' => [
-                'default_encoding' => 'xml',
-            ],
-        ];
-
-        $container = $this->getLoadedExtension($parameters);
-        $this->assertEquals(
-            'xml',
-            $container->getParameter('ongr_api.default_encoding'),
-            'Incorrect default_encoding parameter.'
-        );
-    }
-
-    /**
-     * Tests default_encoding validation.
-     *
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Currently valid encoders are only json and xml.
-     */
-    public function testOutputFormatValueWithDumpValue()
-    {
-        $parameters = [
-            'ongr_api' => [
-                'default_encoding' => 'nothing_knows',
-            ],
-        ];
-
-        $this->getLoadedExtension($parameters);
-    }
-
-    /**
      * Tests if invalid configuration are checked.
      *
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException

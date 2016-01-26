@@ -13,7 +13,7 @@ namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class VariantsControllerTest extends BasicControllerTestCase
+class VariantsControllerTest extends AbstractControllerTestCase
 {
     /**
      * {@inheritdoc}
@@ -22,10 +22,10 @@ class VariantsControllerTest extends BasicControllerTestCase
     {
         return [
             'default' => [
-                'tshirt' => [
+                'jeans' => [
                     [
                         '_id' => 1,
-                        'manufacturer' => 'NIKE',
+                        'manufacturer' => 'armani',
                         'variants' => [
                             [
                                 'color' => 'black',
@@ -47,7 +47,7 @@ class VariantsControllerTest extends BasicControllerTestCase
                     ],
                     [
                         '_id' => 2,
-                        'manufacturer' => 'Fox',
+                        'manufacturer' => 'levis',
                         'variants' => [
                             [
                                 'color' => 'red',
@@ -69,7 +69,7 @@ class VariantsControllerTest extends BasicControllerTestCase
                     ],
                     [
                         '_id' => 3,
-                        'manufacturer' => 'Cloth',
+                        'manufacturer' => 'diesel',
                         'variants' => [],
                     ],
                 ],
@@ -80,63 +80,25 @@ class VariantsControllerTest extends BasicControllerTestCase
     /**
      * @return array
      */
-    public function getTestGetAllVariantsDate()
+    public function getTestGetAllVariantsData()
     {
         $cases = [];
 
         $cases['Document with id 1'] = [
-            '/api/v3/tshirt/1/_variant',
-            json_encode(
-                [
-                    [
-                        'color' => 'black',
-                        'size' => 'S',
-                    ],
-                    [
-                        'color' => 'black',
-                        'size' => 'M',
-                    ],
-                    [
-                        'color' => 'black',
-                        'size' => 'L',
-                    ],
-                    [
-                        'color' => 'blue',
-                        'size' => 'L',
-                    ],
-                ]
-            )
+            '/api/v3/jeans/1/_variant',
+            json_encode($this->getDataArray()['default']['jeans'][0]['variants'])
         ];
 
         $cases['Document with id 2'] = [
-            '/api/v3/tshirt/2/_variant',
-            json_encode(
-                [
-                    [
-                        'color' => 'red',
-                        'size' => 'S',
-                    ],
-                    [
-                        'color' => 'red',
-                        'size' => 'M',
-                    ],
-                    [
-                        'color' => 'white',
-                        'size' => 'L',
-                    ],
-                    [
-                        'color' => 'blue',
-                        'size' => 'XL',
-                    ],
-                ]
-            )
+            '/api/v3/jeans/2/_variant',
+            json_encode($this->getDataArray()['default']['jeans'][1]['variants'])
         ];
 
         return $cases;
     }
 
     /**
-     * @dataProvider getTestGetAllVariantsDate()
+     * @dataProvider getTestGetAllVariantsData()
      */
     public function testGetAllVariants($uri, $expectedVariants)
     {
@@ -166,13 +128,13 @@ class VariantsControllerTest extends BasicControllerTestCase
 
         $this->sendApiRequest(
             Request::METHOD_POST,
-            '/api/v3/tshirt/3/_variant',
+            '/api/v3/jeans/3/_variant',
             $variants
         );
 
         $this->assertEquals(
             $variants,
-            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/3/_variant')->getContent()
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/jeans/3/_variant')->getContent()
         );
     }
 
@@ -181,29 +143,24 @@ class VariantsControllerTest extends BasicControllerTestCase
      */
     public function testSendDeleteVariants()
     {
-        $this->sendApiRequest(
-            Request::METHOD_DELETE,
-            '/api/v3/tshirt/2/_variant/0'
-        );
+        $variants = $this->getDataArray()['default']['jeans'][1]['variants'];
 
         $this->assertEquals(
-            json_encode(
-                [
-                    [
-                        'color' => 'red',
-                        'size' => 'M',
-                    ],
-                    [
-                        'color' => 'white',
-                        'size' => 'L',
-                    ],
-                    [
-                        'color' => 'blue',
-                        'size' => 'XL',
-                    ]
-                ]
-            ),
-            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant')->getContent()
+            json_encode($variants),
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/jeans/2/_variant')->getContent()
+        );
+
+        $this->sendApiRequest(
+            Request::METHOD_DELETE,
+            '/api/v3/jeans/2/_variant/0'
+        );
+
+        unset($variants[0]);
+        $variants = array_values($variants);
+
+        $this->assertEquals(
+            json_encode($variants),
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/jeans/2/_variant')->getContent()
         );
     }
 
@@ -216,14 +173,13 @@ class VariantsControllerTest extends BasicControllerTestCase
 
         $this->sendApiRequest(
             Request::METHOD_PUT,
-            '/api/v3/tshirt/2/_variant/0',
+            '/api/v3/jeans/2/_variant/0',
             $variant
         );
 
-
         $this->assertEquals(
             $variant,
-            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/tshirt/2/_variant/0')->getContent()
+            $this->sendApiRequest(Request::METHOD_GET, '/api/v3/jeans/2/_variant/0')->getContent()
         );
     }
 }

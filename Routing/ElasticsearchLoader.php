@@ -12,6 +12,8 @@
 namespace ONGR\ApiBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -19,18 +21,33 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class ElasticsearchLoader extends Loader
 {
+    /**
+     * @var array
+     */
+    private $versions;
 
     /**
-     * @var RouteCollection
+     * @param array $versions
      */
-    private $collection;
+    public function __construct(array $versions = [])
+    {
+        $this->versions = $versions;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function load($resource, $type = null)
     {
-        return clone $this->getCollection();
+        $collection = new RouteCollection();
+
+        foreach ($this->versions as $version => $config) {
+            foreach ($config['endpoints'] as $document => $endpoint) {
+                $this->processRestRoute($collection, $document, $endpoint, $version);
+            }
+        }
+
+        return $collection;
     }
 
     /**
@@ -42,18 +59,51 @@ class ElasticsearchLoader extends Loader
     }
 
     /**
-     * @return RouteCollection
-     */
-    public function getCollection()
-    {
-        return $this->collection;
-    }
-
-    /**
+     * Create route for REST action
+     *
      * @param RouteCollection $collection
+     * @param string          $document
+     * @param array           $endpoint
+     * @param string          $version
      */
-    public function setCollection($collection)
-    {
-        $this->collection = $collection;
+    private function processRestRoute(
+        $collection,
+        $document,
+        $endpoint,
+        $version = 'v1'
+    ) {
+        $defaults = [
+            '_documentId' => null,
+            '_endpoint' => $endpoint,
+            '_version' => $version,
+            'repository' => $endpoint['repository'],
+        ];
+        $requirements = [];
+
+        foreach ($endpoint['methods'] as $method) {
+
+            $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, $method));
+            $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
+
+            if ($method == Request::METHOD_POST) {
+                $postPattern = $version.'/'.sprintf('%s', strtolower($document));
+                $collection->add($name.'_wi', new Route($postPattern, $defaults, [], [], "", [], [$method]));
+            }
+
+            $pattern = $version.'/'.sprintf('%s/{documentId}', strtolower($document));
+            $collection->add($name, new Route($pattern, $defaults, [], [], "", [], [$method]));
+
+            if ($endpoint['variants']) {
+                $defaults['_controller'] = sprintf('ONGRApiBundle:Variant:%s', strtolower($method));
+
+                if ($method == Request::METHOD_POST || $method == Request::METHOD_GET) {
+                    $variantPattern = $pattern. '/_variant';
+                    $collection->add($name.'_variant_wi', new Route($variantPattern, $defaults, [], [], "", [], [$method]));
+                }
+
+                $variantPattern = $pattern. '/_variant/{variantId}';
+                $collection->add($name.'_variant', new Route($variantPattern, $defaults, [], [], "", [], [$method]));
+            }
+        }
     }
 }

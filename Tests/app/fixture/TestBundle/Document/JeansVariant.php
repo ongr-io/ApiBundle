@@ -7,7 +7,7 @@ use ONGR\ElasticsearchBundle\Annotation as ES;
 /**
  * @ES\Nested
  */
-class TshirtVariant
+class JeansVariant
 {
     /**
      * @var

@@ -37,11 +37,12 @@ interface CrudInterface
      * Update document action.
      *
      * @param Repository $repository
+     * @param string $id
      * @param array $data
      *
      * @throws \RuntimeException
      */
-    public function update(Repository $repository, array $data);
+    public function update(Repository $repository, $id, array $data);
 
     /**
      * Delete a document by Id.

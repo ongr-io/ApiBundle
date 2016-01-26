@@ -14,7 +14,7 @@ namespace ONGR\ApiBundle\Tests\Functional\Controller;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class BasicControllerTestCase extends AbstractElasticsearchTestCase
+class AbstractControllerTestCase extends AbstractElasticsearchTestCase
 {
     /**
      * Sends api request.

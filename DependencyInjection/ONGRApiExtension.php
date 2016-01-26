@@ -33,7 +33,7 @@ class ONGRApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('ongr_api.default_encoding', $config['default_encoding']);
+        $container->setParameter('ongr_api.default_encoding', 'json');
         $container->setParameter('ongr_api.versions', $config['versions']);
     }
 }

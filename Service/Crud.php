@@ -54,17 +54,9 @@ class Crud implements CrudInterface
     /**
      * {@inheritdoc}
      */
-    public function update(Repository $repository, array $data)
+    public function update(Repository $repository, $id, array $data)
     {
-        if (!isset($data['_id'])) {
-            throw new \RuntimeException('Missing _id field for update operations.');
-        }
-
-        if (!$this->read($repository, $data['_id'])) {
-            throw new NoDocumentsToGetException("Identifier not found!");
-        }
-
-        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $data['_id'], 'doc' => $data]);
+        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $id, 'doc' => $data]);
     }
 
     /**

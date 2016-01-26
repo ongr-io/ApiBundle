@@ -24,39 +24,39 @@ interface RestControllerInterface
      * Create operation.
      *
      * @param Request $request
-     * @param string  $id
+     * @param string  $documentId
      *
      * @return Response
      */
-    public function postAction(Request $request, $id = null);
+    public function postAction(Request $request, $documentId = null);
 
     /**
      * Read operation.
      *
      * @param Request $request
-     * @param string  $id
+     * @param string  $documentId
      *
      * @return Response
      */
-    public function getAction(Request $request, $id);
+    public function getAction(Request $request, $documentId);
 
     /**
      * Update operation.
      *
      * @param Request $request
-     * @param string  $id
+     * @param string  $documentId
      *
      * @return Response
      */
-    public function putAction(Request $request, $id);
+    public function putAction(Request $request, $documentId);
 
     /**
      * Delete operation.
      *
      * @param Request $request
-     * @param string  $id
+     * @param string  $documentId
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $id);
+    public function deleteAction(Request $request, $documentId);
 }

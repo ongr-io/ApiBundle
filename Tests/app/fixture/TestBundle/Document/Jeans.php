@@ -12,16 +12,14 @@
 namespace ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document;
 
 use ONGR\ElasticsearchBundle\Annotation as ES;
-use ONGR\ElasticsearchBundle\Collection;
+use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
- * @ES\Document(type="tshirt")
+ * @ES\Document(type="jeans")
  */
-class Tshirt
+class Jeans
 {
     /**
-     * @var
-     *
      * @ES\Id()
      */
     public $id;
@@ -36,7 +34,7 @@ class Tshirt
     /**
      * @var Collection
      *
-     * @ES\Embedded(class="TestBundle:TshirtVariant", multiple=true)
+     * @ES\Embedded(class="TestBundle:JeansVariant", multiple=true)
      */
     public $variants;
 

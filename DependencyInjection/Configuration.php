@@ -31,52 +31,21 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('default_encoding')
-                    ->defaultValue('json')
-                    ->example('json')
-                    ->info('Default encoding type. Changed through headers')
-                    ->validate()
-                        ->ifNotInArray(['json', 'xml'])
-                        ->thenInvalid(
-                            'Currently valid encoders are only json and xml. '.
-                            'For more you can inject your own serializer.'
-                        )
-                    ->end()
+                ->arrayNode('versions')
+                    ->info('Defines api versions.')
+                    ->useAttributeAsKey('version')
+                    ->prototype('array')
+                    ->children()
+                        ->scalarNode('versions')
+                            ->info('Defines a version for current api endpoints.')
+                            ->example('v1')
+                            ->end()
+                        ->append($this->getEndpointNode())
+                        ->end()
                 ->end()
-
-                ->append($this->getVersionsNode())
-
             ->end();
 
         return $treeBuilder;
-    }
-
-    /**
-     * Builds configuration tree for endpoint versions.
-     *
-     * @return NodeDefinition
-     */
-    private function getVersionsNode()
-    {
-        $builder = new TreeBuilder();
-        $node = $builder->root('versions');
-
-        $node
-            ->info('Defines api versions.')
-            ->useAttributeAsKey('version')
-            ->prototype('array')
-                ->children()
-
-                    ->scalarNode('versions')
-                        ->info('Defines a version for current api endpoints.')
-                        ->example('v1')
-                    ->end()
-
-                    ->append($this->getEndpointNode())
-                ->end()
-            ->end();
-
-        return $node;
     }
 
     /**

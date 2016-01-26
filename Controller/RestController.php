@@ -26,41 +26,41 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function getAction(Request $request, $id)
+    public function getAction(Request $request, $documentId)
     {
         $repository = $this->getRequestRepository($request);
 
         try {
-            $row = $this->getCrud()->read($repository, $id);
+            $document = $this->getCrudService()->read($repository, $documentId);
 
-            if ($row === null) {
+            if ($document === null) {
                 return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
             }
         } catch(\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->renderRest($request, $row, Response::HTTP_OK);
+        return $this->renderRest($request, $document, Response::HTTP_OK);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function postAction(Request $request, $id = null)
+    public function postAction(Request $request, $documentId = null)
     {
         $repository = $this->getRequestRepository($request);
 
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
-        if (!empty($id)) {
-            $data['_id'] = $id;
+        if (!empty($documentId)) {
+            $data['_id'] = $documentId;
         }
 
-        // TODO: check validation
+        // TODO: validate data
 
         try {
-            $this->getCrud()->create($repository, $data);
-            $response = $this->getCrud()->commit($repository);
+            $this->getCrudService()->create($repository, $data);
+            $response = $this->getCrudService()->commit($repository);
         } catch (\RuntimeException $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
@@ -71,29 +71,25 @@ class RestController extends AbstractRestController implements
             // TODO: 406 validation error
         }
 
-        $id = $response['items'][0]['create']['_id'];
-        $row = $this->getCrud()->read($repository, $id);
+        $documentId = $response['items'][0]['create']['_id'];
+        $row = $this->getCrudService()->read($repository, $documentId);
         return $this->renderRest($request, $row, Response::HTTP_CREATED);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request, $documentId)
     {
         $repository = $this->getRequestRepository($request);
 
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
-        if (!empty($id)) {
-            $data['_id'] = $id;
-        }
-
         // TODO: check validation
 
         try {
-            $this->getCrud()->update($repository, $data);
-            $response = $this->getCrud()->commit($repository);
+            $this->getCrudService()->update($repository, $documentId, $data);
+            $response = $this->getCrudService()->commit($repository);
         } catch (\RuntimeException $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (NoDocumentsToGetException $e) {
@@ -106,8 +102,8 @@ class RestController extends AbstractRestController implements
             // TODO: 406 validation error
         }
 
-        $id = $response['items'][0]['update']['_id'];
-        $row = $this->getCrud()->read($repository, $id);
+        $documentId = $response['items'][0]['update']['_id'];
+        $row = $this->getCrudService()->read($repository, $documentId);
 
         return $this->renderRest($request, $row, Response::HTTP_NO_CONTENT);
     }
@@ -115,13 +111,13 @@ class RestController extends AbstractRestController implements
     /**
      * {@inheritdoc}
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $documentId)
     {
         $repository = $this->getRequestRepository($request);
 
         try {
-            $this->getCrud()->delete($repository, $id);
-            $response = $this->getCrud()->commit($repository);
+            $this->getCrudService()->delete($repository, $documentId);
+            $response = $this->getCrudService()->commit($repository);
         } catch (\RuntimeException $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
         } catch (NoDocumentsToGetException $e) {

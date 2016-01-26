@@ -3,7 +3,9 @@ framework:
     router:
         resource: "%kernel.root_dir%/config/routing_test.yml"
         strict_requirements: %kernel.debug%
+    profiler: { only_exceptions: false }
     test: ~
+    assets: ~
 
 ongr_elasticsearch:
     connections:
@@ -18,25 +20,18 @@ ongr_elasticsearch:
                 - TestBundle
 
 # Generated routes for API from config below
-# /api/v1/person POST -> ["name" => "John"]
-# /api/v1/person/{id} PUT -> ["name" => "Steve"]
-# /api/v1/person/{id} GET
-# /api/v1/person/_all GET ?size=10&from=0
-# /api/v1/person/{id} DELETE
-# /api/v1/person/_batch POST -> [["name" => "John"],["name" => "Doe"]]
+# /api/v3/jeans POST -> ["name" => "John"]
+# /api/v3/jeans/1 POST -> ["name" => "John"]
+# /api/v3/jeans/{id} PUT -> ["name" => "Steve"]
+# /api/v3/jeans/{id} GET
+# /api/v3/jeans/_all GET ?size=10&from=0
+# /api/v3/jeans/{id} DELETE
+# /api/v3/jeans/_batch POST -> [["name" => "John"],["name" => "Doe"]]
 ongr_api:
-   default_encoding: json
-   version_in_url: true
    versions:
        v3:
            endpoints:
-               person:
-                   repository: es.manager.default.person
-                   allow_extra_fields: false
-                   methods: ["GET", "POST", "PUT", "DELETE"]
-                   allow_get_all: true
-                   allow_batch: true
-               tshirt:
-                   repository: es.manager.default.tshirt
+               jeans:
+                   repository: es.manager.default.jeans
                    methods: ["GET", "POST", "PUT", "DELETE"]
                    variants: true

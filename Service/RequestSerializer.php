@@ -87,10 +87,10 @@ class RequestSerializer
     {
         $headers = $request->getAcceptableContentTypes();
 
-        if (array_intersect($headers, ['application/xml', 'text/xml'])) {
-            return 'xml';
-        } elseif (array_intersect($headers, ['application/json', 'text/json'])) {
+        if (array_intersect($headers, ['application/json', 'text/json'])) {
             return 'json';
+        } elseif (array_intersect($headers, ['application/xml', 'text/xml'])) {
+            return 'xml';
         }
 
         return $this->defaultAcceptType;
