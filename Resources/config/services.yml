@@ -1,18 +1,10 @@
-parameters:
-    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
-
-    ongr_api.elasticsearch_loader.class: ONGR\ApiBundle\Routing\ElasticsearchLoader
-    ongr_api.route_collection.class: ONGR\ApiBundle\Routing\ApiRouteCollection
-
-    ongr_api.crud.class: ONGR\ApiBundle\Service\Crud
-    ongr_api.rest_controller.class: ONGR\ApiBundle\Controller\RestController
-    ongr_api.command_controller.class: ONGR\ApiBundle\Controller\CollectionController
-
-    ongr_api.event_listener.rest_request.class: ONGR\ApiBundle\EventListener\RestRequestEventListener
-
 services:
+    jms_serializer.camel_case_naming_strategy:
+        class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
+        public: false
+
     ongr_api.route_collection:
-        class: %ongr_api.route_collection.class%
+        class: ONGR\ApiBundle\Routing\ApiRouteCollection
         public: false
         arguments:
             - "@service_container"
@@ -20,23 +12,20 @@ services:
             - [collectRoutes]
 
     ongr_api.elasticsearch_loader:
-        class: %ongr_api.elasticsearch_loader.class%
+        class: ONGR\ApiBundle\Routing\ElasticsearchLoader
         calls:
             - [setCollection, ["@ongr_api.route_collection"]]
         tags:
             - { name: routing.loader }
 
     ongr_api.crud:
-        class: %ongr_api.crud.class%
+        class: ONGR\ApiBundle\Service\Crud
 
     ongr_api.rest_controller:
-        class: %ongr_api.rest_controller.class%
-
-    ongr_api.command_controller:
-        class: %ongr_api.command_controller.class%
+        class: ONGR\ApiBundle\Controller\RestController
 
     ongr_api.request_serializer:
         class: ONGR\ApiBundle\Service\RequestSerializer
         arguments:
             - "@serializer"
-            - "%ongr_api.default_encoding%"
+            - %ongr_api.default_encoding%
