@@ -6,8 +6,6 @@
 #app/config/config.yml
 
 ongr_api:
-    default_encoding: json #default: json
-    version_in_url: true #default: true
     versions:
         v3:
             endpoints:
@@ -19,10 +17,6 @@ ongr_api:
                     allow_get_all: true #default: true
                     allow_batch: true #default: true
 ```
-
-- `default_encoding` - default encoding used if unknown `Accept` value set in header.
-
-- `version_in_url` - use API version in the URL e.g. `/api/v3/product`. If set to false then version must be specified as `Accept` value set in header.
 
 - `versions` - define multiple API versions. Version name will correspond to first url parameter e.g. `/v1`
 > You should be consistent with version naming. Think of version naming conventions and stick to them e.g. `v1`, `v2`, `v2.2` ...
