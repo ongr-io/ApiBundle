@@ -98,7 +98,10 @@ class ElasticsearchLoader extends Loader
 
                 if ($method == Request::METHOD_POST || $method == Request::METHOD_GET) {
                     $variantPattern = $pattern. '/_variant';
-                    $collection->add($name.'_variant_wi', new Route($variantPattern, $defaults, [], [], "", [], [$method]));
+                    $collection->add(
+                        $name.'_variant_wi',
+                        new Route($variantPattern, $defaults, [], [], "", [], [$method])
+                    );
                 }
 
                 $variantPattern = $pattern. '/_variant/{variantId}';

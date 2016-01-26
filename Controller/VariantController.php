@@ -42,7 +42,7 @@ class VariantController extends AbstractRestController
 
         if ($variantId === null) {
             return $this->renderRest($request, $document['variants']);
-        } else if (isset($document['variants'][$variantId])) {
+        } elseif (isset($document['variants'][$variantId])) {
             return $this->renderRest($request, $document['variants'][$variantId]);
         } else {
             return $this->renderError(
@@ -136,7 +136,7 @@ class VariantController extends AbstractRestController
         if ($variantId === null) {
             $document['variants'] = [];
             $crud->update($repository, $documentId, $document);
-        } else if (isset($document['variants'][$variantId])) {
+        } elseif (isset($document['variants'][$variantId])) {
             unset($document['variants'][$variantId]);
             $document['variants'] = array_values($document['variants']);
 

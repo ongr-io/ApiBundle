@@ -36,7 +36,7 @@ class RestController extends AbstractRestController implements
             if ($document === null) {
                 return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
