@@ -62,9 +62,9 @@ class ElasticsearchLoader extends Loader
      * Create route for REST action
      *
      * @param RouteCollection $collection
-     * @param string          $document
-     * @param array           $endpoint
-     * @param string          $version
+     * @param string $document
+     * @param array $endpoint
+     * @param string $version
      */
     private function processRestRoute(
         $collection,
@@ -72,6 +72,7 @@ class ElasticsearchLoader extends Loader
         $endpoint,
         $version = 'v1'
     ) {
+    
         $defaults = [
             '_documentId' => null,
             '_endpoint' => $endpoint,
@@ -79,13 +80,21 @@ class ElasticsearchLoader extends Loader
             'repository' => $endpoint['repository'],
         ];
 
-        $pattern = $version.'/'.sprintf('%s/{documentId}', strtolower($document));
+        $pattern = $version . '/' . sprintf('%s/{documentId}', strtolower($document));
 
         if ($endpoint['batch']) {
             $defaults['_controller'] = 'ONGRApiBundle:Batch:Process';
-            $batchPattern = $version.'/'.sprintf('%s', strtolower($document)) . '/_batch';
+            $batchPattern = $version . '/' . sprintf('%s', strtolower($document)) . '/_batch';
             $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, Request::METHOD_POST));
-            $collection->add($name.'_batch', new Route($batchPattern, $defaults, [], [], "", [], [Request::METHOD_POST]));
+            $collection->add($name . '_batch', new Route(
+                $batchPattern,
+                $defaults,
+                [],
+                [],
+                "",
+                [],
+                [Request::METHOD_POST]
+            ));
         }
 
         foreach ($endpoint['methods'] as $method) {
@@ -94,8 +103,8 @@ class ElasticsearchLoader extends Loader
             $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
 
             if ($method == Request::METHOD_POST) {
-                $postPattern = $version.'/'.sprintf('%s', strtolower($document));
-                $collection->add($name.'_wi', new Route($postPattern, $defaults, [], [], "", [], [$method]));
+                $postPattern = $version . '/' . sprintf('%s', strtolower($document));
+                $collection->add($name . '_wi', new Route($postPattern, $defaults, [], [], "", [], [$method]));
             }
 
             $collection->add($name, new Route($pattern, $defaults, [], [], "", [], [$method]));
@@ -104,15 +113,15 @@ class ElasticsearchLoader extends Loader
                 $defaults['_controller'] = sprintf('ONGRApiBundle:Variant:%s', strtolower($method));
 
                 if ($method == Request::METHOD_POST || $method == Request::METHOD_GET) {
-                    $variantPattern = $pattern. '/_variant';
+                    $variantPattern = $pattern . '/_variant';
                     $collection->add(
-                        $name.'_variant_wi',
+                        $name . '_variant_wi',
                         new Route($variantPattern, $defaults, [], [], "", [], [$method])
                     );
                 }
 
-                $variantPattern = $pattern. '/_variant/{variantId}';
-                $collection->add($name.'_variant', new Route($variantPattern, $defaults, [], [], "", [], [$method]));
+                $variantPattern = $pattern . '/_variant/{variantId}';
+                $collection->add($name . '_variant', new Route($variantPattern, $defaults, [], [], "", [], [$method]));
             }
         }
     }
