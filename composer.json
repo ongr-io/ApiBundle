@@ -15,7 +15,7 @@
         "symfony/symfony": "~2.7|~3.0",
         "sensio/framework-extra-bundle": "^3.0",
         "jms/serializer-bundle": "~1.0",
-        "ongr/elasticsearch-bundle": "dev-master"
+        "ongr/elasticsearch-bundle": "~1.0"
     },
     "require-dev": {
         "symfony/monolog-bundle": "~2.0",
@@ -24,6 +24,13 @@
         "satooshi/php-coveralls": "~1.0"
     },
     "autoload": {
-        "psr-4": { "ONGR\\ApiBundle\\": "" }
+        "psr-4": { "ONGR\\ApiBundle\\": "" },
+        "exclude-from-classmap": ["/Tests/"]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
     }
 }
