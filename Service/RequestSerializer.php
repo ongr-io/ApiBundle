@@ -13,7 +13,6 @@ namespace ONGR\ApiBundle\Service;
 
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * This class provides all data for deserialization and serialization of API requests.
@@ -66,20 +65,21 @@ class RequestSerializer
      */
     public function deserializeRequest(Request $request)
     {
-        $type = 'array';
         $format = $this->checkAcceptHeader($request);
 
         try {
-            return $this->serializer->deserialize($request->getContent(), $type, $format);
+            return $this->serializer->deserialize($request->getContent(), 'array', $format);
         } catch (\Exception $e) {
             throw new \RuntimeException(
-                'Could not deserialize content to object of \'' . $type . '\' type and \'' . $format . '\' format.'
+                'Could not deserialize content from the request.'
             );
         }
     }
 
     /**
      * Returns acceptance type based on given request.
+     *
+     * @param Request $request
      *
      * @return string
      */

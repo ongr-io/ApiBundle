@@ -11,13 +11,34 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use ONGR\ApiBundle\Service\Crud;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Batch controller
  */
-class BatchController extends Controller
+class BatchController extends AbstractRestController
 {
+    /**
+     * Main action to process batch call.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function processAction(Request $request)
+    {
+        $crud = $this->getCrudService();
+        $repository = $this->getRequestRepository($request);
+        $documents = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
+        try {
+            foreach ($documents as $document) {
+                $crud->create($repository, $document);
+            }
+            $crud->commit($repository);
+            return $this->renderRest($request, '', Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+    }
 }

@@ -138,6 +138,13 @@ class Configuration implements ConfigurationInterface
                     )
                     ->end()
 
+                    ->booleanNode('batch')
+                    ->defaultTrue()
+                    ->info(
+                        'If set to true user can sent documents in batch\'s.'
+                    )
+                    ->end()
+
                 ->end()
             ->end();
 

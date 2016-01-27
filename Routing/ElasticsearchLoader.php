@@ -78,7 +78,15 @@ class ElasticsearchLoader extends Loader
             '_version' => $version,
             'repository' => $endpoint['repository'],
         ];
-        $requirements = [];
+
+        $pattern = $version.'/'.sprintf('%s/{documentId}', strtolower($document));
+
+        if ($endpoint['batch']) {
+            $defaults['_controller'] = 'ONGRApiBundle:Batch:Process';
+            $batchPattern = $version.'/'.sprintf('%s', strtolower($document)) . '/_batch';
+            $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, Request::METHOD_POST));
+            $collection->add($name.'_batch', new Route($batchPattern, $defaults, [], [], "", [], [Request::METHOD_POST]));
+        }
 
         foreach ($endpoint['methods'] as $method) {
 
@@ -90,7 +98,6 @@ class ElasticsearchLoader extends Loader
                 $collection->add($name.'_wi', new Route($postPattern, $defaults, [], [], "", [], [$method]));
             }
 
-            $pattern = $version.'/'.sprintf('%s/{documentId}', strtolower($document));
             $collection->add($name, new Route($pattern, $defaults, [], [], "", [], [$method]));
 
             if ($endpoint['variants']) {
