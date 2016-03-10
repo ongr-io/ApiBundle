@@ -56,7 +56,7 @@ class Crud implements CrudInterface
      */
     public function update(Repository $repository, $id, array $data)
     {
-        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $id, 'doc' => $data]);
+        $repository->getManager()->bulk('update', $repository->getType(), ['_id' => $id, 'doc' => $data, 'doc_as_upsert' => true]);
     }
 
     /**

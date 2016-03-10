@@ -72,7 +72,7 @@ class ElasticsearchLoader extends Loader
         $endpoint,
         $version = 'v1'
     ) {
-    
+
         $defaults = [
             '_documentId' => null,
             '_endpoint' => $endpoint,
@@ -83,18 +83,20 @@ class ElasticsearchLoader extends Loader
         $pattern = $version . '/' . sprintf('%s/{documentId}', strtolower($document));
 
         if ($endpoint['batch']) {
-            $defaults['_controller'] = 'ONGRApiBundle:Batch:Process';
-            $batchPattern = $version . '/' . sprintf('%s', strtolower($document)) . '/_batch';
-            $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, Request::METHOD_POST));
-            $collection->add($name . '_batch', new Route(
-                $batchPattern,
-                $defaults,
-                [],
-                [],
-                "",
-                [],
-                [Request::METHOD_POST]
-            ));
+            foreach ([Request::METHOD_PUT, Request::METHOD_POST, Request::METHOD_DELETE] as $method) {
+                $defaults['_controller'] = 'ONGRApiBundle:Batch:' . ucfirst(strtolower($method));
+                $batchPattern = $version . '/' . sprintf('%s', strtolower($document)) . '/_batch';
+                $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, $method));
+                $collection->add($name . '_batch', new Route(
+                    $batchPattern,
+                    $defaults,
+                    [],
+                    [],
+                    "",
+                    [],
+                    [$method]
+                ));
+            }
         }
 
         foreach ($endpoint['methods'] as $method) {
