@@ -100,7 +100,6 @@ class ElasticsearchLoader extends Loader
         }
 
         foreach ($endpoint['methods'] as $method) {
-
             $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, $method));
             $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
 
