@@ -27,7 +27,7 @@ class AbstractRestController extends Controller
      *
      * @return Crud
      */
-    public function getCrudService()
+    protected function getCrudService()
     {
         return $this->get('ongr_api.crud');
     }
@@ -42,7 +42,7 @@ class AbstractRestController extends Controller
      *
      * @return Response|array
      */
-    public function renderRest(
+    protected function renderRest(
         $request,
         $data,
         $statusCode = Response::HTTP_OK,
@@ -69,7 +69,7 @@ class AbstractRestController extends Controller
      *
      * @return Response
      */
-    public function renderError(
+    protected function renderError(
         $request,
         $message,
         $statusCode = Response::HTTP_BAD_REQUEST
