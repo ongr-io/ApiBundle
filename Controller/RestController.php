@@ -12,17 +12,14 @@
 namespace ONGR\ApiBundle\Controller;
 
 use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
-use ONGR\ElasticsearchBundle\Service\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
  */
-class RestController extends AbstractRestController implements
-    RestControllerInterface
+class RestController extends AbstractRestController implements RestControllerInterface
 {
-
     /**
      * {@inheritdoc}
      */

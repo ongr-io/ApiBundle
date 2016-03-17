@@ -11,7 +11,6 @@
 
 namespace ONGR\ApiBundle\Controller;
 
-use ONGR\ElasticsearchBundle\Service\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
