@@ -74,9 +74,6 @@ class AbstractRestController extends Controller
         $message,
         $statusCode = Response::HTTP_BAD_REQUEST
     ) {
-
-        // TODO: Add more information about this Error
-
         $response = [
             'errors' => [],
             'message' => $message,

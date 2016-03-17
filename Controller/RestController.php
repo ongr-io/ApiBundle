@@ -56,8 +56,6 @@ class RestController extends AbstractRestController implements
             $data['_id'] = $documentId;
         }
 
-        // TODO: validate data
-
         try {
             $this->getCrudService()->create($repository, $data);
             $response = $this->getCrudService()->commit($repository);
@@ -65,10 +63,6 @@ class RestController extends AbstractRestController implements
             return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($response['errors']) {
-            // TODO: 406 validation error
         }
 
         $documentId = $response['items'][0]['create']['_id'];
@@ -85,8 +79,6 @@ class RestController extends AbstractRestController implements
 
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
-        // TODO: check validation
-
         try {
             $this->getCrudService()->update($repository, $documentId, $data);
             $response = $this->getCrudService()->commit($repository);
@@ -96,10 +88,6 @@ class RestController extends AbstractRestController implements
             return $this->renderError($request, $e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($response['errors']) {
-            // TODO: 406 validation error
         }
 
         $documentId = $response['items'][0]['update']['_id'];
