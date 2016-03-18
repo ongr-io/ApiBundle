@@ -13,14 +13,14 @@ namespace ONGR\ApiBundle\Controller;
 
 use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * CRUD implementation for Api Controller.
  */
-class RestController extends AbstractRestController implements
-    RestControllerInterface
+class RestController extends Controller implements RestControllerInterface
 {
 
     /**
@@ -28,19 +28,46 @@ class RestController extends AbstractRestController implements
      */
     public function getAction(Request $request, $documentId)
     {
-        $repository = $this->getRequestRepository($request);
+        $repository = $this->get($request->attributes->get('repository'));
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
         try {
-            $document = $this->getCrudService()->read($repository, $documentId);
+            $document = $this->get('ongr_api.crud')->read($repository, $documentId);
 
             if ($document === null) {
-                return $this->renderError($request, 'Document does not exist', Response::HTTP_NOT_FOUND);
+                return new Response(
+                    $requestSerializer->serializeRequest(
+                        $request,
+                        [
+                            'errors' => [],
+                            'message' => 'Document does not exist',
+                            'code' => Response::HTTP_NOT_FOUND,
+                        ]
+                    ),
+                    Response::HTTP_NOT_FOUND,
+                    ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+                );
             }
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
-        return $this->renderRest($request, $document, Response::HTTP_OK);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $document),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 
     /**
@@ -48,9 +75,11 @@ class RestController extends AbstractRestController implements
      */
     public function postAction(Request $request, $documentId = null)
     {
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $repository = $this->get($request->attributes->get('repository'));
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
-        $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+        $data = $requestSerializer->deserializeRequest($request);
 
         if (!empty($documentId)) {
             $data['_id'] = $documentId;
@@ -59,12 +88,34 @@ class RestController extends AbstractRestController implements
         // TODO: validate data
 
         try {
-            $this->getCrudService()->create($repository, $data);
-            $response = $this->getCrudService()->commit($repository);
+            $crud->create($repository, $data);
+            $response = $crud->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_CONFLICT,
+                    ]
+                ),
+                Response::HTTP_CONFLICT,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
         if ($response['errors']) {
@@ -72,8 +123,12 @@ class RestController extends AbstractRestController implements
         }
 
         $documentId = $response['items'][0]['create']['_id'];
-        $row = $this->getCrudService()->read($repository, $documentId);
-        return $this->renderRest($request, $row, Response::HTTP_CREATED);
+        $row = $crud->read($repository, $documentId);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $row),
+            Response::HTTP_CREATED,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 
     /**
@@ -81,21 +136,56 @@ class RestController extends AbstractRestController implements
      */
     public function putAction(Request $request, $documentId)
     {
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $repository = $this->get($request->attributes->get('repository'));
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
         // TODO: check validation
 
         try {
-            $this->getCrudService()->update($repository, $documentId, $data);
-            $response = $this->getCrudService()->commit($repository);
+            $crud->update($repository, $documentId, $data);
+            $response = $crud->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (NoDocumentsToGetException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_NOT_FOUND);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
         if ($response['errors']) {
@@ -103,9 +193,13 @@ class RestController extends AbstractRestController implements
         }
 
         $documentId = $response['items'][0]['update']['_id'];
-        $row = $this->getCrudService()->read($repository, $documentId);
+        $row = $crud->read($repository, $documentId);
 
-        return $this->renderRest($request, $row, Response::HTTP_NO_CONTENT);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $row),
+            Response::HTTP_NO_CONTENT,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 
     /**
@@ -113,19 +207,58 @@ class RestController extends AbstractRestController implements
      */
     public function deleteAction(Request $request, $documentId)
     {
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $repository = $this->get($request->attributes->get('repository'));
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
         try {
-            $this->getCrudService()->delete($repository, $documentId);
-            $response = $this->getCrudService()->commit($repository);
+            $crud->delete($repository, $documentId);
+            $response = $crud->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST); // Missing _id
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (NoDocumentsToGetException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_NOT_FOUND);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
-        return $this->renderRest($request, $response, Response::HTTP_NO_CONTENT);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $response),
+            Response::HTTP_NO_CONTENT,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 }

@@ -11,44 +11,79 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This controller works with document variants.
  */
-class VariantController extends AbstractRestController
+class VariantController extends Controller
 {
     /**
      * @inheritDoc
      */
     public function getAction(Request $request, $documentId, $variantId = null)
     {
-        $crud = $this->getCrudService();
+        $crud = $this->get('ongr_api.crud');
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
         try {
-            $document = $crud->read($this->getRequestRepository($request), $documentId);
+            $document = $crud->read($this->get($request->attributes->get('repository')), $documentId);
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
         if (!isset($document['variants'])) {
-            return $this->renderError(
-                $request,
-                'Document does not support variants.',
-                Response::HTTP_INTERNAL_SERVER_ERROR
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Document does not support variants.',
+                        'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                    ]
+                ),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
             );
         }
 
         if ($variantId === null) {
-            return $this->renderRest($request, $document['variants']);
+            return new Response(
+                $requestSerializer->serializeRequest($request, $document['variants']),
+                Response::HTTP_OK,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } elseif (isset($document['variants'][$variantId])) {
-            return $this->renderRest($request, $document['variants'][$variantId]);
+            return new Response(
+                $requestSerializer->serializeRequest($request, $document['variants'][$variantId]),
+                Response::HTTP_OK,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } else {
-            return $this->renderError(
-                $request,
-                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
-                Response::HTTP_NOT_FOUND
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
             );
         }
     }
@@ -58,9 +93,11 @@ class VariantController extends AbstractRestController
      */
     public function postAction(Request $request, $documentId)
     {
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $repository = $this->get($request->attributes->get('repository'));
+        $requestSerializer = $this->get('ongr_api.request_serializer');
 
-        $document = $this->getCrudService()->read($repository, $documentId);
+        $document = $crud->read($repository, $documentId);
 
         if (!$document) {
             return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
@@ -69,16 +106,42 @@ class VariantController extends AbstractRestController
         $document['variants'] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
         try {
-            $this->getCrudService()->update($repository, $documentId, $document);
-            $this->getCrudService()->commit($repository);
+            $crud->update($repository, $documentId, $document);
+            $crud->commit($repository);
         } catch (\RuntimeException $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_CONFLICT);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_CONFLICT,
+                    ]
+                ),
+                Response::HTTP_CONFLICT,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
-        $row = $this->getCrudService()->read($repository, $documentId);
-        return $this->renderRest($request, $row, Response::HTTP_CREATED);
+        $row = $crud->read($repository, $documentId);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $row),
+            Response::HTTP_CREATED,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 
     /**
@@ -86,37 +149,68 @@ class VariantController extends AbstractRestController
      */
     public function putAction(Request $request, $documentId, $variantId)
     {
+        $requestSerializer = $this->get('ongr_api.request_serializer');
+
         if ($variantId === null) {
-            return $this->renderError(
-                $request,
-                'You must provide variant id in your request.',
-                Response::HTTP_BAD_REQUEST
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'You must provide variant id in your request.',
+                        'code' => Response::HTTP_BAD_REQUEST,
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
             );
         }
 
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $repository = $this->get($request->attributes->get('repository'));
 
         $document = $crud->read($repository, $documentId);
 
         if (!$document) {
-            return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
-        }
-
-        if (!isset($document['variants'][$variantId])) {
-            return $this->renderError(
-                $request,
-                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
-                Response::HTTP_NOT_FOUND
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Document was not found',
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
             );
         }
 
-        $document['variants'][$variantId] = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+        if (!isset($document['variants'][$variantId])) {
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
+        }
+
+        $document['variants'][$variantId] = $requestSerializer->deserializeRequest($request);
 
         $crud->update($repository, $documentId, $document);
         $crud->commit($repository);
 
-        return $this->renderRest($request, $document, Response::HTTP_OK);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $document),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 
     /**
@@ -124,13 +218,25 @@ class VariantController extends AbstractRestController
      */
     public function deleteAction(Request $request, $documentId, $variantId = null)
     {
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
+        $crud = $this->get('ongr_api.crud');
+        $requestSerializer = $this->get('ongr_api.request_serializer');
+        $repository = $this->get($request->attributes->get('repository'));
 
         $document = $crud->read($repository, $documentId);
 
         if (!$document) {
-            return $this->renderError($request, 'Document was not found', Response::HTTP_NOT_FOUND);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Document was not found',
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
 
         if ($variantId === null) {
@@ -142,15 +248,26 @@ class VariantController extends AbstractRestController
 
             $crud->update($repository, $documentId, $document);
         } else {
-            return $this->renderError(
-                $request,
-                'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
-                Response::HTTP_NOT_FOUND
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => 'Variant "' . $variantId . '" for object "' . $documentId . '" does not exist.',
+                        'code' => Response::HTTP_NOT_FOUND,
+                    ]
+                ),
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
             );
         }
 
         $crud->commit($repository);
 
-        return $this->renderRest($request, $document, Response::HTTP_OK);
+        return new Response(
+            $requestSerializer->serializeRequest($request, $document),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+        );
     }
 }
