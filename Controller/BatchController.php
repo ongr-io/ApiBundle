@@ -11,13 +11,14 @@
 
 namespace ONGR\ApiBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Batch controller
  */
-class BatchController extends AbstractRestController
+class BatchController extends Controller
 {
     /**
      * Main action to process batch call.
@@ -27,18 +28,34 @@ class BatchController extends AbstractRestController
      */
     public function processAction(Request $request)
     {
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
-        $documents = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+        $crud = $this->get('ongr_api.crud');
+        $requestSerializer = $this->get('ongr_api.request_serializer');
+        $repository = $this->get($request->attributes->get('repository'));
+        $documents = $requestSerializer->deserializeRequest($request);
 
         try {
             foreach ($documents as $document) {
                 $crud->create($repository, $document);
             }
             $crud->commit($repository);
-            return $this->renderRest($request, '', Response::HTTP_NO_CONTENT);
+            return new Response(
+                $requestSerializer->serializeRequest($request, ''),
+                Response::HTTP_NO_CONTENT,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         } catch (\Exception $e) {
-            return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(
+                $requestSerializer->serializeRequest(
+                    $request,
+                    [
+                        'errors' => [],
+                        'message' => $e->getMessage(),
+                        'code' => Response::HTTP_BAD_REQUEST
+                    ]
+                ),
+                Response::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/' . $requestSerializer->checkAcceptHeader($request)]
+            );
         }
     }
 }
