@@ -38,13 +38,13 @@ ongr_api:
 ```
 > By default batch is enabled but if you don't want to allow multiple documents insert, you can disable it.
 
-To index multiple documents sent POST request to the new `_batch` endpoint. By provided example above it should look like this:
+To index multiple documents send either a POST or PUT request, or delete multiple documents by sending a DELETE request, to the new `_batch` endpoint. By provided example above it should look like this:
 
 ```
 <yourdomain.com>/api/v3/product/_batch 
 ```
 
-This API endpoint only takes **POST** requests and in specific structure. f.e.
+This API endpoint takes requests bodies in a specific structure. f.e.
 
 ```json
 [
@@ -62,6 +62,8 @@ This API endpoint only takes **POST** requests and in specific structure. f.e.
 ]
 ```
 
+Note that both PUT and DELETE will require you to send the _id for every document.
+
 API will return a response with created products ID's if no error occurs. e.g. response:
 
 ```json
@@ -70,6 +72,14 @@ API will return a response with created products ID's if no error occurs. e.g. r
     "SS10043"
 ]
 ```
+
+### Overview
+
+| Method | Full document body | _id field  | Resulting Action              |
+|--------|--------------------|------------|-------------------------------|
+| POST   | required           | Optional   | Creation, no update           |
+| PUT    | required           | Required   | Update, creation if necessary |
+| DELETE | will be ignored    | Required   | Deletion                      |
 
 
 ## Get all documents
