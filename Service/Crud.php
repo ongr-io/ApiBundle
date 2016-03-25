@@ -15,6 +15,7 @@ use Elasticsearch\Common\Exceptions\NoDocumentsToGetException;
 use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 
 /**
  * Simple CRUD operations service.
@@ -89,5 +90,29 @@ class Crud implements CrudInterface
     public function commit(Repository $repository)
     {
         return $repository->getManager()->commit();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAll(Repository $repository, array $parameters = [])
+    {
+        $search = $repository->createSearch();
+        $search->addQuery(new MatchAllQuery());
+
+        if (isset($parameters['size'])) {
+            $search->setSize($parameters['size']);
+        }
+        if (isset($parameters['from'])) {
+            $search->setFrom($parameters['from']);
+        }
+
+        $results = $repository->execute($search, Result::RESULTS_ARRAY);
+
+        if (!isset($results[0])) {
+            return null;
+        }
+
+        return $results;
     }
 }

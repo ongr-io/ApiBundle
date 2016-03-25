@@ -191,4 +191,23 @@ class RestControllerTest extends AbstractControllerTestCase
         $response = $this->sendApiRequest('DELETE', '/api/v3/jeans/4');
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
+
+    /**
+     * Tests get all api
+     */
+    public function testAllRequest()
+    {
+        $response = $this->sendApiRequest('GET', '/api/v3/jeans/_all');
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals(
+            '[{"manufacturer":"armani"},{"manufacturer":"levis"},{"manufacturer":"denim"}]',
+            $response->getContent()
+        );
+
+        $response = $this->sendApiRequest('GET', '/api/v3/jeans/_all?size=1');
+        $this->assertEquals('[{"manufacturer":"armani"}]', $response->getContent());
+
+        $response = $this->sendApiRequest('GET', '/api/v3/jeans/_all?from=2');
+        $this->assertEquals('[{"manufacturer":"denim"}]', $response->getContent());
+    }
 }
