@@ -38,6 +38,13 @@ class Jeans
      */
     public $variants;
 
+    /**
+     * @var
+     *
+     * @ES\Property(type="string")
+     */
+    public $designer;
+
     public function __construct()
     {
         $this->variants = new Collection();

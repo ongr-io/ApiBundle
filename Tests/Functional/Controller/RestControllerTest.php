@@ -12,7 +12,6 @@
 namespace ONGR\ApiBundle\Tests\Functional\Controller;
 
 use ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document\Jeans;
-use ONGR\ApiBundle\Tests\app\fixture\TestBundle\Document\Person;
 use ONGR\ElasticsearchBundle\Test\AbstractElasticsearchTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -190,5 +189,50 @@ class RestControllerTest extends AbstractControllerTestCase
     {
         $response = $this->sendApiRequest('DELETE', '/api/v3/jeans/4');
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertTrue(strpos($response->getContent(), 'Identifier not found!') !== false);
+    }
+
+    /**
+     * Tests post with non existing property
+     */
+    public function testPostApiWithNotExistingProperty()
+    {
+        $response = $this
+            ->sendApiRequest(
+                'POST',
+                '/api/v3/jeans/5',
+                json_encode(
+                    [
+                        'manufacturer' => 'armani',
+                        'non_existing_property' => ''
+                    ]
+                )
+            );
+        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
+        $this->assertTrue(
+            strpos($response->getContent(), 'Property `non_existing_property` does not exist') !== false
+        );
+    }
+
+    /**
+     * Tests post with non existing property
+     */
+    public function testPostApiWithNotAllowedField()
+    {
+        $response = $this
+            ->sendApiRequest(
+                'POST',
+                '/api/v3/jeans/5',
+                json_encode(
+                    [
+                        'manufacturer' => 'armani',
+                        'designer' => ''
+                    ]
+                )
+            );
+        $this->assertEquals(Response::HTTP_NOT_ACCEPTABLE, $response->getStatusCode());
+        $this->assertTrue(
+            strpos($response->getContent(), 'You are not allowed to insert or modify the field') !== false
+        );
     }
 }

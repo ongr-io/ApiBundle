@@ -20,3 +20,9 @@ services:
         arguments:
             - "@serializer"
             - %ongr_api.default_encoding%
+
+    ongr_api.field_validator:
+        class: ONGR\ApiBundle\Service\FieldValidator
+        arguments:
+            - "@es.manager"
+            - %ongr_api.versions%

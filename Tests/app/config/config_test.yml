@@ -35,3 +35,4 @@ ongr_api:
                    repository: es.manager.default.jeans
                    methods: ["GET", "POST", "PUT", "DELETE"]
                    variants: true
+                   allow_fields: ["id", "manufacturer", "variants"]
