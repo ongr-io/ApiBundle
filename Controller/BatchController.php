@@ -27,41 +27,33 @@ class BatchController extends AbstractRestController
      */
     public function postAction(Request $request)
     {
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
-        $documents = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
-
         try {
-            foreach ($documents as $document) {
-                $crud->create($repository, $document);
-            }
-            $crud->commit($repository);
-            return $this->renderRest($request, '', Response::HTTP_NO_CONTENT);
+            $data = $this->get('ongr_api.batch_request_handler')->handleRequest(
+                $request,
+                $repository = $this->getRequestRepository($request),
+                'create'
+            );
+            return $this->renderRest($request, $data, Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
 
     /**
-     * Action to process upsert batch call.
+     * Action to process put batch call.
      *
      * @param Request $request
      * @return Response
      */
     public function putAction(Request $request)
     {
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
-        $documents = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
-
         try {
-            foreach ($documents as $document) {
-                $id = $document['_id'];
-                unset($document['_id']);
-                $crud->update($repository, $id, $document);
-            }
-            $crud->commit($repository);
-            return $this->renderRest($request, '', Response::HTTP_NO_CONTENT);
+            $data = $this->get('ongr_api.batch_request_handler')->handleRequest(
+                $request,
+                $repository = $this->getRequestRepository($request),
+                'update'
+            );
+            return $this->renderRest($request, $data, Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -75,16 +67,13 @@ class BatchController extends AbstractRestController
      */
     public function deleteAction(Request $request)
     {
-        $crud = $this->getCrudService();
-        $repository = $this->getRequestRepository($request);
-        $documents = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
-
         try {
-            foreach ($documents as $document) {
-                $crud->delete($repository, $document['_id']);
-            }
-            $crud->commit($repository);
-            return $this->renderRest($request, '', Response::HTTP_NO_CONTENT);
+            $data = $this->get('ongr_api.batch_request_handler')->handleRequest(
+                $request,
+                $repository = $this->getRequestRepository($request),
+                'delete'
+            );
+            return $this->renderRest($request, $data, Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->renderError($request, $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
