@@ -67,10 +67,40 @@ Note that both PUT and DELETE will require you to send the _id for every documen
 API will return a response with created products ID's if no error occurs. e.g. response:
 
 ```json
-[
-    "8b32718e91f9b62a788594525d446642",
-    "SS10043"
-]
+{
+    "took" : 13,
+    "errors" :false,
+    "items" : [
+        {
+            "create" : {
+                "_index" : "ongr_api_test",
+                "_type" : "product",
+                "_id" : "AVPLTR8LO-XYW3LRUZyP",
+                "_version" : 1,
+                "_shards" : {
+                    "total" : 2,
+                    "successful" : 1,
+                    "failed" : 0
+                },
+                "status" : 201
+            }
+        },
+        {
+            "create" : {
+                "_index" : "ongr_api_test",
+                "_type" : "product",
+                "_id" : "SS10043",
+                "_version" : 1,
+                "_shards" : {
+                    "total" : 2,
+                    "successful" : 1,
+                    "failed" : 0
+                },
+                "status" : 201
+            }
+        }
+    ]
+}
 ```
 
 ### Overview
