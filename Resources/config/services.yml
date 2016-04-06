@@ -21,6 +21,12 @@ services:
             - "@serializer"
             - %ongr_api.default_encoding%
 
+    ongr_api.field_validator:
+        class: ONGR\ApiBundle\Service\FieldValidator
+        arguments:
+            - "@es.manager"
+            - %ongr_api.versions%
+
     ongr_api.batch_request_handler:
         class: ONGR\ApiBundle\Service\BatchRequestHandler
         arguments:
