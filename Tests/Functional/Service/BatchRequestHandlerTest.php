@@ -59,8 +59,5 @@ class BatchRequestHandlerTest extends AbstractElasticsearchTestCase
         $response = json_decode($response, true);
 
         $this->assertEquals(3, count($response));
-        foreach ($response as $item) {
-            $this->assertTrue(isset($item['items'][0]['create']['_id']));
-        }
     }
 }
