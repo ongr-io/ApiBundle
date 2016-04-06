@@ -60,4 +60,14 @@ interface CrudInterface
      * @return array
      */
     public function commit(Repository $repository);
+
+    /**
+     * Gets all documents from elasticsearch
+     *
+     * @param Repository $repository
+     * @param array $params
+     *
+     * @return array
+     */
+    public function readAll(Repository $repository, array $params = []);
 }

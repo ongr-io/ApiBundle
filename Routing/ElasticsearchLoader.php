@@ -99,6 +99,11 @@ class ElasticsearchLoader extends Loader
             }
         }
 
+        $name = strtolower(sprintf('ongr_api_%s_%s_all', $version, $document));
+        $defaults['_controller'] = 'ONGRApiBundle:GetAll:getAll';
+        $postPattern = $version . '/' . sprintf('%s', strtolower($document)).'/_all';
+        $collection->add($name, new Route($postPattern, $defaults, [], [], "", [], [Request::METHOD_GET]));
+
         foreach ($endpoint['methods'] as $method) {
             $name = strtolower(sprintf('ongr_api_%s_%s_%s', $version, $document, $method));
             $defaults['_controller'] = sprintf('ONGRApiBundle:Rest:%s', strtolower($method));
