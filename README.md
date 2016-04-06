@@ -25,7 +25,7 @@ If you haven't, here's a quick [setup guide][3] on how to do it.
 Api bundle is installed using [Composer][4].
 
 ```bash
-composer require ongr/api-bundle
+composer require ongr/api-bundle "~1.0pdate"
 ```
 
 ### Step 2: Enable bundle in the AppKernel
