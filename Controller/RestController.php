@@ -46,9 +46,22 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function postAction(Request $request, $documentId = null)
     {
         $repository = $this->getRequestRepository($request);
-
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
 
+        $validation = $this->get('ongr_api.field_validator')
+            ->validateFields(
+                $request,
+                $repository,
+                $data
+            );
+
+        if (isset($validation['message'])) {
+            return $this->renderError(
+                $request,
+                $validation['message'],
+                Response::HTTP_NOT_ACCEPTABLE
+            );
+        }
         if (!empty($documentId)) {
             $data['_id'] = $documentId;
         }
@@ -73,8 +86,22 @@ class RestController extends AbstractRestController implements RestControllerInt
     public function putAction(Request $request, $documentId)
     {
         $repository = $this->getRequestRepository($request);
-
         $data = $this->get('ongr_api.request_serializer')->deserializeRequest($request);
+
+        $validation = $this->get('ongr_api.field_validator')
+            ->validateFields(
+                $request,
+                $repository,
+                $data
+            );
+
+        if (isset($validation['message'])) {
+            return $this->renderError(
+                $request,
+                $validation['message'],
+                Response::HTTP_NOT_ACCEPTABLE
+            );
+        }
 
         try {
             $this->getCrudService()->update($repository, $documentId, $data);
