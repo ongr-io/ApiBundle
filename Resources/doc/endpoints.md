@@ -19,6 +19,7 @@ Default controller status codes:
 | PUT    | 204     | 400   | 406 validation error.                                                  |
 | DELETE | 204     | 400   | 404 if not found.                                                      |
 
+As you would expect, `GET` requests are used to retrieve documents from the Elasticsearch, `DELETE` is used for removing documents, PUT -for updating documents and POST is used for indexing. The difference between POST and PUT is that PUT requires you to specify the document id in the url, as mentioned above, and POST lets Elasticsearch create a document id.
 
 
 ## Multiple insert
@@ -44,7 +45,7 @@ To index multiple documents send either a POST or PUT request, or delete multipl
 <yourdomain.com>/api/v3/product/_batch 
 ```
 
-This API endpoint takes requests bodies in a specific structure. f.e.
+This API endpoint can be accessed by sending a POST request and it takes requests bodies in a specific structure. f.e.
 
 ```json
 [
@@ -64,7 +65,7 @@ This API endpoint takes requests bodies in a specific structure. f.e.
 
 Note that both PUT and DELETE will require you to send the _id for every document.
 
-API will return a response with created products ID's if no error occurs. e.g. response:
+API will return a response with created products ID's if no error occur. e.g. response:
 
 ```json
 {
@@ -128,7 +129,7 @@ ongr_api:
                     allow_get_all: true #default: true
 ```
 
-When the `allow_get_all` is set to `true` there will be generated new route, e.g. :
+When the `allow_get_all` is set to `true` new route will be generated, e.g. :
  
 ```
 <yourdomain.com>/api/v3/product/_all
