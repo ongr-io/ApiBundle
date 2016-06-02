@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This controller works with document variants.
+ *
+ * @deprecated since 1.0. Will be removed in 2.0. Use a custom controller for your implementation of variants.
  */
 class VariantController extends AbstractRestController
 {
