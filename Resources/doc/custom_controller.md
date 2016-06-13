@@ -1,12 +1,12 @@
 # Custom controller
 
-Sometimes might be that default functionality is not enough. So for this reason you can create/extend current controller or create your own one.
+Sometimes default functionality might not be enough. For this reason you can create/extend current controller or create your own one.
 
 There are two types of controllers:
  - `RestController` extends `AbstractRestController` implements `RestControllerInterface`. Handles normal endpoint requests.
  - `BatchController` extends `AbstractRestController` implements `BatchControllerInterface`. Handles only **POST** requests.
 
-ONGRApiBundle comes with default controllers which allows you to use API functionality right after bundle install.
+ONGRApiBundle comes with default controllers which allow you to use the API functionality right after the installation of the bundle. And these default controllers are written to be able to handle the majority of your API needs, therefore check if what you need is not already covered before writing a custom controller.
 
 
 ## How to
@@ -45,5 +45,5 @@ class AppRestController extends AbstractRestController implements RestController
 
 Add a route to the `routing.yml`.
 
-It's a simple route like all other in your app. How to add routing read [the official Symfony docs](http://symfony.com/doc/current/book/routing.html). 
+It's a simple route like all others in your app. For information on how to add routing read [the official Symfony docs](http://symfony.com/doc/current/book/routing.html).
 
