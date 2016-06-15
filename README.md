@@ -5,6 +5,9 @@
 
 Api Bundle allows rapid setup of RESTful API to simplify Elasticsearch data access for the remote clients.
 
+If you need any help, [stack overflow](http://stackoverflow.com/questions/tagged/ongr)
+is the preffered and recommended way to ask ONGR support questions.
+
 [![Build Status](https://travis-ci.org/ongr-io/ApiBundle.svg?branch=master)](https://travis-ci.org/ongr-io/ApiBundle)
 
 Documentation
