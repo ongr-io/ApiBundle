@@ -1,5 +1,7 @@
 # ONGR Api Bundle
 
+[![Join the chat at https://gitter.im/ongr-io/ApiBundle](https://badges.gitter.im/ongr-io/ApiBundle.svg)](https://gitter.im/ongr-io/ApiBundle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 Api Bundle allows rapid setup of RESTful API to simplify Elasticsearch data access for the remote clients.
 
